@@ -5,6 +5,9 @@ import java.io.StringWriter;
 
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
+import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.jface.dialogs.IInputValidator;
+import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
@@ -18,14 +21,15 @@ public class Utils {
         messageBox.open();
     }
 
-    public static void showInformationMessage(Shell shell, String title, String text) {
+    public static void showInformationMessage(Shell shell, String title,
+        String text) {
         MessageBox messageBox = new MessageBox(shell, SWT.ICON_INFORMATION
-                | SWT.OK);
+            | SWT.OK);
         messageBox.setMessage(text);
         messageBox.setText(title);
         messageBox.open();
     }
-    
+
     public static void showException(Shell shell, Throwable t) {
         t.printStackTrace();
         StringWriter out = new StringWriter();
@@ -53,5 +57,24 @@ public class Utils {
     public static byte[] bytesFromHex(String hex) throws DecoderException {
         String text = hex.replaceAll(" ", "");
         return Hex.decodeHex(text.toCharArray());
+    }
+
+    public static Boolean getBooleanInput(Shell parentShell,
+        String dialogTitle, String dialogMessage, String initialValue) {
+        InputDialog inputDialog = new InputDialog(parentShell, dialogTitle,
+            dialogMessage, initialValue, new IInputValidator() {
+
+                public String isValid(String newText) {
+                    if (newText.equals("true") || newText.equals("false")) {
+                        return null;
+                    }
+                    return "Should be true or false";
+                }
+            });
+        int rc = inputDialog.open();
+        if (rc == Dialog.OK) {
+            return Boolean.parseBoolean(inputDialog.getValue());
+        }
+        return null;
     }
 }
