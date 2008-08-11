@@ -30,6 +30,9 @@ public abstract class AbstractEncoder implements SelectionListener {
             } else {
                 out = encode(inText);
             }
+            if (out == null) {
+                return;
+            }
             if (out instanceof byte[]) {
                 String bytes = Utils.bytesToHex((byte[]) out);
                 ((Button) targetText.getData()).setSelection(true);
