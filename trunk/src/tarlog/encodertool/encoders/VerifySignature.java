@@ -6,6 +6,8 @@ import java.security.cert.Certificate;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -72,7 +74,8 @@ public class VerifySignature extends KeyStoreAwareEncoder {
 
         @Override
         protected Control createDialogArea(Composite parent) {
-            Composite composite = (Composite) super.createDialogArea(parent);
+            Composite composite = new Composite((Composite) super.createDialogArea(parent), SWT.NONE);
+            composite.setLayout(new GridLayout(2, false));
             Label label = new Label(composite, SWT.NONE);
             label.setText("Algorithm: ");
             uiAlgorithm = new Combo(composite, SWT.DROP_DOWN);
@@ -92,7 +95,10 @@ public class VerifySignature extends KeyStoreAwareEncoder {
 
             label = new Label(composite, SWT.NONE);
             label.setText("Signature (as bytes): ");
-            uiSignature = new Text(composite, SWT.SINGLE | SWT.BORDER);
+            uiSignature = new Text(composite, SWT.MULTI | SWT.BORDER);
+            GridData layoutData = new GridData(GridData.FILL_BOTH);
+            layoutData.verticalSpan = 3;
+            uiSignature.setLayoutData(layoutData);
             if (signature != null) {
                 uiSignature.setText(signature);
             }
