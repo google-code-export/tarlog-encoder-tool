@@ -14,7 +14,7 @@ public class InflaterEncoder extends AbstractEncoder {
 
     @Override
     public String getName() {
-        return "Inflater";
+        return "Inflate";
     }
 
     @Override

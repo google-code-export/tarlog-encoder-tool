@@ -6,6 +6,7 @@ import java.security.Signature;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -34,7 +35,7 @@ public class SignatureEncoder extends KeyStoreAwareEncoder {
                 "Key store should be initialized");
             return null;
         }
-        InputDialog inputDialog = new InputDialog(shell);
+        SigDetailsDialog inputDialog = new SigDetailsDialog(shell);
         int rc = inputDialog.open();
         if (rc != Dialog.OK) {
             return null;
@@ -57,13 +58,13 @@ public class SignatureEncoder extends KeyStoreAwareEncoder {
     private String alias;
     private String password;
 
-    public class InputDialog extends Dialog {
+    public class SigDetailsDialog extends Dialog {
 
         private Combo uiAlgorithm;
         private Text  uiAlias;
         private Text  uiPassword;
 
-        public InputDialog(Shell parent) {
+        public SigDetailsDialog(Shell parent) {
             super(parent);
         }
 
@@ -74,7 +75,9 @@ public class SignatureEncoder extends KeyStoreAwareEncoder {
 
         @Override
         protected Control createDialogArea(Composite parent) {
-            Composite composite = (Composite) super.createDialogArea(parent);
+            Composite composite = new Composite(
+                (Composite) super.createDialogArea(parent), SWT.NONE);
+            composite.setLayout(new GridLayout(2, false));
             Label label = new Label(composite, SWT.NONE);
             label.setText("Algorithm: ");
             uiAlgorithm = new Combo(composite, SWT.DROP_DOWN);

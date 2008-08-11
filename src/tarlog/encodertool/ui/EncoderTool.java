@@ -1,6 +1,9 @@
 package tarlog.encodertool.ui;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Iterator;
 import java.util.Properties;
 import java.util.TreeSet;
@@ -9,6 +12,9 @@ import org.eclipse.jface.window.ApplicationWindow;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.ImageData;
+import org.eclipse.swt.graphics.ImageLoader;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.RowLayout;
@@ -47,11 +53,26 @@ public class EncoderTool extends ApplicationWindow {
         open();
     }
 
+    private Image getImage() {
+        try {
+            InputStream img = new FileInputStream("icons/encoders.jpg");
+            ImageLoader imageLoader = new ImageLoader();
+            ImageData[] load = imageLoader.load(img);
+            return new Image(shell.getDisplay(), load[0]);
+        } catch (FileNotFoundException e) {
+            return null;
+        }
+    }
+
     @Override
     protected Control createContents(Composite parent) {
         shell = getShell();
         shell.setText("Encoder Tool");
-        shell.setMaximized(true);
+        Image image = getImage();
+        if (image != null) {
+            shell.setImage(image);
+        }
+        //        shell.setMaximized(true);
 
         SashForm sashForm = new SashForm(shell, SWT.VERTICAL);
         createTopPart(sashForm);
@@ -77,7 +98,7 @@ public class EncoderTool extends ApplicationWindow {
 
                 String oldText = sourceText.getText();
                 boolean oldBytesButtonStatus = sourceBytesButton.getSelection();
-                
+
                 sourceText.setText(targetText.getText());
                 sourceBytesButton.setSelection(targetBytesButton.getSelection());
                 targetText.setText(oldText);
