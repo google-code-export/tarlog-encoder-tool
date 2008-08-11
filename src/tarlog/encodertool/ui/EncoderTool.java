@@ -1,7 +1,9 @@
 package tarlog.encodertool.ui;
 
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.Properties;
+import java.util.TreeSet;
 
 import org.eclipse.jface.window.ApplicationWindow;
 import org.eclipse.swt.SWT;
@@ -62,8 +64,26 @@ public class EncoderTool extends ApplicationWindow {
 
     private void createTopPart(Composite parent) {
         Composite composite = new Composite(parent, SWT.BORDER);
-        composite.setLayout(new GridLayout());
+        composite.setLayout(new GridLayout(2, false));
         sourceText = createTextEditor(composite, SWT.MULTI | SWT.BORDER);
+        Button exchange = new Button(composite, SWT.PUSH);
+        exchange.setText("<>");
+        exchange.addSelectionListener(new AbstractSelectionListener() {
+
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                Button sourceBytesButton = (Button) sourceText.getData();
+                Button targetBytesButton = (Button) targetText.getData();
+
+                String oldText = sourceText.getText();
+                boolean oldBytesButtonStatus = sourceBytesButton.getSelection();
+                
+                sourceText.setText(targetText.getText());
+                sourceBytesButton.setSelection(targetBytesButton.getSelection());
+                targetText.setText(oldText);
+                targetBytesButton.setSelection(oldBytesButtonStatus);
+            }
+        });
     }
 
     private void createBottomPart(Composite parent) {
@@ -81,15 +101,19 @@ public class EncoderTool extends ApplicationWindow {
     }
 
     private void load() {
-        for (Object property : properties.values()) {
+        @SuppressWarnings("unchecked")
+        TreeSet<String> names = new TreeSet(properties.keySet());
+
+        for (Iterator<String> itr = names.iterator(); itr.hasNext();) {
             try {
                 @SuppressWarnings("unchecked")
-                Class<AbstractEncoder> clazz = (Class<AbstractEncoder>) Class.forName(property.toString());
+                Class<AbstractEncoder> clazz = (Class<AbstractEncoder>) Class.forName(properties.getProperty(itr.next()));
                 final AbstractEncoder encoder = clazz.newInstance();
                 encoder.setSource(sourceText);
                 encoder.setTarget(targetText);
                 encoder.setShell(shell);
-                final Composite composite = new Composite(leftComposite, SWT.NULL);
+                final Composite composite = new Composite(leftComposite,
+                    SWT.NULL);
                 RowLayout layout = new RowLayout();
                 layout.type = SWT.HORIZONTAL;
                 composite.setLayout(layout);
@@ -113,7 +137,7 @@ public class EncoderTool extends ApplicationWindow {
                     }
                 });
                 if (encoder instanceof FileAware) {
-                    Button fileButton = new Button(composite, SWT.PUSH);
+                    Button fileButton = new Button(composite, SWT.ARROW);
                     fileButton.setText("...");
                     fileButton.addSelectionListener(new AbstractSelectionListener() {
 
@@ -140,9 +164,12 @@ public class EncoderTool extends ApplicationWindow {
     }
 
     private Text createTextEditor(Composite parent, int style) {
-        Text text = new Text(parent, style | SWT.WRAP);
+        Composite composite = new Composite(parent, SWT.NONE);
+        composite.setLayout(new GridLayout());
+        composite.setLayoutData(new GridData(GridData.FILL_BOTH));
+        Text text = new Text(composite, style | SWT.WRAP);
         text.setLayoutData(new GridData(GridData.FILL_BOTH));
-        final Button showBytesButton = new Button(parent, SWT.CHECK);
+        final Button showBytesButton = new Button(composite, SWT.CHECK);
         showBytesButton.setData(text);
         text.setData(showBytesButton);
         showBytesButton.setText("Show bytes");
