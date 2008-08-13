@@ -1,8 +1,12 @@
 package tarlog.encodertool.encoders;
 
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.security.PublicKey;
 import java.security.Signature;
-import java.security.cert.Certificate;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
 
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
@@ -18,11 +22,47 @@ import org.eclipse.swt.widgets.Text;
 
 import tarlog.encodertool.Utils;
 
-public class VerifySignature extends KeyStoreAwareEncoder {
+public class X509CertificateEncoder extends FileAwareEncoder {
+
+    private X509Certificate cert;
 
     @Override
     public String getEncoderName() {
-        return "Verify Signature";
+        return "X509 Verifier";
+    }
+
+    @Override
+    public void setFileName(String fileName) {
+        try {
+            super.setFileName(fileName);
+            InputStream inStream = new FileInputStream(fileName);
+            CertificateFactory cf = CertificateFactory.getInstance("X.509");
+            cert = (X509Certificate) cf.generateCertificate(inStream);
+            inStream.close();
+        } catch (Exception e) {
+            Utils.showException(shell, e);
+        }
+    }
+
+    @Override
+    public Object encode(byte[] source) {
+        SigDetailsDialog inputDialog = new SigDetailsDialog(shell);
+        int rc = inputDialog.open();
+        if (rc != Dialog.OK) {
+            return null;
+        }
+        try {
+            PublicKey publicKey = cert.getPublicKey();
+            System.out.println("Using public key: "
+                + publicKey.toString());
+            Signature sig = Signature.getInstance(algorithm);
+            sig.initVerify(publicKey);
+            sig.update(source);
+            return String.valueOf(sig.verify(Utils.bytesFromHex(signature)));
+        } catch (Exception e) {
+            Utils.showException(shell, e);
+            return null;
+        }
     }
 
     @Override
@@ -35,38 +75,14 @@ public class VerifySignature extends KeyStoreAwareEncoder {
         }
     }
 
-    @Override
-    public Object encode(byte[] source) {
-        if (keystore == null) {
-            Utils.showErrorMessage(shell, "Error",
-                "Key store should be initialized");
-            return null;
-        }
-        SigDetailsDialog inputDialog = new SigDetailsDialog(shell);
-        int rc = inputDialog.open();
-        if (rc != Dialog.OK) {
-            return null;
-        }
-        try {
-            Signature sig = Signature.getInstance(algorithm);
-            Certificate certificate = keystore.getCertificate(alias);
-            sig.initVerify(certificate.getPublicKey());
-            sig.update(source);
-            return String.valueOf(sig.verify(Utils.bytesFromHex(signature)));
-        } catch (Exception e) {
-            Utils.showException(shell, e);
-            return null;
-        }
-    }
-
     private String algorithm;
-    private String alias;
+    //    private String alias;
     private String signature;
 
     public class SigDetailsDialog extends Dialog {
 
         private Combo uiAlgorithm;
-        private Text  uiAlias;
+        //        private Text  uiAlias;
         private Text  uiSignature;
 
         public SigDetailsDialog(Shell parent) {
@@ -93,12 +109,12 @@ public class VerifySignature extends KeyStoreAwareEncoder {
             } else {
                 uiAlgorithm.setText("SHA1withDSA");
             }
-            label = new Label(composite, SWT.NONE);
-            label.setText("Certificate: ");
-            uiAlias = new Text(composite, SWT.SINGLE | SWT.BORDER);
-            if (alias != null) {
-                uiAlias.setText(alias);
-            }
+            //            label = new Label(composite, SWT.NONE);
+            //            label.setText("Certificate: ");
+            //            uiAlias = new Text(composite, SWT.SINGLE | SWT.BORDER);
+            //            if (alias != null) {
+            //                uiAlias.setText(alias);
+            //            }
 
             label = new Label(composite, SWT.NONE);
             label.setText("Signature (as bytes): ");
@@ -115,12 +131,11 @@ public class VerifySignature extends KeyStoreAwareEncoder {
         protected void buttonPressed(int buttonId) {
             if (buttonId == IDialogConstants.OK_ID) {
                 algorithm = uiAlgorithm.getText();
-                alias = uiAlias.getText();
+                //                alias = uiAlias.getText();
                 signature = uiSignature.getText();
             }
             super.buttonPressed(buttonId);
         }
 
     }
-
 }

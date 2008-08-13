@@ -16,7 +16,12 @@ public class MyUrlDecoder extends AbstractEncoder {
     
     @Override
     public Object encode(byte[] source) {
-        return encode(new String(source));
+        try {
+            return encode(new String(source, "UTF-8"));
+        } catch (UnsupportedEncodingException e) {
+            Utils.showException(shell, e);
+            return null;
+        }
     }
     
     @Override

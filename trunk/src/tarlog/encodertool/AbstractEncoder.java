@@ -25,8 +25,7 @@ public abstract class AbstractEncoder implements SelectionListener {
             String inText = sourceText.getText();
             Object out;
             if (sourceBytes) {
-                String bytes = new String(Utils.bytesFromHex(inText));
-                out = encode(bytes.getBytes());
+                out = encode(Utils.bytesFromHex(inText));
             } else {
                 out = encode(inText);
             }
