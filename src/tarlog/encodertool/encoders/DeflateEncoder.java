@@ -2,6 +2,7 @@ package tarlog.encodertool.encoders;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.zip.Deflater;
 import java.util.zip.DeflaterOutputStream;
 
@@ -42,7 +43,12 @@ public class DeflateEncoder extends AbstractEncoder {
 
     @Override
     public Object encode(String source) {
-        return encode(source.getBytes());
+        try {
+            return encode(source.getBytes("UTF-8"));
+        } catch (UnsupportedEncodingException e) {
+            Utils.showException(shell, e);
+            return null;
+        }
     }
 
 }

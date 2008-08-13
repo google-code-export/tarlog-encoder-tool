@@ -46,7 +46,6 @@ public class SignatureEncoder extends KeyStoreAwareEncoder {
                 password.toCharArray());
             sig.initSign(privateKey);
             sig.update(source);
-            Utils.showInformationMessage(shell, "Signing", new String(source));
             return sig.sign();
         } catch (Exception e) {
             Utils.showException(shell, e);
@@ -80,7 +79,7 @@ public class SignatureEncoder extends KeyStoreAwareEncoder {
             composite.setLayout(new GridLayout(2, false));
             Label label = new Label(composite, SWT.NONE);
             label.setText("Algorithm: ");
-            uiAlgorithm = new Combo(composite, SWT.DROP_DOWN);
+            uiAlgorithm = new Combo(composite, SWT.DROP_DOWN | SWT.READ_ONLY);
             uiAlgorithm.add("SHA1withDSA");
             uiAlgorithm.add("SHA1withRSA");
             if (algorithm != null) {
@@ -89,7 +88,7 @@ public class SignatureEncoder extends KeyStoreAwareEncoder {
                 uiAlgorithm.setText("SHA1withDSA");
             }
             label = new Label(composite, SWT.NONE);
-            label.setText("Private Key: ");
+            label.setText("Private Key Alias: ");
             uiAlias = new Text(composite, SWT.SINGLE | SWT.BORDER);
             if (alias != null) {
                 uiAlias.setText(alias);

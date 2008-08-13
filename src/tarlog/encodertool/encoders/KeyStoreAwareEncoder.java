@@ -17,7 +17,7 @@ public abstract class KeyStoreAwareEncoder extends FileAwareEncoder {
     public void setFileName(String fileName) {
         super.setFileName(fileName);
         InputDialog inputDialog = new InputDialog(shell, "Keystore type",
-            "Please, enter the keystore type", "JKS", new IInputValidator() {
+            "Please, enter the keystore type", "JKS",null /* new IInputValidator() {
 
                 public String isValid(String newText) {
                     if (newText.equals("JKS") || newText.equals("PKCS12")) {
@@ -25,7 +25,7 @@ public abstract class KeyStoreAwareEncoder extends FileAwareEncoder {
                     }
                     return "Currently only JKS or PKCS12 are supported";
                 }
-            });
+            }*/);
         int rc = inputDialog.open();
         String type;
         if (rc != InputDialog.OK) {

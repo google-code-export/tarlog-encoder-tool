@@ -46,6 +46,8 @@ public class EncoderTool extends ApplicationWindow {
     }
 
     public void init() throws IOException {
+
+        
         properties = new Properties();
         properties.load(getClass().getClassLoader().getResourceAsStream(
             ENCODERS_FILE));
@@ -68,6 +70,7 @@ public class EncoderTool extends ApplicationWindow {
     protected Control createContents(Composite parent) {
         shell = getShell();
         shell.setText("Encoder Tool");
+        shell.setSize(1000, 700);
         Image image = getImage();
         if (image != null) {
             shell.setImage(image);
