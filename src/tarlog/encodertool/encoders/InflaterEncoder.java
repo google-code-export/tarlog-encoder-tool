@@ -47,8 +47,4 @@ public class InflaterEncoder extends AbstractEncoder {
         }
     }
 
-    @Override
-    public Object encode(String source) {
-        return encode(source.getBytes());
-    }
 }

@@ -24,11 +24,6 @@ public class SignatureEncoder extends KeyStoreAwareEncoder {
     }
 
     @Override
-    public Object encode(String source) {
-        return encode(source.getBytes());
-    }
-
-    @Override
     public Object encode(byte[] source) {
         if (keystore == null) {
             Utils.showErrorMessage(shell, "Error",

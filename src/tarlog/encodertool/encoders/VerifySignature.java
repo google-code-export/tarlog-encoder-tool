@@ -1,6 +1,5 @@
 package tarlog.encodertool.encoders;
 
-import java.io.UnsupportedEncodingException;
 import java.security.Signature;
 import java.security.cert.Certificate;
 
@@ -23,16 +22,6 @@ public class VerifySignature extends KeyStoreAwareEncoder {
     @Override
     public String getEncoderName() {
         return "Verify Signature";
-    }
-
-    @Override
-    public Object encode(String source) {
-        try {
-            return encode(source.getBytes("UTF-8"));
-        } catch (UnsupportedEncodingException e) {
-            Utils.showException(shell, e);
-            return null;
-        }
     }
 
     @Override
