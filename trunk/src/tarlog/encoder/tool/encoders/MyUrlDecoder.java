@@ -1,24 +1,24 @@
-package tarlog.encodertool.encoders;
+package tarlog.encoder.tool.encoders;
 
 import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
+import java.net.URLDecoder;
 
 import tarlog.encoder.tool.AbstractEncoder;
 import tarlog.encoder.tool.Utils;
 
 
-public class MyUrlEncoder extends AbstractEncoder {
+public class MyUrlDecoder extends AbstractEncoder {
 
     @Override
     public String getName() {
-        return "URL Encoder";
+        return "URL Decoder";
     }
     
     
     @Override
     public Object encode(String source) {
         try {
-            return URLEncoder.encode(source, "UTF-8");
+            return URLDecoder.decode(source, "UTF-8");
         } catch (UnsupportedEncodingException e) {
             Utils.showException(shell, e);
             return null;

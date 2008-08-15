@@ -1,5 +1,5 @@
 // (C) Copyright 2003-2008 Hewlett-Packard Development Company, L.P.
-package tarlog.encodertool.encoders;
+package tarlog.encoder.tool.encoders;
 
 import org.apache.commons.codec.binary.Base64;
 

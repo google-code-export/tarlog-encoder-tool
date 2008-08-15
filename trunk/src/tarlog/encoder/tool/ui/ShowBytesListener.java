@@ -1,4 +1,4 @@
-package tarlog.encodertool.ui;
+package tarlog.encoder.tool.ui;
 
 import org.apache.commons.codec.DecoderException;
 import org.eclipse.swt.events.SelectionEvent;

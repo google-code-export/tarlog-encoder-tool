@@ -7,7 +7,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
-import tarlog.encodertool.ui.AbstractSelectionListener;
+import tarlog.encoder.tool.ui.AbstractSelectionListener;
 
 /**
  * Basic class for all encoders. The implementing class should extend from this class
