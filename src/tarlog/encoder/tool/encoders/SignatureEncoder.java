@@ -1,16 +1,11 @@
-package tarlog.encodertool.encoders;
+package tarlog.encoder.tool.encoders;
 
-import java.io.FileInputStream;
-import java.io.InputStream;
-import java.security.PublicKey;
+import java.security.PrivateKey;
 import java.security.Signature;
-import java.security.cert.CertificateFactory;
-import java.security.cert.X509Certificate;
 
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
@@ -19,63 +14,50 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
-import tarlog.encoder.tool.FileAwareEncoder;
+import tarlog.encoder.tool.KeyStoreAwareEncoder;
 import tarlog.encoder.tool.Utils;
 
-public class X509CertificateEncoder extends FileAwareEncoder {
-
-    private X509Certificate cert;
+public class SignatureEncoder extends KeyStoreAwareEncoder {
 
     @Override
     public String getEncoderName() {
-        return "X509 Verifier";
-    }
-
-    @Override
-    public void setFileName(String fileName) {
-        try {
-            super.setFileName(fileName);
-            InputStream inStream = new FileInputStream(fileName);
-            CertificateFactory cf = CertificateFactory.getInstance("X.509");
-            cert = (X509Certificate) cf.generateCertificate(inStream);
-            inStream.close();
-        } catch (Exception e) {
-            Utils.showException(shell, e);
-            super.setFileName(null);
-        }
+        return "Create Signature";
     }
 
     @Override
     public Object encode(byte[] source) {
+        if (keystore == null) {
+            Utils.showErrorMessage(shell, "Error",
+                "Key store should be initialized");
+            return null;
+        }
         SigDetailsDialog inputDialog = new SigDetailsDialog(shell);
         int rc = inputDialog.open();
         if (rc != Dialog.OK) {
             return null;
         }
         try {
-            PublicKey publicKey = cert.getPublicKey();
-            System.out.println("Using public key: "
-                + publicKey.toString());
             Signature sig = Signature.getInstance(algorithm);
-            sig.initVerify(publicKey);
+            PrivateKey privateKey = (PrivateKey) keystore.getKey(alias,
+                password.toCharArray());
+            sig.initSign(privateKey);
             sig.update(source);
-            return String.valueOf(sig.verify(Utils.bytesFromHex(signature)));
+            return sig.sign();
         } catch (Exception e) {
             Utils.showException(shell, e);
             return null;
         }
     }
 
-
     private String algorithm;
-    //    private String alias;
-    private String signature;
+    private String alias;
+    private String password;
 
     public class SigDetailsDialog extends Dialog {
 
         private Combo uiAlgorithm;
-        //        private Text  uiAlias;
-        private Text  uiSignature;
+        private Text  uiAlias;
+        private Text  uiPassword;
 
         public SigDetailsDialog(Shell parent) {
             super(parent);
@@ -101,21 +83,17 @@ public class X509CertificateEncoder extends FileAwareEncoder {
             } else {
                 uiAlgorithm.setText("SHA1withDSA");
             }
-            //            label = new Label(composite, SWT.NONE);
-            //            label.setText("Certificate: ");
-            //            uiAlias = new Text(composite, SWT.SINGLE | SWT.BORDER);
-            //            if (alias != null) {
-            //                uiAlias.setText(alias);
-            //            }
-
             label = new Label(composite, SWT.NONE);
-            label.setText("Signature (as bytes): ");
-            uiSignature = new Text(composite, SWT.MULTI | SWT.BORDER);
-            GridData layoutData = new GridData(GridData.FILL_BOTH);
-            layoutData.verticalSpan = 3;
-            uiSignature.setLayoutData(layoutData);
-            if (signature != null) {
-                uiSignature.setText(signature);
+            label.setText("Private Key Alias: ");
+            uiAlias = new Text(composite, SWT.SINGLE | SWT.BORDER);
+            if (alias != null) {
+                uiAlias.setText(alias);
+            }
+            label = new Label(composite, SWT.NONE);
+            label.setText("Private Key Password: ");
+            uiPassword = new Text(composite, SWT.SINGLE | SWT.BORDER);
+            if (password != null) {
+                uiPassword.setText(password);
             }
             return composite;
         }
@@ -123,8 +101,8 @@ public class X509CertificateEncoder extends FileAwareEncoder {
         protected void buttonPressed(int buttonId) {
             if (buttonId == IDialogConstants.OK_ID) {
                 algorithm = uiAlgorithm.getText();
-                //                alias = uiAlias.getText();
-                signature = uiSignature.getText();
+                alias = uiAlias.getText();
+                password = uiPassword.getText();
             }
             super.buttonPressed(buttonId);
         }

@@ -1,4 +1,4 @@
-package tarlog.encodertool.ui;
+package tarlog.encoder.tool.ui;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;

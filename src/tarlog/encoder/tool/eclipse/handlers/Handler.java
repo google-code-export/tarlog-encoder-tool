@@ -6,7 +6,7 @@ import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 
-import tarlog.encodertool.ui.EncoderTool;
+import tarlog.encoder.tool.ui.EncoderTool;
 
 /**
  * Our sample handler extends AbstractHandler, an IHandler base class.
