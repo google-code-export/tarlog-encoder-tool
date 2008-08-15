@@ -1,4 +1,4 @@
-package tarlog.encodertool.encoders;
+package tarlog.encoder.tool;
 
 import java.io.FileInputStream;
 import java.security.KeyStore;
@@ -6,7 +6,6 @@ import java.security.KeyStoreException;
 
 import org.eclipse.jface.dialogs.InputDialog;
 
-import tarlog.encodertool.Utils;
 
 public abstract class KeyStoreAwareEncoder extends FileAwareEncoder {
 

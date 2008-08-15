@@ -1,4 +1,4 @@
-package tarlog.encodertool.eclipse.handlers;
+package tarlog.encoder.tool.eclipse.handlers;
 
 import java.io.IOException;
 

@@ -1,9 +1,9 @@
-package tarlog.encodertool.eclipse.preferences;
+package tarlog.encoder.tool.eclipse.preferences;
 
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.jface.preference.IPreferenceStore;
 
-import tarlog.encodertool.eclipse.Activator;
+import tarlog.encoder.tool.eclipse.Activator;
 
 /**
  * Class used to initialize default preference values.

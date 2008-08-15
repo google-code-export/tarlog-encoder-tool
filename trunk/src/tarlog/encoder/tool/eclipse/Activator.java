@@ -1,4 +1,4 @@
-package tarlog.encodertool.eclipse;
+package tarlog.encoder.tool.eclipse;
 
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;

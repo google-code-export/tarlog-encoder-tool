@@ -16,7 +16,7 @@
    <extension
          point="org.eclipse.ui.handlers">
       <handler
-            class="tarlog.encodertool.eclipse.handlers.Handler"
+            class="tarlog.encoder.tool.eclipse.handlers.Handler"
             commandId="tarlog.encoder.commands.run">
       </handler>
    </extension>
@@ -38,15 +38,15 @@
    <extension
          point="org.eclipse.ui.preferencePages">
       <page
-            class="tarlog.encodertool.eclipse.preferences.EncoderToolPreferencePage"
-            id="tarlog.encodertool.eclipse.preferences.EncoderToolPreferencePage"
+            class="tarlog.encoder.tool.eclipse.preferences.EncoderToolPreferencePage"
+            id="tarlog.encoder.tool.eclipse.preferences.EncoderToolPreferencePage"
             name="Encoder Tool Preferences">
       </page>
    </extension>
    <extension
          point="org.eclipse.core.runtime.preferences">
       <initializer
-            class="tarlog.encodertool.eclipse.preferences.PreferenceInitializer">
+            class="tarlog.encoder.tool.eclipse.preferences.PreferenceInitializer">
       </initializer>
    </extension>
    </plugin>

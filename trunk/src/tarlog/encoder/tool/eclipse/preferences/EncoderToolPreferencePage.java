@@ -1,9 +1,10 @@
-package tarlog.encodertool.eclipse.preferences;
+package tarlog.encoder.tool.eclipse.preferences;
 
 import org.eclipse.jface.preference.*;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.eclipse.ui.IWorkbench;
-import tarlog.encodertool.eclipse.Activator;
+
+import tarlog.encoder.tool.eclipse.Activator;
 
 /**
  * This class represents a preference page that

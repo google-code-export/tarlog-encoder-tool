@@ -3,8 +3,8 @@ package tarlog.encodertool.encoders;
 
 import org.apache.commons.codec.binary.Base64;
 
-import tarlog.encodertool.AbstractEncoder;
-import tarlog.encodertool.Utils;
+import tarlog.encoder.tool.AbstractEncoder;
+import tarlog.encoder.tool.Utils;
 
 
 /**

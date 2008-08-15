@@ -14,7 +14,8 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
-import tarlog.encodertool.Utils;
+import tarlog.encoder.tool.KeyStoreAwareEncoder;
+import tarlog.encoder.tool.Utils;
 
 public class SignatureEncoder extends KeyStoreAwareEncoder {
 
