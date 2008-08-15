@@ -1,4 +1,4 @@
-package tarlog.encodertool;
+package tarlog.encoder.tool;
 
 import java.io.UnsupportedEncodingException;
 
@@ -9,6 +9,10 @@ import org.eclipse.swt.widgets.Text;
 
 import tarlog.encodertool.ui.AbstractSelectionListener;
 
+/**
+ * Basic class for all encoders. The implementing class should extend from this class
+ * and override at least one encode method.
+ */
 public abstract class AbstractEncoder extends AbstractSelectionListener {
 
     private Text    targetText;
@@ -33,7 +37,7 @@ public abstract class AbstractEncoder extends AbstractSelectionListener {
         }
     }
 
-    public void widgetSelected(SelectionEvent e) {
+    final public void widgetSelected(SelectionEvent e) {
         try {
             boolean sourceBytes = ((Button) sourceText.getData()).getSelection();
             String inText = sourceText.getText();
@@ -59,6 +63,19 @@ public abstract class AbstractEncoder extends AbstractSelectionListener {
         }
     }
 
+    /**
+     * <p>
+     * Method is invoked to convert text source
+     * <p>
+     * Override this method to add a specific behavior. By default
+     * <tt>encode(byte[] source)</tt> is invoked.
+     * 
+     * @param source
+     * @return the result of the encoding. Usually should be either String or
+     *         byte[]. Otherwise toString() of the result will be invoked. In
+     *         case of null, the method invocation will be canceled and the
+     *         result will remain unchanged.
+     */
     public Object encode(String source) {
         try {
             return encode(source.getBytes("UTF-8"));
@@ -68,6 +85,19 @@ public abstract class AbstractEncoder extends AbstractSelectionListener {
         }
     }
 
+    /**
+     * <p>
+     * Method is invoked to convert bytes source
+     * <p>
+     * Override this method to add a specific behavior. By default
+     * <tt>encode(String source)</tt> is invoked.
+     * 
+     * @param source
+     * @return the result of the encoding. Usually should be either String or
+     *         byte[]. Otherwise toString() of the result will be invoked. In
+     *         case of null, the method invocation will be canceled and the
+     *         result will remain unchanged.
+     */
     public Object encode(byte[] source) {
         try {
             return encode(new String(source, "UTF-8"));
@@ -77,6 +107,9 @@ public abstract class AbstractEncoder extends AbstractSelectionListener {
         }
     }
 
+    /**
+     * @return the name of the encoder
+     */
     public abstract String getName();
 
     public void setTarget(Text targetText) {

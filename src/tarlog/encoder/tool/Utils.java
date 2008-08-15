@@ -1,4 +1,4 @@
-package tarlog.encodertool;
+package tarlog.encoder.tool;
 
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;

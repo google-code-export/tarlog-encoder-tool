@@ -1,4 +1,4 @@
-package tarlog.encodertool.eclipse.preferences;
+package tarlog.encoder.tool.eclipse.preferences;
 
 /**
  * Constant definitions for plug-in preferences

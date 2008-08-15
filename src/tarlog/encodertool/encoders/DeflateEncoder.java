@@ -5,8 +5,8 @@ import java.io.IOException;
 import java.util.zip.Deflater;
 import java.util.zip.DeflaterOutputStream;
 
-import tarlog.encodertool.AbstractEncoder;
-import tarlog.encodertool.Utils;
+import tarlog.encoder.tool.AbstractEncoder;
+import tarlog.encoder.tool.Utils;
 
 public class DeflateEncoder extends AbstractEncoder {
 

@@ -1,4 +1,4 @@
-package tarlog.encodertool;
+package tarlog.encoder.tool;
 
 
 public interface FileAware {

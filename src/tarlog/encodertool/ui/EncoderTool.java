@@ -26,9 +26,9 @@ import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
-import tarlog.encodertool.AbstractEncoder;
-import tarlog.encodertool.FileAware;
-import tarlog.encodertool.Utils;
+import tarlog.encoder.tool.AbstractEncoder;
+import tarlog.encoder.tool.FileAware;
+import tarlog.encoder.tool.Utils;
 
 /**
  *

@@ -2,8 +2,8 @@ package tarlog.encodertool.encoders;
 
 import java.util.zip.Inflater;
 
-import tarlog.encodertool.AbstractEncoder;
-import tarlog.encodertool.Utils;
+import tarlog.encoder.tool.AbstractEncoder;
+import tarlog.encoder.tool.Utils;
 
 public class InflaterEncoder extends AbstractEncoder {
 

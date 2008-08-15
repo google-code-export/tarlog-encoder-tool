@@ -1,9 +1,7 @@
-package tarlog.encodertool.encoders;
+package tarlog.encoder.tool;
 
 import java.io.File;
 
-import tarlog.encodertool.AbstractEncoder;
-import tarlog.encodertool.FileAware;
 
 public abstract class FileAwareEncoder extends AbstractEncoder implements
     FileAware {
@@ -11,7 +9,7 @@ public abstract class FileAwareEncoder extends AbstractEncoder implements
     private File file;
 
     @Override
-    public String getName() {
+    final public String getName() {
         return getEncoderName() + " (" + (file == null ? "null" : file.getName())
             + ")";
     }

@@ -19,7 +19,8 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
-import tarlog.encodertool.Utils;
+import tarlog.encoder.tool.FileAwareEncoder;
+import tarlog.encoder.tool.Utils;
 
 public class X509CertificateEncoder extends FileAwareEncoder {
 

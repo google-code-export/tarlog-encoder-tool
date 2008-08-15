@@ -5,7 +5,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Text;
 
-import tarlog.encodertool.Utils;
+import tarlog.encoder.tool.Utils;
 
 public class ShowBytesListener extends AbstractSelectionListener {
 
