@@ -3,12 +3,13 @@ package tarlog.encodertool;
 import java.io.UnsupportedEncodingException;
 
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
-public abstract class AbstractEncoder implements SelectionListener {
+import tarlog.encodertool.ui.AbstractSelectionListener;
+
+public abstract class AbstractEncoder extends AbstractSelectionListener {
 
     private Text    targetText;
     private Text    sourceText;
@@ -16,19 +17,20 @@ public abstract class AbstractEncoder implements SelectionListener {
 
     public AbstractEncoder() {
         try {
+            // verify that at least one encode method was overriden
             Class<? extends AbstractEncoder> realClass = getClass();
             if (realClass.getMethod("encode", String.class).getDeclaringClass() != realClass
                 && realClass.getMethod("encode", byte[].class).getDeclaringClass() != realClass) {
-                throw new RuntimeException(String.format("The encoder class %s must override at least one 'encode' method", realClass.getName()));
+                throw new RuntimeException(
+                    String.format(
+                        "The encoder class %s must override at least one 'encode' method",
+                        realClass.getName()));
             }
         } catch (SecurityException e) {
             throw new RuntimeException(e);
         } catch (NoSuchMethodException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    public void widgetDefaultSelected(SelectionEvent e) {
     }
 
     public void widgetSelected(SelectionEvent e) {

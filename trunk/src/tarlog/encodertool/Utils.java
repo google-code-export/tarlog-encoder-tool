@@ -1,11 +1,12 @@
 package tarlog.encodertool;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.MultiStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.IInputValidator;
 import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.swt.SWT;
@@ -32,9 +33,11 @@ public class Utils {
 
     public static void showException(Shell shell, Throwable t) {
         t.printStackTrace();
-        StringWriter out = new StringWriter();
-        t.printStackTrace(new PrintWriter(out));
-        Utils.showErrorMessage(shell, "Exception occured", out.toString());
+        MultiStatus info = new MultiStatus("OK", IStatus.ERROR, t.getMessage(), t);
+        for (StackTraceElement stackTraceElement : t.getStackTrace()) {
+            info.add(new Status(IStatus.ERROR, "OK", stackTraceElement.toString()));
+        }
+        ErrorDialog.openError(shell, "Exception occured", null, info);
     }
 
     public static String bytesToHex(String string) {
