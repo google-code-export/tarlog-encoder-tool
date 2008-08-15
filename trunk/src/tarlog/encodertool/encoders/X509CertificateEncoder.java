@@ -2,7 +2,6 @@ package tarlog.encodertool.encoders;
 
 import java.io.FileInputStream;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.security.PublicKey;
 import java.security.Signature;
 import java.security.cert.CertificateFactory;
@@ -41,6 +40,7 @@ public class X509CertificateEncoder extends FileAwareEncoder {
             inStream.close();
         } catch (Exception e) {
             Utils.showException(shell, e);
+            super.setFileName(null);
         }
     }
 
@@ -65,15 +65,6 @@ public class X509CertificateEncoder extends FileAwareEncoder {
         }
     }
 
-    @Override
-    public Object encode(String source) {
-        try {
-            return encode(source.getBytes("UTF-8"));
-        } catch (UnsupportedEncodingException e) {
-            Utils.showException(shell, e);
-            return null;
-        }
-    }
 
     private String algorithm;
     //    private String alias;

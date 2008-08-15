@@ -11,6 +11,7 @@ import java.util.TreeSet;
 import org.eclipse.jface.window.ApplicationWindow;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
+import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
@@ -47,7 +48,6 @@ public class EncoderTool extends ApplicationWindow {
 
     public void init() throws IOException {
 
-        
         properties = new Properties();
         properties.load(getClass().getClassLoader().getResourceAsStream(
             ENCODERS_FILE));
@@ -118,10 +118,14 @@ public class EncoderTool extends ApplicationWindow {
     }
 
     private void createLeftPart(Composite parent) {
-        leftComposite = new Composite(parent, SWT.BORDER);
-        RowLayout layout = new RowLayout();
-        layout.type = SWT.VERTICAL;
+        final ScrolledComposite scrolledComposite = new ScrolledComposite(
+            parent, SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
+        leftComposite = new Composite(scrolledComposite, SWT.NONE);
+        scrolledComposite.setContent(leftComposite);
+        GridLayout layout = new GridLayout();
         leftComposite.setLayout(layout);
+        leftComposite.setLayoutData(new GridData(GridData.FILL_BOTH));
+
     }
 
     private void load() {
@@ -170,7 +174,8 @@ public class EncoderTool extends ApplicationWindow {
                             String file = fileDialog.open();
                             ((FileAware) encoder).setFileName(file);
                             button.setText(encoder.getName());
-                            leftComposite.layout();
+                            leftComposite.setSize(leftComposite.computeSize(SWT.DEFAULT,
+                                SWT.DEFAULT));
                         }
                     });
                 }
@@ -178,6 +183,8 @@ public class EncoderTool extends ApplicationWindow {
                 Utils.showException(shell, e);
             }
         }
+        leftComposite.setSize(leftComposite.computeSize(SWT.DEFAULT,
+            SWT.DEFAULT));
     }
 
     private void createRightPart(Composite parent) {

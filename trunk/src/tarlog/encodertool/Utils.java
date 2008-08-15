@@ -55,7 +55,7 @@ public class Utils {
     }
 
     public static byte[] bytesFromHex(String hex) throws DecoderException {
-        String text = hex.replaceAll(" ", "");
+        String text = hex.replaceAll("\\s", "");
         return Hex.decodeHex(text.toCharArray());
     }
 
