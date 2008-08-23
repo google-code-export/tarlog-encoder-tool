@@ -1,6 +1,11 @@
 package tarlog.encoder.tool;
 
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Button;
@@ -8,10 +13,15 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
 import tarlog.encoder.tool.ui.AbstractSelectionListener;
+import tarlog.encoder.tool.ui.DynamicInputDialog;
+import tarlog.encoder.tool.ui.InputField;
 
 /**
- * Basic class for all encoders. The implementing class should extend from this class
- * and override at least one encode method.
+ * Basic class for all encoders. The implementing class should extend from this
+ * class and override at least one encode method.
+ * 
+ * @see FileAwareEncoder
+ * @see KeyStoreAwareEncoder
  */
 public abstract class AbstractEncoder extends AbstractSelectionListener {
 
@@ -23,8 +33,8 @@ public abstract class AbstractEncoder extends AbstractSelectionListener {
         try {
             // verify that at least one encode method was overriden
             Class<? extends AbstractEncoder> realClass = getClass();
-            if (realClass.getMethod("encode", String.class).getDeclaringClass() != realClass
-                && realClass.getMethod("encode", byte[].class).getDeclaringClass() != realClass) {
+            if (realClass.getMethod("encode", String.class).getDeclaringClass() == AbstractEncoder.class
+                && realClass.getMethod("encode", byte[].class).getDeclaringClass() == AbstractEncoder.class) {
                 throw new RuntimeException(
                     String.format(
                         "The encoder class %s must override at least one 'encode' method",
@@ -42,6 +52,7 @@ public abstract class AbstractEncoder extends AbstractSelectionListener {
             boolean sourceBytes = ((Button) sourceText.getData()).getSelection();
             String inText = sourceText.getText();
             Object out;
+            beforeEncode();
             if (sourceBytes) {
                 out = encode(Utils.bytesFromHex(inText));
             } else {
@@ -62,6 +73,66 @@ public abstract class AbstractEncoder extends AbstractSelectionListener {
             Utils.showException(shell, e1);
         }
     }
+
+    /**
+     * This method is invoked before the encode method. It's useful to put here
+     * code that open a preferences dialog and so on.
+     */
+    protected void beforeEncode() {
+        openInputDialog();
+    }
+
+    protected void openInputDialog() {
+        List<FieldWrapper> fields = getInputFields();
+        if (!fields.isEmpty()) {
+            new DynamicInputDialog(shell, "Input", this, fields).open();
+        }
+    }
+
+    protected List<FieldWrapper> getInputFields() {
+        List<FieldWrapper> fields = new ArrayList<FieldWrapper>();
+        for (Field field : getClass().getDeclaredFields()) {
+            InputField inputField = field.getAnnotation(InputField.class);
+            if (inputField != null) {
+                fields.add(new FieldWrapper(field, inputField));
+            }
+        }
+        Collections.sort(fields, new Comparator<FieldWrapper>() {
+
+            public int compare(FieldWrapper o1, FieldWrapper o2) {
+                return o1.inputField.order() - o2.inputField.order();
+            }
+        });
+        return fields;
+    }
+
+    public class FieldWrapper {
+
+        public InputField inputField;
+        public Field      field;
+
+        FieldWrapper(Field field, InputField inputField) {
+            this.field = field;
+            this.inputField = inputField;
+        }
+
+    }
+
+    //    class SimplePreferences extends FieldEditorPreferencePage {
+    //
+    //        public SimplePreferences() {
+    //            super(FieldEditorPreferencePage.GRID);
+    //        }
+    //
+    //        @Override
+    //        protected void createFieldEditors() {
+    //            StringFieldEditor stringFieldEditor = new StringFieldEditor(
+    //                "text1", "Text", getFieldEditorParent());
+    //            addField(stringFieldEditor);
+    //
+    //        }
+    //
+    //    }
 
     /**
      * <p>
