@@ -3,12 +3,20 @@ package tarlog.encoder.tool.encoders;
 import java.util.zip.Inflater;
 
 import tarlog.encoder.tool.AbstractEncoder;
+import tarlog.encoder.tool.SignatureAlgorithms;
 import tarlog.encoder.tool.Utils;
+import tarlog.encoder.tool.ui.InputField;
 
 public class InflaterEncoder extends AbstractEncoder {
 
     private boolean nowrap = true;
 
+    @InputField
+    private String test;
+    
+    @InputField
+    private SignatureAlgorithms algorithms;
+    
     @Override
     public String getName() {
         return "Inflate";
