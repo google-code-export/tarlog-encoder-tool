@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Shell;
@@ -52,15 +53,21 @@ public abstract class AbstractEncoder extends AbstractSelectionListener {
             boolean sourceBytes = ((Button) sourceText.getData()).getSelection();
             String inText = sourceText.getText();
             Object out;
-            beforeEncode();
+            // run beforeEncode()
+            if (beforeEncode() != Dialog.OK) {
+                return;
+            }
+            // run encode()
             if (sourceBytes) {
                 out = encode(Utils.bytesFromHex(inText));
             } else {
                 out = encode(inText);
             }
             if (out == null) {
+                // no result returned, do nothing
                 return;
             }
+            // set the result
             if (out instanceof byte[]) {
                 String bytes = Utils.bytesToHex((byte[]) out);
                 ((Button) targetText.getData()).setSelection(true);
@@ -75,27 +82,45 @@ public abstract class AbstractEncoder extends AbstractSelectionListener {
     }
 
     /**
-     * This method is invoked before the encode method. It's useful to put here
-     * code that open a preferences dialog and so on.
+     * <p>
+     * This method is invoked before the encode method.
+     * <p>
+     * By default it opens the input dialog and returns its status.
+     * <p>
+     * Override to change this behavior. When overriding, make sure to return
+     * Dialog.OK if you want to continue execution after this method, and any
+     * other value otherwise.
      */
-    protected void beforeEncode() {
-        openInputDialog();
+    protected int beforeEncode() {
+        return openInputDialog();
     }
 
-    protected void openInputDialog() {
+    /**
+     * opens input dialog in case there are any input fields.
+     * 
+     * @return Dialog.OK or Dialog.CANCEL
+     */
+    protected int openInputDialog() {
         List<FieldWrapper> fields = getInputFields();
         if (!fields.isEmpty()) {
-            new DynamicInputDialog(shell, "Input", this, fields).open();
+            return new DynamicInputDialog(shell, "Input", this, fields).open();
         }
+        // in case dialog was not opened, it's like OK was pressed
+        return Dialog.OK;
     }
 
-    protected List<FieldWrapper> getInputFields() {
+    @SuppressWarnings("unchecked")
+    private List<FieldWrapper> getInputFields() {
         List<FieldWrapper> fields = new ArrayList<FieldWrapper>();
-        for (Field field : getClass().getDeclaredFields()) {
-            InputField inputField = field.getAnnotation(InputField.class);
-            if (inputField != null) {
-                fields.add(new FieldWrapper(field, inputField));
+        Class<? extends AbstractEncoder> clazz = getClass();
+        while (clazz != AbstractEncoder.class) {
+            for (Field field : clazz.getDeclaredFields()) {
+                InputField inputField = field.getAnnotation(InputField.class);
+                if (inputField != null) {
+                    fields.add(new FieldWrapper(field, inputField));
+                }
             }
+            clazz = (Class<? extends AbstractEncoder>) clazz.getSuperclass();
         }
         Collections.sort(fields, new Comparator<FieldWrapper>() {
 

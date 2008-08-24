@@ -3,17 +3,6 @@ package tarlog.encoder.tool.encoders;
 import java.security.PrivateKey;
 import java.security.Signature;
 
-import org.eclipse.jface.dialogs.Dialog;
-import org.eclipse.jface.dialogs.IDialogConstants;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Combo;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.Text;
-
 import tarlog.encoder.tool.KeyStoreAwareEncoder;
 import tarlog.encoder.tool.Utils;
 import tarlog.encoder.tool.ui.InputField;
