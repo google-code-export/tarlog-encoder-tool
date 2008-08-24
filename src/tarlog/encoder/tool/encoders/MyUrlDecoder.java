@@ -10,8 +10,13 @@ import tarlog.encoder.tool.Utils;
 public class MyUrlDecoder extends AbstractEncoder {
 
     @Override
+    public String getGroup() {
+        return MyUrlEncoder.URL_ENCODING;
+    }
+    
+    @Override
     public String getName() {
-        return "URL Decoder";
+        return "Decode";
     }
     
     

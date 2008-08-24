@@ -79,26 +79,35 @@ public class DynamicInputDialog extends Dialog {
 
             // create input field
             final Class<?> fieldType = fieldWrapper.field.getType();
+            Control control;
             if (fieldType.equals(String.class)) {
-                createStringField(parent.getFont(), composite, fieldWrapper,
-                    fieldName);
+                TextField textField = fieldWrapper.field.getAnnotation(TextField.class);
+                if (textField != null && textField.values().length > 0) {
+                    control = createComboField(parent.getFont(), composite, fieldWrapper,
+                        fieldName, fieldType);
+                } else {
+                    control = createStringField(parent.getFont(), composite,
+                        fieldWrapper, fieldName);
+                }
             } else if (fieldType.equals(Boolean.class)
                 || fieldType.equals(boolean.class)) {
-                createCheckButtonField(composite, fieldWrapper, fieldName);
+                control = createCheckButtonField(composite, fieldWrapper, fieldName);
             } else if (fieldType.isEnum()) {
-                createComboField(parent.getFont(), composite, fieldWrapper,
-                    fieldName, fieldType);
+                control = createComboFieldOfEnum(parent.getFont(), composite,
+                    fieldWrapper, fieldName, fieldType);
 
             } else {
                 throw new RuntimeException("Unsupported type : "
                     + fieldType.getName());
             }
+            
+            control.setEnabled(fieldWrapper.inputField.enabled());
         }
         applyDialogFont(composite);
         return composite;
     }
 
-    private Combo createComboField(Font font, Composite parent,
+    private Combo createComboFieldOfEnum(Font font, Composite parent,
         final FieldWrapper fieldWrapper, String fieldName,
         final Class<?> fieldType) {
         createLabel(font, parent, fieldName);
@@ -128,19 +137,52 @@ public class DynamicInputDialog extends Dialog {
         return combo;
     }
 
+    private Combo createComboField(Font font, Composite parent,
+        final FieldWrapper fieldWrapper, String fieldName,
+        final Class<?> fieldType) {
+        createLabel(font, parent, fieldName);
+        final Combo combo = new Combo(parent, SWT.DROP_DOWN
+            | (fieldWrapper.inputField.readonly() ? SWT.READ_ONLY : SWT.NONE));
+        TextField textField = fieldWrapper.field.getAnnotation(TextField.class);
+        if (textField != null) {
+            for (String val : textField.values()) {
+                combo.add(val);
+            }
+        }
+        Object value = getValue(fieldWrapper.field);
+        if (value != null) {
+            combo.setText((String) value);
+        }
+        fieldControls.add(new FieldControl() {
+
+            public Field getField() {
+                return fieldWrapper.field;
+            }
+
+            public Object getValue() {
+                return combo.getText();
+            }
+        });
+        return combo;
+    }
+
     private Text createStringField(Font font, Composite parent,
         final FieldWrapper fieldWrapper, String fieldName) {
         createLabel(font, parent, fieldName);
-        boolean multiline = fieldWrapper.inputField.multiline();
-        final Text text = new Text(parent, (multiline ? SWT.MULTI : SWT.SINGLE)
-            | SWT.BORDER | SWT.V_SCROLL
+        TextField textField = fieldWrapper.field.getAnnotation(TextField.class);
+        boolean isMultiline = textField != null ? textField.multiline() : false;
+        boolean isPassword = textField != null ? textField.password() : false;
+        final Text text = new Text(parent, (isMultiline ? SWT.MULTI
+            : SWT.SINGLE)
+            | SWT.BORDER
+            | SWT.V_SCROLL
             | (fieldWrapper.inputField.readonly() ? SWT.READ_ONLY : SWT.NONE));
-        if (fieldWrapper.inputField.password()) {
+        if (isPassword) {
             text.setEchoChar('*');
         }
-        GridData layoutData = new GridData(SWT.FILL, (multiline ? SWT.FILL
-            : SWT.CENTER), true, (multiline ? true : false));
-        if (multiline) {
+        GridData layoutData = new GridData(SWT.FILL, (isMultiline ? SWT.FILL
+            : SWT.CENTER), true, (isMultiline ? true : false));
+        if (isMultiline) {
             layoutData.heightHint = convertHorizontalDLUsToPixels(30);
         }
         text.setLayoutData(layoutData);

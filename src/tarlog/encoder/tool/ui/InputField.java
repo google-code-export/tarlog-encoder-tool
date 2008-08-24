@@ -5,6 +5,10 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * Specifies that this field is actually input field. Meaning that input dialog
+ * would be opened in order to populate this field.
+ */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
 public @interface InputField {
@@ -16,7 +20,8 @@ public @interface InputField {
     String name() default "";
 
     /**
-     * order of fields
+     * order of fields in the input dialog. The fields are sorted in the ascending
+     * order.
      */
     int order() default 0;
 
@@ -26,19 +31,9 @@ public @interface InputField {
     boolean readonly() default false;
 
     /**
-     * <p>
-     * For text field declares if the field is multiline
-     * <p>
-     * Irrelevant for non-text fields
+     * indicates if the field is enabled
+     * 
+     * @return
      */
-    boolean multiline() default false;
-
-    /**
-     * <p>
-     * For text field declares if the field is password, which cause to replace
-     * characters with the stars.
-     * <p>
-     * Irrelevant for non-text fields
-     */
-    boolean password() default false;
+    boolean enabled() default true;
 }

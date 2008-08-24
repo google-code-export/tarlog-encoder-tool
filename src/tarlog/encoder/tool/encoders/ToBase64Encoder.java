@@ -15,6 +15,11 @@ import tarlog.encoder.tool.Utils;
 public class ToBase64Encoder extends AbstractEncoder {
 
     @Override
+    public String getGroup() {
+        return FromBase64Encoder.BASE64;
+    }
+    
+    @Override
     public String encode(String source) {
         try {
             return new String(Base64.encodeBase64(source.getBytes("UTF-8")));

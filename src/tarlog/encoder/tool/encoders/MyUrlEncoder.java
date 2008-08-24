@@ -9,9 +9,17 @@ import tarlog.encoder.tool.Utils;
 
 public class MyUrlEncoder extends AbstractEncoder {
 
+    public static final String URL_ENCODING = "URL Encoding";
+
+
+    @Override
+    public String getGroup() {
+        return URL_ENCODING;
+    }
+    
     @Override
     public String getName() {
-        return "URL Encoder";
+        return "Encode";
     }
     
     

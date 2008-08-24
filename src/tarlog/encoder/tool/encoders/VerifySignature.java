@@ -7,14 +7,32 @@ import tarlog.encoder.tool.KeyStoreAwareEncoder;
 import tarlog.encoder.tool.SignatureAlgorithms;
 import tarlog.encoder.tool.Utils;
 import tarlog.encoder.tool.ui.InputField;
+import tarlog.encoder.tool.ui.TextField;
 
 public class VerifySignature extends KeyStoreAwareEncoder {
 
+    public static final String SIGNATURES = "Digital Signatures";
+
+    @InputField(name = "Algorithm", readonly=true)
+    private SignatureAlgorithms algorithm = SignatureAlgorithms.SHA1withDSA;
+    
+    @InputField(name = "Certificate Alias")
+    private String              alias;
+    
+    @InputField(name = "Signature")
+    @TextField(multiline = true)
+    private String              signature;
+    
     @Override
     public String getEncoderName() {
         return "Verify Signature";
     }
 
+    @Override
+    public String getGroup() {
+        return SIGNATURES;
+    }
+    
     @Override
     public Object encode(byte[] source) {
         if (keystore == null) {
@@ -39,12 +57,7 @@ public class VerifySignature extends KeyStoreAwareEncoder {
         }
     }
 
-    @InputField(name = "Algorithm", readonly=true)
-    private SignatureAlgorithms algorithm = SignatureAlgorithms.SHA1withDSA;
-    @InputField(name = "Certificate Alias")
-    private String              alias;
-    @InputField(name = "Signature", multiline = true)
-    private String              signature;
+
 
     //    public class SigDetailsDialog extends Dialog {
     //
