@@ -11,11 +11,23 @@ public class InflaterEncoder extends AbstractEncoder {
 
     private boolean nowrap = true;
 
-    @InputField
-    private String test;
+    /**************************************************/
     
-    @InputField
+    @InputField(name="String")
+    private String test;
+
+    @InputField(name="Text", multiline=true)
+    private String text;
+
+    
+    @InputField(name="Algorithm")
     private SignatureAlgorithms algorithms;
+    
+    @InputField(name="Check Me!")
+    private boolean checkme;
+    
+    
+    /***************************************************/
     
     @Override
     public String getName() {

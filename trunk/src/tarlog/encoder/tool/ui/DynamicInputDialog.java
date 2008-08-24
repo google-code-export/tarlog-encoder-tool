@@ -1,14 +1,19 @@
 package tarlog.encoder.tool.ui;
 
+import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
@@ -43,7 +48,8 @@ public class DynamicInputDialog extends Dialog {
 
     private Object getValue(Field field) {
         try {
-            field.setAccessible(true);
+            AccessibleObject.setAccessible(new Field[] { field }, true);
+            //            field.setAccessible(true);
             return field.get(object);
         } catch (IllegalArgumentException e) {
             Utils.showException(getShell(), e);
@@ -55,97 +61,134 @@ public class DynamicInputDialog extends Dialog {
 
     protected Control createDialogArea(Composite parent) {
         // create composite
-        //        Composite composite = new Composite(parent, SWT.NONE);
-        //        GridLayout layout = new GridLayout();
-        //        composite.setLayout(layout);
-        //        composite.setLayoutData(new GridData(GridData.FILL_BOTH));
-        Composite composite = (Composite) super.createDialogArea(parent);
+        Composite composite = new Composite(parent, SWT.NONE);
+        GridLayout layout = new GridLayout(2, false);
+        layout.marginHeight = convertVerticalDLUsToPixels(IDialogConstants.VERTICAL_MARGIN);
+        layout.marginWidth = convertHorizontalDLUsToPixels(IDialogConstants.HORIZONTAL_MARGIN);
+        layout.verticalSpacing = convertVerticalDLUsToPixels(IDialogConstants.VERTICAL_SPACING);
+        layout.horizontalSpacing = convertHorizontalDLUsToPixels(IDialogConstants.HORIZONTAL_SPACING);
+        composite.setLayout(layout);
+        composite.setLayoutData(new GridData(GridData.FILL_BOTH));
+        //        Composite composite = (Composite) super.createDialogArea(parent);
 
         for (final FieldWrapper fieldWrapper : fields) {
 
             String fieldName = fieldWrapper.inputField.name().equals("") ? fieldWrapper.field.getName()
                 : fieldWrapper.inputField.name();
-            // create label
-            Label label = new Label(composite, SWT.WRAP);
-            label.setText(fieldName);
-            GridData data = new GridData(GridData.GRAB_HORIZONTAL
-                | GridData.GRAB_VERTICAL | GridData.HORIZONTAL_ALIGN_FILL
-                | GridData.VERTICAL_ALIGN_CENTER);
-            data.widthHint = convertHorizontalDLUsToPixels(IDialogConstants.MINIMUM_MESSAGE_AREA_WIDTH);
-            label.setLayoutData(data);
-            label.setFont(parent.getFont());
 
             // create input field
-            Class<?> fieldType = fieldWrapper.field.getType();
-            Control control = null;
+            final Class<?> fieldType = fieldWrapper.field.getType();
             if (fieldType.equals(String.class)) {
-                final Text text = new Text(composite, SWT.SINGLE | SWT.BORDER);
-                String value = (String) getValue(fieldWrapper.field);
-                if (value != null) {
-                    text.setText(value);
-                }
-                fieldWrappers.add(new FieldControl() {
-
-                    public Field getField() {
-                        return fieldWrapper.field;
-                    }
-
-                    public Object getValue() {
-                        return text.getText();
-                    }
-                });
-                control = text;
+                createStringField(parent.getFont(), composite, fieldWrapper,
+                    fieldName);
             } else if (fieldType.equals(Boolean.class)
                 || fieldType.equals(boolean.class)) {
-                final Button button = new Button(composite, SWT.CHECK);
-                Boolean value = (Boolean) getValue(fieldWrapper.field);
-                if (value != null) {
-                    button.setSelection(value.booleanValue());
-                }
-                fieldWrappers.add(new FieldControl() {
-
-                    public Field getField() {
-                        return fieldWrapper.field;
-                    }
-
-                    public Object getValue() {
-                        return button.getSelection();
-                    }
-                });
-                control = button;
+                createCheckButtonField(composite, fieldWrapper, fieldName);
             } else if (fieldType.isEnum()) {
-                final Combo combo = new Combo(composite, SWT.DROP_DOWN
-                    | SWT.READ_ONLY);
-                String value = (String) getValue(fieldWrapper.field);
-                if (value != null) {
-                    combo.setText(value);
-                }
-                Enum<?>[] enumConstants = (Enum[]) fieldType.getEnumConstants();
-                for (Enum<?> enumConstant : enumConstants) {
-                    combo.add(enumConstant.name());
-                }
-                fieldWrappers.add(new FieldControl() {
+                createComboField(parent.getFont(), composite, fieldWrapper,
+                    fieldName, fieldType);
 
-                    public Field getField() {
-                        return fieldWrapper.field;
-                    }
-
-                    public Object getValue() {
-                        return combo.getText();
-                    }
-                });
-                control = combo;
             } else {
                 throw new RuntimeException("Unsupported type : "
                     + fieldType.getName());
             }
-
-            control.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL
-                | GridData.HORIZONTAL_ALIGN_FILL));
-
         }
         applyDialogFont(composite);
         return composite;
+    }
+
+    private Combo createComboField(Font font, Composite parent,
+        final FieldWrapper fieldWrapper, String fieldName,
+        final Class<?> fieldType) {
+        createLabel(font, parent, fieldName);
+        final Combo combo = new Combo(parent, SWT.DROP_DOWN | SWT.READ_ONLY);
+        Enum<?>[] enumConstants = (Enum[]) fieldType.getEnumConstants();
+        for (Enum<?> enumConstant : enumConstants) {
+            combo.add(enumConstant.name());
+        }
+        Object value = getValue(fieldWrapper.field);
+        if (value != null) {
+            combo.setText(((Enum<?>) value).name());
+        }
+        fieldWrappers.add(new FieldControl() {
+
+            public Field getField() {
+                return fieldWrapper.field;
+            }
+
+            @SuppressWarnings("unchecked")
+            public Object getValue() {
+                String text = combo.getText();
+                return "".equals(text) ? null : Enum.valueOf((Class) fieldType,
+                    text);
+            }
+        });
+        return combo;
+    }
+
+    private Text createStringField(Font font, Composite parent,
+        final FieldWrapper fieldWrapper, String fieldName) {
+        createLabel(font, parent, fieldName);
+        boolean multiline = fieldWrapper.inputField.multiline();
+        final Text text = new Text(parent, (multiline ? SWT.MULTI : SWT.SINGLE)
+            | SWT.BORDER);
+        text.setLayoutData(new GridData(SWT.FILL, (multiline ? SWT.FILL
+            : SWT.CENTER), true, (multiline ? true : false)));
+        String value = (String) getValue(fieldWrapper.field);
+        if (value != null) {
+            text.setText(value);
+        }
+        fieldWrappers.add(new FieldControl() {
+
+            public Field getField() {
+                return fieldWrapper.field;
+            }
+
+            public Object getValue() {
+                return text.getText();
+            }
+        });
+        return text;
+    }
+
+    private Button createCheckButtonField(Composite composite,
+        final FieldWrapper fieldWrapper, String fieldName) {
+        final Button button = new Button(composite, SWT.CHECK);
+        GridData data = new GridData(GridData.GRAB_HORIZONTAL
+            | GridData.GRAB_VERTICAL | GridData.HORIZONTAL_ALIGN_FILL
+            | GridData.VERTICAL_ALIGN_CENTER);
+        data.widthHint = convertHorizontalDLUsToPixels(IDialogConstants.MINIMUM_MESSAGE_AREA_WIDTH);
+        data.horizontalSpan = 2;
+        button.setLayoutData(data);
+
+        button.setText(fieldName);
+        Boolean value = (Boolean) getValue(fieldWrapper.field);
+        if (value != null) {
+            button.setSelection(value.booleanValue());
+        }
+        fieldWrappers.add(new FieldControl() {
+
+            public Field getField() {
+                return fieldWrapper.field;
+            }
+
+            public Object getValue() {
+                return button.getSelection();
+            }
+        });
+        return button;
+    }
+
+    private void createLabel(Font font, Composite composite, String fieldName) {
+        if (!fieldName.trim().endsWith(":")) {
+            fieldName = fieldName + ":";
+        }
+        Label label = new Label(composite, SWT.WRAP);
+        label.setText(fieldName);
+        GridData data = new GridData(SWT.LEFT, SWT.CENTER, false, false);
+        //        data.widthHint = convertHorizontalDLUsToPixels(IDialogConstants.MINIMUM_MESSAGE_AREA_WIDTH);
+        label.setLayoutData(data);
+        label.setFont(font);
     }
 
     protected void buttonPressed(int buttonId) {
@@ -153,8 +196,18 @@ public class DynamicInputDialog extends Dialog {
             for (FieldControl fieldWrapper : fieldWrappers) {
                 Object value = fieldWrapper.getValue();
                 try {
-                    fieldWrapper.getField().setAccessible(true);
-                    fieldWrapper.getField().set(object, value);
+                    final Field f = fieldWrapper.getField();
+                    if (!f.isAccessible()) {
+                        AccessController.doPrivileged(new PrivilegedAction<Object>() {
+
+                            public Object run() {
+                                f.setAccessible(true);
+                                return null;
+                            }
+                        });
+                    }
+                    //                    AccessibleObject.setAccessible(new Field[] {f}, true);
+                    f.set(object, value);
                 } catch (Exception e) {
                     Utils.showException(getShell(), e);
                 }
