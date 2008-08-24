@@ -24,8 +24,11 @@ import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Group;
+import org.eclipse.swt.widgets.Link;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
@@ -213,13 +216,23 @@ public class EncoderTool extends ApplicationWindow {
         Composite composite = new Composite(parent, SWT.NONE);
         composite.setLayout(new GridLayout());
         composite.setLayoutData(new GridData(GridData.FILL_BOTH));
-        Text text = new Text(composite, style | SWT.WRAP);
+        final Text text = new Text(composite, style | SWT.WRAP);
         text.setLayoutData(new GridData(GridData.FILL_BOTH));
-        final Button showBytesButton = new Button(composite, SWT.CHECK);
+        Composite bottomComposite = new Composite(composite, SWT.NONE);
+        bottomComposite.setLayout(new RowLayout(SWT.HORIZONTAL));
+        final Button showBytesButton = new Button(bottomComposite, SWT.CHECK);
         showBytesButton.setData(text);
         text.setData(showBytesButton);
         showBytesButton.setText("Show bytes");
         showBytesButton.addSelectionListener(new ShowBytesListener());
+        Link link = new Link(bottomComposite, SWT.NONE);
+        link.setText("<a>Clean</a>");
+        link.addListener (SWT.Selection, new Listener () {
+            public void handleEvent(Event event) {
+                text.setText("");
+            }
+        });
+
         return text;
     }
 
