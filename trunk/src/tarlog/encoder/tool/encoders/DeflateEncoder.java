@@ -13,6 +13,11 @@ public class DeflateEncoder extends AbstractEncoder {
     boolean nowrap = true;
 
     @Override
+    public String getGroup() {
+        return InflaterEncoder.DEFLATER;
+    }
+
+    @Override
     public String getName() {
         return "Deflate";
     }

@@ -4,7 +4,9 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Properties;
 import java.util.TreeSet;
 
@@ -23,6 +25,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.FileDialog;
+import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
@@ -131,7 +134,7 @@ public class EncoderTool extends ApplicationWindow {
     private void load() {
         @SuppressWarnings("unchecked")
         TreeSet<String> names = new TreeSet(properties.keySet());
-
+        Map<String, Group> groups = new HashMap<String, Group>();
         for (Iterator<String> itr = names.iterator(); itr.hasNext();) {
             try {
                 @SuppressWarnings("unchecked")
@@ -140,30 +143,42 @@ public class EncoderTool extends ApplicationWindow {
                 encoder.setSource(sourceText);
                 encoder.setTarget(targetText);
                 encoder.setShell(shell);
-                final Composite composite = new Composite(leftComposite,
-                    SWT.NULL);
+                String groupName = encoder.getGroup();
+                Group group = groups.get(groupName);
+                if (group == null) {
+                    group = new Group(leftComposite, SWT.NONE);
+                    group.setText(groupName);
+                    group.setLayout(new GridLayout());
+                    group.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true,
+                        true));
+                    groups.put(groupName, group);
+                }
+                final Composite composite = new Composite(group, SWT.NULL);
                 RowLayout layout = new RowLayout();
                 layout.type = SWT.HORIZONTAL;
                 composite.setLayout(layout);
                 final Button button = new Button(composite, SWT.RADIO);
                 button.setText(encoder.getName());
-                button.addSelectionListener(encoder);
                 button.addSelectionListener(new AbstractSelectionListener() {
 
                     public void widgetSelected(SelectionEvent e) {
                         for (Control child : leftComposite.getChildren()) {
-                            Composite compositeChild = (Composite) child;
-                            for (Control lbutton : compositeChild.getChildren()) {
-                                if (e.getSource() != lbutton
-                                    && lbutton instanceof Button
-                                    && (lbutton.getStyle() & SWT.RADIO) != 0) {
-                                    ((Button) lbutton).setSelection(false);
+                            Composite groupChild = (Composite) child;
+                            for (Control groupChildControl : groupChild.getChildren()) {
+                                Composite groupChildComposite = (Composite) groupChildControl;
+                                for (Control lbutton : groupChildComposite.getChildren()) {
+                                    if (e.getSource() != lbutton
+                                        && lbutton instanceof Button
+                                        && (lbutton.getStyle() & SWT.RADIO) != 0) {
+                                        ((Button) lbutton).setSelection(false);
+                                    }
                                 }
                             }
                         }
 
                     }
                 });
+                button.addSelectionListener(encoder);
                 if (encoder instanceof FileAware) {
                     Button fileButton = new Button(composite, SWT.ARROW);
                     fileButton.setText("...");
@@ -174,8 +189,8 @@ public class EncoderTool extends ApplicationWindow {
                             String file = fileDialog.open();
                             ((FileAware) encoder).setFileName(file);
                             button.setText(encoder.getName());
-                            leftComposite.setSize(leftComposite.computeSize(SWT.DEFAULT,
-                                SWT.DEFAULT));
+                            leftComposite.setSize(leftComposite.computeSize(
+                                SWT.DEFAULT, SWT.DEFAULT));
                         }
                     });
                 }

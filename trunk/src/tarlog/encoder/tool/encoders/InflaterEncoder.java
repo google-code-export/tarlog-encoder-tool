@@ -7,7 +7,13 @@ import tarlog.encoder.tool.Utils;
 
 public class InflaterEncoder extends AbstractEncoder {
 
-    private boolean nowrap = true;
+    public static final String DEFLATER = "Deflater";
+    private boolean            nowrap   = true;
+
+    @Override
+    public String getGroup() {
+        return InflaterEncoder.DEFLATER;
+    }
 
     @Override
     public String getName() {

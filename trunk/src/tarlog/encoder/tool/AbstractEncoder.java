@@ -220,4 +220,10 @@ public abstract class AbstractEncoder extends AbstractSelectionListener {
         this.shell = shell;
     }
 
+    /**
+     * @return the group of the current encoder. Override to change the group.
+     */
+    public String getGroup() {
+        return "Default";
+    }
 }
