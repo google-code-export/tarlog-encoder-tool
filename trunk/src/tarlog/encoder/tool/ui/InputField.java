@@ -21,7 +21,24 @@ public @interface InputField {
     int order() default 0;
 
     /**
-     * for text field declares of the field is multiline
+     * indicates if the field is read only
+     */
+    boolean readonly() default false;
+
+    /**
+     * <p>
+     * For text field declares if the field is multiline
+     * <p>
+     * Irrelevant for non-text fields
      */
     boolean multiline() default false;
+
+    /**
+     * <p>
+     * For text field declares if the field is password, which cause to replace
+     * characters with the stars.
+     * <p>
+     * Irrelevant for non-text fields
+     */
+    boolean password() default false;
 }

@@ -4,6 +4,7 @@ import java.security.PrivateKey;
 import java.security.Signature;
 
 import tarlog.encoder.tool.KeyStoreAwareEncoder;
+import tarlog.encoder.tool.SignatureAlgorithms;
 import tarlog.encoder.tool.Utils;
 import tarlog.encoder.tool.ui.InputField;
 
@@ -21,13 +22,13 @@ public class SignatureEncoder extends KeyStoreAwareEncoder {
                 "Key store should be initialized");
             return null;
         }
-//        SigDetailsDialog inputDialog = new SigDetailsDialog(shell);
-//        int rc = inputDialog.open();
-//        if (rc != Dialog.OK) {
-//            return null;
-//        }
+        //        SigDetailsDialog inputDialog = new SigDetailsDialog(shell);
+        //        int rc = inputDialog.open();
+        //        if (rc != Dialog.OK) {
+        //            return null;
+        //        }
         try {
-            Signature sig = Signature.getInstance(algorithm);
+            Signature sig = Signature.getInstance(algorithm.name());
             PrivateKey privateKey = (PrivateKey) keystore.getKey(alias,
                 password.toCharArray());
             sig.initSign(privateKey);
@@ -39,12 +40,12 @@ public class SignatureEncoder extends KeyStoreAwareEncoder {
         }
     }
 
-    @InputField
-    private String algorithm;
-    @InputField
-    private String alias;
-    @InputField
-    private String password;
+    @InputField(name = "Algorithm", readonly = true)
+    private SignatureAlgorithms algorithm = SignatureAlgorithms.SHA1withDSA;
+    @InputField(name = "Private Key Alias")
+    private String              alias;
+    @InputField(name = "Password", password = true)
+    private String              password;
 
     //    public class SigDetailsDialog extends Dialog {
     //
