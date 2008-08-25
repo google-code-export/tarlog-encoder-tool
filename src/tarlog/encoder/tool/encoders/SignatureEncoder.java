@@ -17,7 +17,7 @@ public class SignatureEncoder extends KeyStoreAwareEncoder {
     @InputField(name = "Private Key Alias")
     private String              alias;
 
-    @InputField(name = "Password")
+    @InputField(name = "Private Key Password")
     @TextField(password = true)
     private String              password;
 
@@ -33,16 +33,6 @@ public class SignatureEncoder extends KeyStoreAwareEncoder {
 
     @Override
     public Object encode(byte[] source) {
-        if (keystore == null) {
-            Utils.showErrorMessage(shell, "Error",
-                "Key store should be initialized");
-            return null;
-        }
-        //        SigDetailsDialog inputDialog = new SigDetailsDialog(shell);
-        //        int rc = inputDialog.open();
-        //        if (rc != Dialog.OK) {
-        //            return null;
-        //        }
         try {
             Signature sig = Signature.getInstance(algorithm.name());
             PrivateKey privateKey = (PrivateKey) keystore.getKey(alias,
@@ -55,60 +45,4 @@ public class SignatureEncoder extends KeyStoreAwareEncoder {
             return null;
         }
     }
-
-    //    public class SigDetailsDialog extends Dialog {
-    //
-    //        private Combo uiAlgorithm;
-    //        private Text  uiAlias;
-    //        private Text  uiPassword;
-    //
-    //        public SigDetailsDialog(Shell parent) {
-    //            super(parent);
-    //        }
-    //
-    //        protected void configureShell(Shell shell) {
-    //            super.configureShell(shell);
-    //            shell.setText("Select Signature Details");
-    //        }
-    //
-    //        @Override
-    //        protected Control createDialogArea(Composite parent) {
-    //            Composite composite = new Composite(
-    //                (Composite) super.createDialogArea(parent), SWT.NONE);
-    //            composite.setLayout(new GridLayout(2, false));
-    //            Label label = new Label(composite, SWT.NONE);
-    //            label.setText("Algorithm: ");
-    //            uiAlgorithm = new Combo(composite, SWT.DROP_DOWN | SWT.READ_ONLY);
-    //            uiAlgorithm.add("SHA1withDSA");
-    //            uiAlgorithm.add("SHA1withRSA");
-    //            if (algorithm != null) {
-    //                uiAlgorithm.setText(algorithm);
-    //            } else {
-    //                uiAlgorithm.setText("SHA1withDSA");
-    //            }
-    //            label = new Label(composite, SWT.NONE);
-    //            label.setText("Private Key Alias: ");
-    //            uiAlias = new Text(composite, SWT.SINGLE | SWT.BORDER);
-    //            if (alias != null) {
-    //                uiAlias.setText(alias);
-    //            }
-    //            label = new Label(composite, SWT.NONE);
-    //            label.setText("Private Key Password: ");
-    //            uiPassword = new Text(composite, SWT.SINGLE | SWT.BORDER);
-    //            if (password != null) {
-    //                uiPassword.setText(password);
-    //            }
-    //            return composite;
-    //        }
-    //
-    //        protected void buttonPressed(int buttonId) {
-    //            if (buttonId == IDialogConstants.OK_ID) {
-    //                algorithm = uiAlgorithm.getText();
-    //                alias = uiAlias.getText();
-    //                password = uiPassword.getText();
-    //            }
-    //            super.buttonPressed(buttonId);
-    //        }
-    //
-    //    }
 }

@@ -25,16 +25,15 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
-import tarlog.encoder.tool.FileAware;
 import tarlog.encoder.tool.Utils;
 import tarlog.encoder.tool.api.AbstractEncoder;
+import tarlog.encoder.tool.api.Initiable;
 
 /**
  *
@@ -182,16 +181,13 @@ public class EncoderTool extends ApplicationWindow {
                     }
                 });
                 button.addSelectionListener(encoder);
-                if (encoder instanceof FileAware) {
+                if (encoder instanceof Initiable) {
                     Button fileButton = new Button(composite, SWT.ARROW);
                     fileButton.setText("...");
                     fileButton.addSelectionListener(new AbstractSelectionListener() {
 
                         public void widgetSelected(SelectionEvent e) {
-                            FileDialog fileDialog = new FileDialog(shell);
-                            String file = fileDialog.open();
-                            ((FileAware) encoder).setFileName(file);
-                            button.setText(encoder.getName());
+                            ((Initiable) encoder).init();
                             leftComposite.setSize(leftComposite.computeSize(
                                 SWT.DEFAULT, SWT.DEFAULT));
                         }
@@ -227,7 +223,8 @@ public class EncoderTool extends ApplicationWindow {
         showBytesButton.addSelectionListener(new ShowBytesListener());
         Link link = new Link(bottomComposite, SWT.NONE);
         link.setText("<a>Clean</a>");
-        link.addListener (SWT.Selection, new Listener () {
+        link.addListener(SWT.Selection, new Listener() {
+
             public void handleEvent(Event event) {
                 text.setText("");
             }

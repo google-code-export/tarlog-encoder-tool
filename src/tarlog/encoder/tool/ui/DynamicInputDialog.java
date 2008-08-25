@@ -13,23 +13,24 @@ import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Font;
-import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Text;
 
-import tarlog.encoder.tool.FileAware;
 import tarlog.encoder.tool.Utils;
 import tarlog.encoder.tool.api.AbstractEncoder.FieldWrapper;
+import tarlog.encoder.tool.api.fields.FileField;
 import tarlog.encoder.tool.api.fields.TextField;
+import tarlog.encoder.tool.api.fields.FileField.FileFieldType;
 
 public class DynamicInputDialog extends Dialog {
 
@@ -134,24 +135,54 @@ public class DynamicInputDialog extends Dialog {
             | (fieldWrapper.inputField.readonly() ? SWT.READ_ONLY : SWT.NONE));
         layoutData = new GridData(SWT.FILL, SWT.CENTER, true, false);
         text.setLayoutData(layoutData);
+        Object value = getValue(fieldWrapper.field);
+        if (value != null) {
+            String fileName = ((File) value).getAbsolutePath();
+            text.setText(fileName);
+        }
+
+        final FileField fileFieldAnnotation = fieldWrapper.field.getAnnotation(FileField.class);
+
         final Button button = new Button(composite, SWT.PUSH);
+        button.setEnabled(!fieldWrapper.inputField.readonly());
         button.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false));
         button.setText("...");
         button.addSelectionListener(new AbstractSelectionListener() {
 
             public void widgetSelected(SelectionEvent e) {
-                FileDialog fileDialog = new FileDialog(getShell());
-                String file = fileDialog.open();
+                FileFieldType fileFieldType = FileFieldType.file;
+                String[] filterExtensions = null;
+                String[] filterNames = null;
+                String filterPath = null;
+                if (fileFieldAnnotation != null) {
+                    fileFieldType = fileFieldAnnotation.fileFieldType();
+                    filterExtensions = fileFieldAnnotation.filterExtensions().length > 0 ? fileFieldAnnotation.filterExtensions()
+                        : null;
+                    filterNames = fileFieldAnnotation.filterNames().length > 0 ? fileFieldAnnotation.filterNames()
+                        : null;
+                    filterPath = fileFieldAnnotation.filterPath().equals("") ? null
+                        : fileFieldAnnotation.filterPath();
+                }
+                String file = null;
+                if (fileFieldType == FileFieldType.file) {
+                    FileDialog fileDialog = new FileDialog(getShell());
+                    fileDialog.setFileName(text.getText());
+                    fileDialog.setFilterExtensions(filterExtensions);
+                    fileDialog.setFilterNames(filterNames);
+                    fileDialog.setFilterPath(filterPath);
+                    file = fileDialog.open();
+                } else {
+                    DirectoryDialog directoryDialog = new DirectoryDialog(
+                        getShell());
+                    directoryDialog.setText(text.getText());
+                    directoryDialog.setFilterPath(filterPath);
+                    file = directoryDialog.open();
+                }
                 if (file != null) {
                     text.setText(file);
                 }
             }
         });
-
-        Object value = getValue(fieldWrapper.field);
-        if (value != null) {
-            text.setText(((File) value).getAbsolutePath());
-        }
 
         fieldControls.add(new FieldControl() {
 
@@ -160,7 +191,10 @@ public class DynamicInputDialog extends Dialog {
             }
 
             public Object getValue() {
-                return new File(text.getText());
+                if (!text.getText().equals("")) {
+                    return new File(text.getText());
+                }
+                return null;
             }
         });
         return composite;
