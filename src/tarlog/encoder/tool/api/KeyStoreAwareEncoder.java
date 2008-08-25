@@ -1,4 +1,4 @@
-package tarlog.encoder.tool;
+package tarlog.encoder.tool.api;
 
 import java.io.FileInputStream;
 import java.security.KeyStore;
@@ -6,8 +6,9 @@ import java.security.KeyStoreException;
 
 import org.eclipse.jface.dialogs.Dialog;
 
-import tarlog.encoder.tool.ui.InputField;
-import tarlog.encoder.tool.ui.TextField;
+import tarlog.encoder.tool.Utils;
+import tarlog.encoder.tool.api.fields.InputField;
+import tarlog.encoder.tool.api.fields.TextField;
 
 public abstract class KeyStoreAwareEncoder extends FileAwareEncoder {
 
@@ -21,10 +22,6 @@ public abstract class KeyStoreAwareEncoder extends FileAwareEncoder {
     @TextField(password = true)
     private String     password;
 
-    @Override
-    public void setFileName(String fileName) {
-        super.setFileName(fileName);
-    }
 
     @Override
     protected int beforeEncode() {

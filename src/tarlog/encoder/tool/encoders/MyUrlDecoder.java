@@ -3,8 +3,8 @@ package tarlog.encoder.tool.encoders;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 
-import tarlog.encoder.tool.AbstractEncoder;
 import tarlog.encoder.tool.Utils;
+import tarlog.encoder.tool.api.AbstractEncoder;
 
 
 public class MyUrlDecoder extends AbstractEncoder {

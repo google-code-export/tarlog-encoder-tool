@@ -32,9 +32,9 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
-import tarlog.encoder.tool.AbstractEncoder;
 import tarlog.encoder.tool.FileAware;
 import tarlog.encoder.tool.Utils;
+import tarlog.encoder.tool.api.AbstractEncoder;
 
 /**
  *
@@ -216,7 +216,7 @@ public class EncoderTool extends ApplicationWindow {
         Composite composite = new Composite(parent, SWT.NONE);
         composite.setLayout(new GridLayout());
         composite.setLayoutData(new GridData(GridData.FILL_BOTH));
-        final Text text = new Text(composite, style | SWT.WRAP);
+        final Text text = new Text(composite, style | SWT.WRAP | SWT.V_SCROLL);
         text.setLayoutData(new GridData(GridData.FILL_BOTH));
         Composite bottomComposite = new Composite(composite, SWT.NONE);
         bottomComposite.setLayout(new RowLayout(SWT.HORIZONTAL));
