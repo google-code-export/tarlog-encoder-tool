@@ -1,4 +1,4 @@
-package tarlog.encoder.tool;
+package tarlog.encoder.tool.api;
 
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
@@ -13,9 +13,10 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
+import tarlog.encoder.tool.Utils;
+import tarlog.encoder.tool.api.fields.InputField;
 import tarlog.encoder.tool.ui.AbstractSelectionListener;
 import tarlog.encoder.tool.ui.DynamicInputDialog;
-import tarlog.encoder.tool.ui.InputField;
 
 /**
  * Basic class for all encoders. The implementing class should extend from this

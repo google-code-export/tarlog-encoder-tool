@@ -1,5 +1,6 @@
 package tarlog.encoder.tool.ui;
 
+import java.io.File;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
 import java.security.AccessController;
@@ -10,19 +11,25 @@ import java.util.List;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Text;
 
+import tarlog.encoder.tool.FileAware;
 import tarlog.encoder.tool.Utils;
-import tarlog.encoder.tool.AbstractEncoder.FieldWrapper;
+import tarlog.encoder.tool.api.AbstractEncoder.FieldWrapper;
+import tarlog.encoder.tool.api.fields.TextField;
 
 public class DynamicInputDialog extends Dialog {
 
@@ -83,28 +90,103 @@ public class DynamicInputDialog extends Dialog {
             if (fieldType.equals(String.class)) {
                 TextField textField = fieldWrapper.field.getAnnotation(TextField.class);
                 if (textField != null && textField.values().length > 0) {
-                    control = createComboField(parent.getFont(), composite, fieldWrapper,
-                        fieldName, fieldType);
+                    control = createComboField(parent.getFont(), composite,
+                        fieldWrapper, fieldName, fieldType);
                 } else {
                     control = createStringField(parent.getFont(), composite,
                         fieldWrapper, fieldName);
                 }
             } else if (fieldType.equals(Boolean.class)
                 || fieldType.equals(boolean.class)) {
-                control = createCheckButtonField(composite, fieldWrapper, fieldName);
+                control = createCheckButtonField(composite, fieldWrapper,
+                    fieldName);
             } else if (fieldType.isEnum()) {
                 control = createComboFieldOfEnum(parent.getFont(), composite,
                     fieldWrapper, fieldName, fieldType);
-
+            } else if (fieldType.equals(Integer.class)) {
+                control = createSpinner(parent.getFont(), composite,
+                    fieldWrapper, fieldName);
+            } else if (fieldType.equals(File.class)) {
+                control = createFileDialog(parent.getFont(), composite,
+                    fieldWrapper, fieldName);
             } else {
                 throw new RuntimeException("Unsupported type : "
                     + fieldType.getName());
             }
-            
+
             control.setEnabled(fieldWrapper.inputField.enabled());
         }
         applyDialogFont(composite);
         return composite;
+    }
+
+    private Control createFileDialog(Font font, Composite parent,
+        final FieldWrapper fieldWrapper, String fieldName) {
+        createLabel(font, parent, fieldName);
+
+        Composite composite = new Composite(parent, SWT.NONE);
+        GridData layoutData = new GridData(SWT.FILL, SWT.CENTER, true, false);
+        composite.setLayoutData(layoutData);
+        GridLayout layout = new GridLayout(2, false);
+        layout.marginWidth = 0;
+        composite.setLayout(layout);
+        final Text text = new Text(composite, SWT.BORDER
+            | (fieldWrapper.inputField.readonly() ? SWT.READ_ONLY : SWT.NONE));
+        layoutData = new GridData(SWT.FILL, SWT.CENTER, true, false);
+        text.setLayoutData(layoutData);
+        final Button button = new Button(composite, SWT.PUSH);
+        button.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false));
+        button.setText("...");
+        button.addSelectionListener(new AbstractSelectionListener() {
+
+            public void widgetSelected(SelectionEvent e) {
+                FileDialog fileDialog = new FileDialog(getShell());
+                String file = fileDialog.open();
+                if (file != null) {
+                    text.setText(file);
+                }
+            }
+        });
+
+        Object value = getValue(fieldWrapper.field);
+        if (value != null) {
+            text.setText(((File) value).getAbsolutePath());
+        }
+
+        fieldControls.add(new FieldControl() {
+
+            public Field getField() {
+                return fieldWrapper.field;
+            }
+
+            public Object getValue() {
+                return new File(text.getText());
+            }
+        });
+        return composite;
+    }
+
+    private Control createSpinner(Font font, Composite parent,
+        final FieldWrapper fieldWrapper, String fieldName) {
+        createLabel(font, parent, fieldName);
+        final Spinner spinner = new Spinner(parent, SWT.BORDER
+            | (fieldWrapper.inputField.readonly() ? SWT.READ_ONLY : SWT.NONE));
+        Object value = getValue(fieldWrapper.field);
+        if (value != null) {
+            spinner.setSelection(((Integer) value).intValue());
+        }
+
+        fieldControls.add(new FieldControl() {
+
+            public Field getField() {
+                return fieldWrapper.field;
+            }
+
+            public Object getValue() {
+                return spinner.getSelection();
+            }
+        });
+        return spinner;
     }
 
     private Combo createComboFieldOfEnum(Font font, Composite parent,

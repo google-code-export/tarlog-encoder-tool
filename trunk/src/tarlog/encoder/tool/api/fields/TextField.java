@@ -1,4 +1,4 @@
-package tarlog.encoder.tool.ui;
+package tarlog.encoder.tool.api.fields;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -6,8 +6,19 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Specifies text fields in addition to the regular input fields. Should be used
- * only together with the <tt>InputField</tt> annotation.
+ * <p>
+ * Specifies text fields in addition to the regular input fields. Putting this
+ * annotation without the <tt>InputField</tt> annotation will do nothing.
+ * <p>
+ * Text fields can be of the following types:
+ * <ul>
+ * <li>Single line text.</li>
+ * <li>Multi-line text.</li>
+ * <li>Combo box with valid values.</li>
+ * </ul>
+ * <p>
+ * In addition it's possible to declare text field as password, which will cause
+ * to replace input characters with the stars.
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
@@ -33,7 +44,7 @@ public @interface TextField {
     /**
      * <p>
      * Values that will be added to combo. If specified, multiline and password
-     * will be ignored and combo will be placed instead of text box.
+     * will be ignored and combo will be placed instead of the text box.
      * <p>
      * In order to force the user to use only these values, set
      * <tt>readonly</tt> attribute on the <tt>InputField</tt> annotation to

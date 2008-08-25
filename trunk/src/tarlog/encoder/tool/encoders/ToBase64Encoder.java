@@ -5,8 +5,8 @@ import java.io.UnsupportedEncodingException;
 
 import org.apache.commons.codec.binary.Base64;
 
-import tarlog.encoder.tool.AbstractEncoder;
 import tarlog.encoder.tool.Utils;
+import tarlog.encoder.tool.api.AbstractEncoder;
 
 
 /**

@@ -3,11 +3,11 @@ package tarlog.encoder.tool.encoders;
 import java.security.Signature;
 import java.security.cert.Certificate;
 
-import tarlog.encoder.tool.KeyStoreAwareEncoder;
 import tarlog.encoder.tool.SignatureAlgorithms;
 import tarlog.encoder.tool.Utils;
-import tarlog.encoder.tool.ui.InputField;
-import tarlog.encoder.tool.ui.TextField;
+import tarlog.encoder.tool.api.KeyStoreAwareEncoder;
+import tarlog.encoder.tool.api.fields.InputField;
+import tarlog.encoder.tool.api.fields.TextField;
 
 public class VerifySignature extends KeyStoreAwareEncoder {
 
@@ -24,7 +24,7 @@ public class VerifySignature extends KeyStoreAwareEncoder {
     private String              signature;
     
     @Override
-    public String getEncoderName() {
+    public String getName() {
         return "Verify Signature";
     }
 

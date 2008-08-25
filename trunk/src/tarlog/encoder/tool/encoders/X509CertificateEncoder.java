@@ -7,11 +7,13 @@ import java.security.Signature;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 
-import tarlog.encoder.tool.FileAwareEncoder;
+import org.eclipse.jface.dialogs.Dialog;
+
 import tarlog.encoder.tool.SignatureAlgorithms;
 import tarlog.encoder.tool.Utils;
-import tarlog.encoder.tool.ui.InputField;
-import tarlog.encoder.tool.ui.TextField;
+import tarlog.encoder.tool.api.FileAwareEncoder;
+import tarlog.encoder.tool.api.fields.InputField;
+import tarlog.encoder.tool.api.fields.TextField;
 
 public class X509CertificateEncoder extends FileAwareEncoder {
 
@@ -25,7 +27,7 @@ public class X509CertificateEncoder extends FileAwareEncoder {
     private String              signature;
 
     @Override
-    public String getEncoderName() {
+    public String getName() {
         return "X509 Verifier";
     }
 
@@ -35,19 +37,23 @@ public class X509CertificateEncoder extends FileAwareEncoder {
     }
     
     @Override
-    public void setFileName(String fileName) {
+    protected int beforeEncode() {
+        int inputStatus = super.beforeEncode();
+        if (inputStatus != Dialog.OK) {
+            return inputStatus;
+        }
         try {
-            super.setFileName(fileName);
-            InputStream inStream = new FileInputStream(fileName);
+            InputStream inStream = new FileInputStream(getFile());
             CertificateFactory cf = CertificateFactory.getInstance("X.509");
             cert = (X509Certificate) cf.generateCertificate(inStream);
             inStream.close();
+            return Dialog.OK;
         } catch (Exception e) {
             Utils.showException(shell, e);
-            super.setFileName(null);
+            return Dialog.CANCEL;
         }
     }
-
+    
     @Override
     public Object encode(byte[] source) {
         //        SigDetailsDialog inputDialog = new SigDetailsDialog(shell);
