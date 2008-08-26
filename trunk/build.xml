@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="Encoder Tool" default="build-stand-alone">
+
+	<property name="encoder.version" value="0.1.0" />
+	<property name="source" value="${basedir}/src" />
+	<property name="target" value="${basedir}/target" />
+	<property name="jar" value="${target}/jar" />
+	<property name="lib" value="${target}/lib" />
+	<property name="jar.icons" value="${jar}/icons" />
+	<property name="eclipse.plugins" value="C:/eclipse-ganymede/plugins" />
+	<property name="encoder.jar.name" value="encoder-${encoder.version}.jar" />
+	<property name="icons.dir" value="${basedir}/icons" />
+
+	<fileset dir="${eclipse.plugins}" id="third.parties">
+		<include name="org.eclipse.ui_3.4.0.I20080610-1200.jar" />
+		<include name="org.eclipse.swt_3.4.0.v3448f.jar" />
+		<include name="org.eclipse.swt.win32.win32.x86_3.4.0.v3448f.jar" />
+		<include name="org.eclipse.jface_3.4.0.I20080606-1300.jar" />
+		<include name="org.eclipse.core.commands_3.4.0.I20080509-2000.jar" />
+		<include name="org.eclipse.ui.workbench_3.4.0.I20080606-1300.jar" />
+		<include name="org.apache.commons.codec_1.3.0.v20080530-1600.jar" />
+		<include name="org.eclipse.core.runtime_3.4.0.v20080512.jar" />
+		<include name="org.eclipse.osgi_3.4.0.v20080605-1900.jar" />
+		<include name="org.eclipse.equinox.common_3.4.0.v20080421-2006.jar" />
+		<include name="org.eclipse.core.jobs_3.4.0.v20080512.jar" />
+		<include name="org.eclipse.core.runtime.compatibility.registry_3.2.200.v20080610\runtime_registry_compatibility.jar" />
+		<include name="org.eclipse.equinox.registry_3.4.0.v20080516-0950.jar" />
+		<include name="org.eclipse.equinox.preferences_3.2.200.v20080421-2006.jar" />
+		<include name="org.eclipse.core.contenttype_3.3.0.v20080604-1400.jar" />
+		<include name="org.eclipse.equinox.app_1.1.0.v20080421-2006.jar" />
+	</fileset>
+
+	<path id="compile.classpath">
+		<fileset refid="third.parties" />
+	</path>
+
+	<target name="compile" depends="clean">
+		<mkdir dir="${jar}" />
+		<javac srcdir="${source}" destdir="${jar}">
+			<classpath refid="compile.classpath" />
+		</javac>
+		<copy todir="${jar}">
+			<fileset dir="${source}">
+				<exclude name="*.java" />
+			</fileset>
+		</copy>
+	</target>
+
+	<target name="copy-icons">
+		<mkdir dir="${jar.icons}" />
+		<copy todir="${jar.icons}">
+			<fileset dir="${icons.dir}">
+			</fileset>
+		</copy>
+	</target>
+
+	<target name="copy-third-parties">
+		<mkdir dir="${lib}" />
+		<copy todir="${lib}" flatten="true">
+			<fileset refid="third.parties" />
+		</copy>
+	</target>
+
+
+
+	<target name="build-stand-alone" depends="compile, copy-icons, copy-third-parties">
+		<manifestclasspath property="classpath" jarfile="${target}/${encoder.jar.name}">
+			<classpath>
+				<fileset id="lib.jars" dir="${lib}" includes="*.jar">
+				</fileset>
+			</classpath>
+		</manifestclasspath>
+		<jar destfile="${target}/${encoder.jar.name}" basedir="${jar}">
+			<manifest>
+				<attribute name="Bundle-Name" value="Encoder Tool" />
+				<attribute name="Bundle-Version" value="${encoder.version}" />
+				<attribute name="Bundle-Vendor" value="http://tarlogonjava.blogspot.com" />
+				<attribute name="Main-Class" value="tarlog.encoder.tool.ui.EncoderTool" />
+				<attribute name="Class-Path" value="${classpath}" />
+			</manifest>
+		</jar>
+	</target>
+
+	<target name="clean">
+		<delete dir="${target}" />
+	</target>
+
+</project>

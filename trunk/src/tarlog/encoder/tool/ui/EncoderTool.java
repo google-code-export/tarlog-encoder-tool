@@ -4,11 +4,15 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
 import java.util.TreeSet;
+import java.util.jar.Attributes;
+import java.util.jar.Manifest;
 
 import org.eclipse.jface.window.ApplicationWindow;
 import org.eclipse.swt.SWT;
@@ -71,6 +75,7 @@ public class EncoderTool extends ApplicationWindow {
         }
     }
 
+
     @Override
     protected Control createContents(Composite parent) {
         shell = getShell();
@@ -80,8 +85,6 @@ public class EncoderTool extends ApplicationWindow {
         if (image != null) {
             shell.setImage(image);
         }
-        //        shell.setMaximized(true);
-
         SashForm sashForm = new SashForm(shell, SWT.VERTICAL);
         createTopPart(sashForm);
         createBottomPart(sashForm);
