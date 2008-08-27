@@ -7,7 +7,7 @@ import tarlog.encoder.tool.SignatureAlgorithms;
 import tarlog.encoder.tool.Utils;
 import tarlog.encoder.tool.api.KeyStoreAwareEncoder;
 import tarlog.encoder.tool.api.fields.InputField;
-import tarlog.encoder.tool.api.fields.TextField;
+import tarlog.encoder.tool.api.fields.InputTextField;
 
 public class VerifySignature extends KeyStoreAwareEncoder {
 
@@ -20,7 +20,7 @@ public class VerifySignature extends KeyStoreAwareEncoder {
     private String              alias;
 
     @InputField(name = "Signature")
-    @TextField(multiline = true)
+    @InputTextField(multiline = true)
     private String              signature;
 
     @Override

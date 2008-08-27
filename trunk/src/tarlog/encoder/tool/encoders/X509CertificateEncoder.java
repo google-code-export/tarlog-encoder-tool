@@ -14,7 +14,7 @@ import tarlog.encoder.tool.SignatureAlgorithms;
 import tarlog.encoder.tool.Utils;
 import tarlog.encoder.tool.api.AbstractEncoder;
 import tarlog.encoder.tool.api.fields.InputField;
-import tarlog.encoder.tool.api.fields.TextField;
+import tarlog.encoder.tool.api.fields.InputTextField;
 
 public class X509CertificateEncoder extends AbstractEncoder {
 
@@ -27,7 +27,7 @@ public class X509CertificateEncoder extends AbstractEncoder {
     private SignatureAlgorithms algorithm = SignatureAlgorithms.SHA1withDSA;
 
     @InputField(name = "Signature")
-    @TextField(multiline = true)
+    @InputTextField(multiline = true)
     private String              signature;
 
     @Override

@@ -28,9 +28,9 @@ import org.eclipse.swt.widgets.Text;
 
 import tarlog.encoder.tool.Utils;
 import tarlog.encoder.tool.api.AbstractEncoder.FieldWrapper;
-import tarlog.encoder.tool.api.fields.FileField;
-import tarlog.encoder.tool.api.fields.TextField;
-import tarlog.encoder.tool.api.fields.FileField.FileFieldType;
+import tarlog.encoder.tool.api.fields.InputFileField;
+import tarlog.encoder.tool.api.fields.InputTextField;
+import tarlog.encoder.tool.api.fields.InputFileField.FileFieldType;
 
 public class DynamicInputDialog extends Dialog {
 
@@ -89,7 +89,7 @@ public class DynamicInputDialog extends Dialog {
             final Class<?> fieldType = fieldWrapper.field.getType();
             Control control;
             if (fieldType.equals(String.class)) {
-                TextField textField = fieldWrapper.field.getAnnotation(TextField.class);
+                InputTextField textField = fieldWrapper.field.getAnnotation(InputTextField.class);
                 if (textField != null && textField.values().length > 0) {
                     control = createComboField(parent.getFont(), composite,
                         fieldWrapper, fieldName, fieldType);
@@ -141,7 +141,7 @@ public class DynamicInputDialog extends Dialog {
             text.setText(fileName);
         }
 
-        final FileField fileFieldAnnotation = fieldWrapper.field.getAnnotation(FileField.class);
+        final InputFileField fileFieldAnnotation = fieldWrapper.field.getAnnotation(InputFileField.class);
 
         final Button button = new Button(composite, SWT.PUSH);
         button.setEnabled(!fieldWrapper.inputField.readonly());
@@ -259,7 +259,7 @@ public class DynamicInputDialog extends Dialog {
         createLabel(font, parent, fieldName);
         final Combo combo = new Combo(parent, SWT.DROP_DOWN
             | (fieldWrapper.inputField.readonly() ? SWT.READ_ONLY : SWT.NONE));
-        TextField textField = fieldWrapper.field.getAnnotation(TextField.class);
+        InputTextField textField = fieldWrapper.field.getAnnotation(InputTextField.class);
         if (textField != null) {
             for (String val : textField.values()) {
                 combo.add(val);
@@ -285,7 +285,7 @@ public class DynamicInputDialog extends Dialog {
     private Text createStringField(Font font, Composite parent,
         final FieldWrapper fieldWrapper, String fieldName) {
         createLabel(font, parent, fieldName);
-        TextField textField = fieldWrapper.field.getAnnotation(TextField.class);
+        InputTextField textField = fieldWrapper.field.getAnnotation(InputTextField.class);
         boolean isMultiline = textField != null ? textField.multiline() : false;
         boolean isPassword = textField != null ? textField.password() : false;
         final Text text = new Text(parent, (isMultiline ? SWT.MULTI

@@ -5,9 +5,20 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * <p>
+ * Specifies file fields in addition to the regular input fields. Putting this
+ * annotation without the <tt>InputField</tt> annotation will do nothing.
+ * <p>
+ * File fields can be of the following types: directory, file.
+ * <p>
+ * It's possible to define the filter path for the dialogs.
+ * <p>
+ * In addition it's possible to define filter extensions for the file dialogs.
+ */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
-public @interface FileField {
+public @interface InputFileField {
 
     /**
      * type of the file field. Can be either file or directory.

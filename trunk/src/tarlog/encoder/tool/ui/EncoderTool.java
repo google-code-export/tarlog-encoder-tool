@@ -4,16 +4,11 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
 import java.util.TreeSet;
-import java.util.jar.Attributes;
-import java.util.jar.JarFile;
-import java.util.jar.Manifest;
 
 import org.eclipse.jface.window.ApplicationWindow;
 import org.eclipse.swt.SWT;
@@ -104,6 +99,7 @@ public class EncoderTool extends ApplicationWindow {
         sourceText = createTextEditor(composite, SWT.MULTI | SWT.BORDER);
         Button exchange = new Button(composite, SWT.PUSH);
         exchange.setText("<>");
+        exchange.setToolTipText("Swap input");
         exchange.addSelectionListener(new AbstractSelectionListener() {
 
             @Override
