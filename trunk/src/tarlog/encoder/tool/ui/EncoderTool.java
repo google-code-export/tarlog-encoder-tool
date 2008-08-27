@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.TreeSet;
 import java.util.jar.Attributes;
+import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 
 import org.eclipse.jface.window.ApplicationWindow;
