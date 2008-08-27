@@ -2,14 +2,15 @@
 <project name="Encoder Tool" default="build-stand-alone">
 
 	<property name="encoder.version" value="0.1.0" />
-	<property name="source" value="${basedir}/src" />
-	<property name="target" value="${basedir}/target" />
+	<property name="source" value="${basedir}/../src" />
+	<property name="target" value="${basedir}/../target" />
 	<property name="jar" value="${target}/jar" />
 	<property name="lib" value="${target}/lib" />
 	<property name="jar.icons" value="${jar}/icons" />
 	<property name="eclipse.plugins" value="C:/eclipse-ganymede/plugins" />
 	<property name="encoder.jar.name" value="encoder-${encoder.version}.jar" />
-	<property name="icons.dir" value="${basedir}/icons" />
+	<property name="encoder.zip.name" value="encoder-${encoder.version}.zip" />
+	<property name="icons.dir" value="${basedir}/../icons" />
 
 	<fileset dir="${eclipse.plugins}" id="third.parties">
 		<include name="org.eclipse.ui_3.4.0.I20080610-1200.jar" />
@@ -70,15 +71,22 @@
 				</fileset>
 			</classpath>
 		</manifestclasspath>
+		<tstamp>
+			<format property="touch.time" pattern="MM/dd/yyyy hh:mm aa" />
+		</tstamp>
 		<jar destfile="${target}/${encoder.jar.name}" basedir="${jar}">
 			<manifest>
 				<attribute name="Bundle-Name" value="Encoder Tool" />
 				<attribute name="Bundle-Version" value="${encoder.version}" />
 				<attribute name="Bundle-Vendor" value="http://tarlogonjava.blogspot.com" />
+				<attribute name="Created-At" value="${touch.time}" />
 				<attribute name="Main-Class" value="tarlog.encoder.tool.ui.EncoderTool" />
 				<attribute name="Class-Path" value="${classpath}" />
 			</manifest>
 		</jar>
+		<zip destfile="${target}/${encoder.zip.name}">
+			<fileset file="${lib}" includes="*.jar"></fileset>
+		</zip>
 	</target>
 
 	<target name="clean">
