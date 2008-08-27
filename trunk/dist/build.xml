@@ -96,7 +96,9 @@
 				<include name="src/**/*.properties"/>
 			</fileset>
 			<fileset file="LICENSE.txt" />
+			<fileset file="README.txt" />
 		</copy>
+		<replace token="@JAR_FILE_NAME@" value="${encoder.jar.name}" file="${zip}/README.txt"></replace>
 		<zip destfile="${target}/${encoder.zip.name}" basedir="${zip}">
 		</zip>
 	</target>
