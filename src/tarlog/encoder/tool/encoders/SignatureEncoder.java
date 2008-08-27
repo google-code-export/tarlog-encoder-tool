@@ -7,7 +7,7 @@ import tarlog.encoder.tool.SignatureAlgorithms;
 import tarlog.encoder.tool.Utils;
 import tarlog.encoder.tool.api.KeyStoreAwareEncoder;
 import tarlog.encoder.tool.api.fields.InputField;
-import tarlog.encoder.tool.api.fields.InputTextField;
+import tarlog.encoder.tool.api.fields.TextField;
 
 public class SignatureEncoder extends KeyStoreAwareEncoder {
 
@@ -18,7 +18,7 @@ public class SignatureEncoder extends KeyStoreAwareEncoder {
     private String              alias;
 
     @InputField(name = "Private Key Password")
-    @InputTextField(password = true)
+    @TextField(password = true)
     private String              password;
 
     @Override

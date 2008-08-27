@@ -9,7 +9,7 @@ import org.eclipse.jface.dialogs.Dialog;
 
 import tarlog.encoder.tool.Utils;
 import tarlog.encoder.tool.api.fields.InputField;
-import tarlog.encoder.tool.api.fields.InputTextField;
+import tarlog.encoder.tool.api.fields.TextField;
 
 public abstract class KeyStoreAwareEncoder extends AbstractEncoder {
 
@@ -19,11 +19,11 @@ public abstract class KeyStoreAwareEncoder extends AbstractEncoder {
     private File       file;
 
     @InputField(name = "Key Store Type", order = -200)
-    @InputTextField(values = { "JKS", "PKCS12" })
+    @TextField(values = { "JKS", "PKCS12" })
     private String     type = "JKS";
 
     @InputField(name = "Key Store Password", order = -100)
-    @InputTextField(password = true)
+    @TextField(password = true)
     private String     password;
 
     @Override
