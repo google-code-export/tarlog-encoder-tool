@@ -6,6 +6,7 @@
 	<property name="target" value="${basedir}/../target" />
 	<property name="jar" value="${target}/jar" />
 	<property name="lib" value="${target}/lib" />
+	<property name="zip" value="${target}/zip" />
 	<property name="jar.icons" value="${jar}/icons" />
 	<property name="eclipse.plugins" value="C:/eclipse-ganymede/plugins" />
 	<property name="encoder.jar.name" value="encoder-${encoder.version}.jar" />
@@ -67,7 +68,7 @@
 	<target name="build-stand-alone" depends="compile, copy-icons, copy-third-parties">
 		<manifestclasspath property="classpath" jarfile="${target}/${encoder.jar.name}">
 			<classpath>
-				<fileset  dir="${lib}" includes="*.jar">
+				<fileset dir="${lib}" includes="*.jar">
 				</fileset>
 			</classpath>
 		</manifestclasspath>
@@ -84,8 +85,19 @@
 				<attribute name="Class-Path" value="${classpath}" />
 			</manifest>
 		</jar>
-		<zip destfile="${target}/${encoder.zip.name}">
-			<fileset file="${lib}" includes="*.jar"></fileset>
+		<delete dir="${jar}" />
+		
+		<mkdir dir="${zip}" />
+		<copy todir="${zip}">
+			<fileset file="${lib}" includes="**/*.jar"></fileset>
+			<fileset file="${target}/${encoder.jar.name}"></fileset>
+			<fileset file="${source}" >
+				<include name="src/**/*.java"/>
+				<include name="src/**/*.properties"/>
+			</fileset>
+			<fileset file="LICENSE.txt" />
+		</copy>
+		<zip destfile="${target}/${encoder.zip.name}" basedir="${zip}">
 		</zip>
 	</target>
 
