@@ -67,7 +67,10 @@ public class EncoderTool extends ApplicationWindow {
 
     private Image getImage() {
         try {
-            InputStream img = new FileInputStream("icons/encoders.jpg");
+            InputStream img = getClass().getClassLoader().getResourceAsStream("icons/encoders.jpg");
+            if (img == null) {
+                img = new FileInputStream("icons/encoders.jpg");
+            }
             ImageLoader imageLoader = new ImageLoader();
             ImageData[] load = imageLoader.load(img);
             return new Image(shell.getDisplay(), load[0]);

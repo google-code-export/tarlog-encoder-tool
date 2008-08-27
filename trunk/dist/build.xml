@@ -67,7 +67,7 @@
 	<target name="build-stand-alone" depends="compile, copy-icons, copy-third-parties">
 		<manifestclasspath property="classpath" jarfile="${target}/${encoder.jar.name}">
 			<classpath>
-				<fileset id="lib.jars" dir="${lib}" includes="*.jar">
+				<fileset  dir="${lib}" includes="*.jar">
 				</fileset>
 			</classpath>
 		</manifestclasspath>
