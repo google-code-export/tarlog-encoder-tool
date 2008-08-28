@@ -1,9 +1,12 @@
 package tarlog.encoder.tool.ui.ddialog;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 import java.util.Map.Entry;
 
+import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ICellModifier;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TextCellEditor;
@@ -22,22 +25,18 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 
 import tarlog.encoder.tool.api.AbstractEncoder.FieldWrapper;
-import tarlog.encoder.tool.ui.AbstractStructuredContentProvider;
 import tarlog.encoder.tool.ui.AbstractTableLabelProvider;
 import tarlog.encoder.tool.ui.ddialog.DynamicInputDialog.FieldControl;
 
 public class CreatePropertiesDialog extends CreateField {
 
-
-
-
-    private static final String VALUE = "Value";
-    private static final String NAME  = "Name";
+    private static final String   VALUE       = "Value";
+    private static final String   NAME        = "Name";
+    private static final String[] columnNames = { NAME, VALUE };
 
     public CreatePropertiesDialog(DynamicInputDialog inputDialog) {
         super(inputDialog);
     }
-
 
     public Control createDialog(Font font, Composite parent,
         final FieldWrapper fieldWrapper, String fieldName) {
@@ -46,9 +45,43 @@ public class CreatePropertiesDialog extends CreateField {
         group.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 2, 1));
         group.setLayout(new GridLayout(2, false));
 
+        final Table table = createTable(group);
+
+        final List<Pair> tableInput = new ArrayList<Pair>();
+        Object value = getValue(fieldWrapper.field);
+
+        if (value instanceof Properties) {
+            Properties props = (Properties) value;
+            for (Entry<Object, Object> entry : props.entrySet()) {
+                tableInput.add(new Pair(entry));
+            }
+        }
+        table.setData(tableInput);
+
+        final TableViewer tableViewer = createTableViewer(table);
+
+        createButtonsArea(group, tableViewer);
+
+        fieldControls.add(new FieldControl() {
+
+            public Field getField() {
+                return fieldWrapper.field;
+            }
+
+            public Object getValue() {
+                Properties properties = new Properties();
+                for (Pair pair : tableInput) {
+                    properties.setProperty(pair.key, pair.value);
+                }
+                return properties;
+            }
+        });
+        return table;
+    }
+
+    private Table createTable(Group group) {
         final Table table = new Table(group, SWT.BORDER | SWT.FULL_SELECTION
             | SWT.MULTI);
-        final String[] columnNames = { NAME, VALUE };
 
         TableColumn tableColumn = new TableColumn(table, SWT.LEFT);
         tableColumn.setText(columnNames[0]);
@@ -63,35 +96,66 @@ public class CreatePropertiesDialog extends CreateField {
         table.setLayoutData(layoutData);
         table.setLinesVisible(true);
         table.setHeaderVisible(true);
+        return table;
+    }
 
-        final TableViewer tableViewer = new TableViewer(table);
+    private void createButtonsArea(Group group, final TableViewer tableViewer) {
+        Composite buttonsComposite = new Composite(group, SWT.NONE);
+        GridLayout gridLayout = new GridLayout();
+        gridLayout.marginWidth = 0;
+        gridLayout.marginHeight = 0;
+        buttonsComposite.setLayout(gridLayout);
+        buttonsComposite.setLayoutData(new GridData(SWT.LEFT, SWT.UP, false,
+            false));
+        Button addButton = new Button(buttonsComposite, SWT.PUSH);
+        addButton.setText("Add");
 
-        tableViewer.setContentProvider(new AbstractStructuredContentProvider() {
+        final Table table = tableViewer.getTable();
+        @SuppressWarnings("unchecked")
+        final List<Pair> tableInput = (List<Pair>) table.getData();
+        addButton.addSelectionListener(new SelectionAdapter() {
 
-            public Object[] getElements(Object inputElement) {
-                if (inputElement instanceof Properties) {
-                    return ((Properties) inputElement).entrySet().toArray();
-                }
-                return new Object[0];
+            public void widgetSelected(SelectionEvent event) {
+                tableInput.add(new Pair());
+                tableViewer.refresh();
+                table.setSelection(tableInput.size() - 1);
             }
         });
 
+        //        addButton.setSize(convertHorizontalDLUsToPixels(6));
+        Button removeButton = new Button(buttonsComposite, SWT.PUSH);
+        removeButton.setText("Remove");
+        // make the buttons equal size
+        addButton.setSize(removeButton.getSize());
+        removeButton.addSelectionListener(new SelectionAdapter() {
+
+            public void widgetSelected(SelectionEvent event) {
+                int selectionIndex = table.getSelectionIndex();
+                if (selectionIndex >= 0 && selectionIndex < tableInput.size()) {
+                    tableInput.remove(selectionIndex);
+                    tableViewer.refresh();
+                    table.setSelection(selectionIndex);
+                }
+            }
+        });
+    }
+
+    private TableViewer createTableViewer(final Table table) {
+        final TableViewer tableViewer = new TableViewer(table);
+
+        tableViewer.setContentProvider(new ArrayContentProvider());
         tableViewer.setLabelProvider(new AbstractTableLabelProvider() {
 
             @Override
             public String getColumnText(Object element, int columnIndex) {
                 @SuppressWarnings("unchecked")
-                Entry<String, String> entry = (Entry<String, String>) element;
-                return columnIndex == 0 ? entry.getKey() : entry.getValue();
+                Pair entry = (Pair) element;
+                return columnIndex == 0 ? entry.key : entry.value;
             }
 
         });
-
-        Object value = getValue(fieldWrapper.field);
-        final Properties tableInput = value == null ? new Properties()
-            : (Properties) value;
-
-        table.setData(tableInput);
+        @SuppressWarnings("unchecked")
+        final List<Pair> tableInput = (List<Pair>) table.getData();
         tableViewer.setInput(tableInput);
         tableViewer.setColumnProperties(columnNames);
 
@@ -105,69 +169,44 @@ public class CreatePropertiesDialog extends CreateField {
             }
 
             public Object getValue(Object element, String property) {
-                @SuppressWarnings("unchecked")
-                Entry<String, String> entry = (Entry<String, String>) element;
+                Pair entry = (Pair) element;
                 if (property.equals(NAME)) {
-                    return entry.getKey();
+                    return entry.key;
                 }
-                return entry.getValue();
+                return entry.value;
             }
 
             public void modify(Object element, String property, Object value) {
                 TableItem item = (TableItem) element;
-                @SuppressWarnings("unchecked")
-                Entry<String, String> entry = (Entry<String, String>) item.getData();
+                Pair pair = (Pair) item.getData();
                 if (property.equals(NAME)) {
-                    Object keyValue = tableInput.remove(entry.getKey());
-                    tableInput.setProperty((String) value, (String) keyValue);
+                    pair.key = (String) value;
                 } else {
-                    entry.setValue((String) value);
+                    pair.value = ((String) value);
                 }
                 tableViewer.refresh();
             }
         });
+        return tableViewer;
+    }
 
-        Composite buttonsComposite = new Composite(group, SWT.NONE);
-        GridLayout gridLayout = new GridLayout();
-        gridLayout.marginWidth = 0;
-        gridLayout.marginHeight = 0;
-        buttonsComposite.setLayout(gridLayout);
-        buttonsComposite.setLayoutData(new GridData(SWT.LEFT, SWT.UP, false,
-            false));
-        Button addButton = new Button(buttonsComposite, SWT.PUSH);
-        addButton.setText("Add");
-        addButton.addSelectionListener(new SelectionAdapter() {
+    class Pair {
 
-            public void widgetSelected(SelectionEvent event) {
-                tableInput.setProperty("", "");
-                table.setSelection(tableInput.size() - 1);
-                tableViewer.refresh();
-            }
-        });
+        Pair(String key, String value) {
+            this.key = key;
+            this.value = value;
+        }
 
-        //        addButton.setSize(convertHorizontalDLUsToPixels(6));
-        Button removeButton = new Button(buttonsComposite, SWT.PUSH);
-        removeButton.setText("Remove");
-        // make the buttons equal size
-        addButton.setSize(removeButton.getSize());
-        removeButton.addSelectionListener(new SelectionAdapter() {
+        public Pair(Entry<Object, Object> entry) {
+            this((String) entry.getKey(), (String) entry.getValue());
 
-            public void widgetSelected(SelectionEvent event) {
-                System.out.println(".widgetSelected()");
-            }
-        });
+        }
 
-        fieldControls.add(new FieldControl() {
-
-            public Field getField() {
-                return fieldWrapper.field;
-            }
-
-            public Object getValue() {
-                return table.getData();
-            }
-        });
-        return table;
+        public Pair() {
+            this("", "");
+        }
+        String key;
+        String value;
     }
 
 }
