@@ -248,16 +248,7 @@ public class DynamicInputDialog extends Dialog {
 
         final TableViewer tableViewer = new TableViewer(table);
 
-        tableViewer.setContentProvider(new IStructuredContentProvider() {
-
-            public void dispose() {
-                // do nothing
-            }
-
-            public void inputChanged(Viewer viewer, Object oldInput,
-                Object newInput) {
-                // do nothing
-            }
+        tableViewer.setContentProvider(new AbstractStructuredContentProvider() {
 
             public Object[] getElements(Object inputElement) {
                 if (inputElement instanceof Properties) {
@@ -267,32 +258,13 @@ public class DynamicInputDialog extends Dialog {
             }
         });
 
-        tableViewer.setLabelProvider(new ITableLabelProvider() {
+        tableViewer.setLabelProvider(new AbstractTableLabelProvider() {
 
-            public Image getColumnImage(Object element, int columnIndex) {
-                return null;
-            }
-
+            @Override
             public String getColumnText(Object element, int columnIndex) {
                 @SuppressWarnings("unchecked")
                 Entry<String, String> entry = (Entry<String, String>) element;
                 return columnIndex == 0 ? entry.getKey() : entry.getValue();
-            }
-
-            public void addListener(ILabelProviderListener listener) {
-
-            }
-
-            public void dispose() {
-
-            }
-
-            public boolean isLabelProperty(Object element, String property) {
-                return false;
-            }
-
-            public void removeListener(ILabelProviderListener listener) {
-
             }
 
         });
@@ -350,6 +322,7 @@ public class DynamicInputDialog extends Dialog {
 
             public void widgetSelected(SelectionEvent event) {
                 tableInput.setProperty("", "");
+                table.setSelection(tableInput.size() - 1);
                 tableViewer.refresh();
             }
         });
