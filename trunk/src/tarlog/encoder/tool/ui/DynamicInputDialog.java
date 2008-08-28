@@ -7,12 +7,23 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
+import java.util.Map.Entry;
 
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.viewers.ICellModifier;
+import org.eclipse.jface.viewers.ILabelProviderListener;
+import org.eclipse.jface.viewers.IStructuredContentProvider;
+import org.eclipse.jface.viewers.ITableLabelProvider;
+import org.eclipse.jface.viewers.TableViewer;
+import org.eclipse.jface.viewers.TextCellEditor;
+import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -21,9 +32,13 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.FileDialog;
+import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Spinner;
+import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.TableColumn;
+import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 
 import tarlog.encoder.tool.Utils;
@@ -34,10 +49,12 @@ import tarlog.encoder.tool.api.fields.InputFileField.FileFieldType;
 
 public class DynamicInputDialog extends Dialog {
 
-    private Object             object;
-    private List<FieldWrapper> fields;
-    private String             title;
-    private List<FieldControl> fieldControls;
+    private static final String VALUE = "Value";
+    private static final String NAME  = "Name";
+    private Object              object;
+    private List<FieldWrapper>  fields;
+    private String              title;
+    private List<FieldControl>  fieldControls;
 
     public DynamicInputDialog(Shell parentShell, String title, Object object,
         List<FieldWrapper> fields) {
@@ -109,6 +126,9 @@ public class DynamicInputDialog extends Dialog {
                     fieldWrapper, fieldName);
             } else if (fieldType.equals(File.class)) {
                 control = createFileDialog(parent.getFont(), composite,
+                    fieldWrapper, fieldName);
+            } else if (fieldType.equals(Properties.class)) {
+                control = createProperties(parent.getFont(), composite,
                     fieldWrapper, fieldName);
             } else {
                 throw new RuntimeException("Unsupported type : "
@@ -198,6 +218,165 @@ public class DynamicInputDialog extends Dialog {
             }
         });
         return composite;
+    }
+
+    private Control createProperties(Font font, Composite parent,
+        final FieldWrapper fieldWrapper, String fieldName) {
+
+        Group group = new Group(parent, SWT.NONE);
+        group.setText(fieldName);
+        group.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 2, 1));
+        group.setLayout(new GridLayout(2, false));
+
+        final Table table = new Table(group, SWT.BORDER | SWT.FULL_SELECTION
+            | SWT.MULTI);
+        final String[] columnNames = { NAME, VALUE };
+
+        TableColumn tableColumn = new TableColumn(table, SWT.LEFT);
+        tableColumn.setText(columnNames[0]);
+        tableColumn.setWidth(100);
+
+        tableColumn = new TableColumn(table, SWT.LEFT);
+        tableColumn.setText(columnNames[1]);
+        tableColumn.setWidth(150);
+
+        GridData layoutData = new GridData(SWT.FILL, SWT.FILL, true, true);
+        layoutData.heightHint = convertVerticalDLUsToPixels(60);
+        table.setLayoutData(layoutData);
+        table.setLinesVisible(true);
+        table.setHeaderVisible(true);
+
+        final TableViewer tableViewer = new TableViewer(table);
+
+        tableViewer.setContentProvider(new IStructuredContentProvider() {
+
+            public void dispose() {
+                // do nothing
+            }
+
+            public void inputChanged(Viewer viewer, Object oldInput,
+                Object newInput) {
+                // do nothing
+            }
+
+            public Object[] getElements(Object inputElement) {
+                if (inputElement instanceof Properties) {
+                    return ((Properties) inputElement).entrySet().toArray();
+                }
+                return new Object[0];
+            }
+        });
+
+        tableViewer.setLabelProvider(new ITableLabelProvider() {
+
+            public Image getColumnImage(Object element, int columnIndex) {
+                return null;
+            }
+
+            public String getColumnText(Object element, int columnIndex) {
+                @SuppressWarnings("unchecked")
+                Entry<String, String> entry = (Entry<String, String>) element;
+                return columnIndex == 0 ? entry.getKey() : entry.getValue();
+            }
+
+            public void addListener(ILabelProviderListener listener) {
+
+            }
+
+            public void dispose() {
+
+            }
+
+            public boolean isLabelProperty(Object element, String property) {
+                return false;
+            }
+
+            public void removeListener(ILabelProviderListener listener) {
+
+            }
+
+        });
+
+        Object value = getValue(fieldWrapper.field);
+        final Properties tableInput = value == null ? new Properties()
+            : (Properties) value;
+
+        table.setData(tableInput);
+        tableViewer.setInput(tableInput);
+        tableViewer.setColumnProperties(columnNames);
+
+        tableViewer.setCellEditors(new TextCellEditor[] {
+            new TextCellEditor(table), new TextCellEditor(table) });
+
+        tableViewer.setCellModifier(new ICellModifier() {
+
+            public boolean canModify(Object element, String property) {
+                return true;
+            }
+
+            public Object getValue(Object element, String property) {
+                @SuppressWarnings("unchecked")
+                Entry<String, String> entry = (Entry<String, String>) element;
+                if (property.equals(NAME)) {
+                    return entry.getKey();
+                }
+                return entry.getValue();
+            }
+
+            public void modify(Object element, String property, Object value) {
+                TableItem item = (TableItem) element;
+                @SuppressWarnings("unchecked")
+                Entry<String, String> entry = (Entry<String, String>) item.getData();
+                if (property.equals(NAME)) {
+                    Object keyValue = tableInput.remove(entry.getKey());
+                    tableInput.setProperty((String) value, (String) keyValue);
+                } else {
+                    entry.setValue((String) value);
+                }
+                tableViewer.refresh();
+            }
+        });
+
+        Composite buttonsComposite = new Composite(group, SWT.NONE);
+        GridLayout gridLayout = new GridLayout();
+        gridLayout.marginWidth = 0;
+        gridLayout.marginHeight = 0;
+        buttonsComposite.setLayout(gridLayout);
+        buttonsComposite.setLayoutData(new GridData(SWT.LEFT, SWT.UP, false,
+            false));
+        Button addButton = new Button(buttonsComposite, SWT.PUSH);
+        addButton.setText("Add");
+        addButton.addSelectionListener(new SelectionAdapter() {
+
+            public void widgetSelected(SelectionEvent event) {
+                tableInput.setProperty("", "");
+                tableViewer.refresh();
+            }
+        });
+
+        //        addButton.setSize(convertHorizontalDLUsToPixels(6));
+        Button removeButton = new Button(buttonsComposite, SWT.PUSH);
+        removeButton.setText("Remove");
+        // make the buttons equal size
+        addButton.setSize(removeButton.getSize());
+        removeButton.addSelectionListener(new SelectionAdapter() {
+
+            public void widgetSelected(SelectionEvent event) {
+                System.out.println(".widgetSelected()");
+            }
+        });
+
+        fieldControls.add(new FieldControl() {
+
+            public Field getField() {
+                return fieldWrapper.field;
+            }
+
+            public Object getValue() {
+                return table.getData();
+            }
+        });
+        return table;
     }
 
     private Control createSpinner(Font font, Composite parent,

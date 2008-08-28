@@ -2,6 +2,7 @@ package tarlog.encoder.tool.encoders;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.Properties;
 import java.util.zip.Deflater;
 import java.util.zip.DeflaterOutputStream;
 
@@ -13,6 +14,9 @@ public class DeflateEncoder extends AbstractEncoder {
 
     @InputField(name="GZIP compatible compression")
     private boolean            nowrap   = true;
+    
+    @InputField
+    private Properties properties;
     
     @Override
     public String getGroup() {
