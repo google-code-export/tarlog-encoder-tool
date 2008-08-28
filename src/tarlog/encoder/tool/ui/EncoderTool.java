@@ -4,8 +4,10 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.TreeSet;
@@ -40,7 +42,9 @@ import tarlog.encoder.tool.api.Initiable;
  */
 public class EncoderTool extends ApplicationWindow {
 
-    private static final String ENCODERS_FILE = "encoders.properties";
+    private static final String ENCODERS_FILE     = "encoders.properties";
+    private static final String ENCODERS_PROPERTY = "encoders";
+    
     private Properties          properties;
     private Text                targetText;
     private Text                sourceText;
@@ -54,15 +58,20 @@ public class EncoderTool extends ApplicationWindow {
     public void init() throws IOException {
 
         properties = new Properties();
+
+        String propertiesFile = System.getProperty(ENCODERS_PROPERTY,
+            ENCODERS_FILE);
+
         properties.load(getClass().getClassLoader().getResourceAsStream(
-            ENCODERS_FILE));
+            propertiesFile));
         setBlockOnOpen(true);
         open();
     }
 
     private Image getImage() {
         try {
-            InputStream img = getClass().getClassLoader().getResourceAsStream("icons/encoders.jpg");
+            InputStream img = getClass().getClassLoader().getResourceAsStream(
+                "icons/encoders.jpg");
             if (img == null) {
                 img = new FileInputStream("icons/encoders.jpg");
             }
@@ -73,7 +82,6 @@ public class EncoderTool extends ApplicationWindow {
             return null;
         }
     }
-
 
     @Override
     protected Control createContents(Composite parent) {
@@ -137,6 +145,8 @@ public class EncoderTool extends ApplicationWindow {
     }
 
     private void load() {
+        final List<Button> radioButtons = new ArrayList<Button>();
+
         @SuppressWarnings("unchecked")
         TreeSet<String> names = new TreeSet(properties.keySet());
         Map<String, Group> groups = new HashMap<String, Group>();
@@ -163,21 +173,14 @@ public class EncoderTool extends ApplicationWindow {
                 layout.type = SWT.HORIZONTAL;
                 composite.setLayout(layout);
                 final Button button = new Button(composite, SWT.RADIO);
+                radioButtons.add(button);
                 button.setText(encoder.getName());
                 button.addSelectionListener(new AbstractSelectionListener() {
 
                     public void widgetSelected(SelectionEvent e) {
-                        for (Control child : leftComposite.getChildren()) {
-                            Composite groupChild = (Composite) child;
-                            for (Control groupChildControl : groupChild.getChildren()) {
-                                Composite groupChildComposite = (Composite) groupChildControl;
-                                for (Control lbutton : groupChildComposite.getChildren()) {
-                                    if (e.getSource() != lbutton
-                                        && lbutton instanceof Button
-                                        && (lbutton.getStyle() & SWT.RADIO) != 0) {
-                                        ((Button) lbutton).setSelection(false);
-                                    }
-                                }
+                        for (Button radioButton : radioButtons) {
+                            if (e.getSource() != radioButton) {
+                                radioButton.setSelection(false);
                             }
                         }
 
