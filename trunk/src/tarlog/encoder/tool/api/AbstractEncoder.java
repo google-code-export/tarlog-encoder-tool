@@ -16,7 +16,7 @@ import org.eclipse.swt.widgets.Text;
 import tarlog.encoder.tool.Utils;
 import tarlog.encoder.tool.api.fields.InputField;
 import tarlog.encoder.tool.ui.AbstractSelectionListener;
-import tarlog.encoder.tool.ui.DynamicInputDialog;
+import tarlog.encoder.tool.ui.ddialog.DynamicInputDialog;
 
 /**
  * Basic class for all encoders. The implementing class should extend from this
