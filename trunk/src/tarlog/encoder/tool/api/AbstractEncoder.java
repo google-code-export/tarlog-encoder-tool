@@ -104,7 +104,7 @@ public abstract class AbstractEncoder extends AbstractSelectionListener {
     protected int openInputDialog() {
         List<FieldWrapper> fields = getInputFields();
         if (!fields.isEmpty()) {
-            return new DynamicInputDialog(shell, "Input", this, fields).open();
+            return new DynamicInputDialog(shell, String.format("Input for %s",getName()), this, fields).open();
         }
         // in case dialog was not opened, it's like OK was pressed
         return Dialog.OK;
@@ -143,22 +143,6 @@ public abstract class AbstractEncoder extends AbstractSelectionListener {
         }
 
     }
-
-    //    class SimplePreferences extends FieldEditorPreferencePage {
-    //
-    //        public SimplePreferences() {
-    //            super(FieldEditorPreferencePage.GRID);
-    //        }
-    //
-    //        @Override
-    //        protected void createFieldEditors() {
-    //            StringFieldEditor stringFieldEditor = new StringFieldEditor(
-    //                "text1", "Text", getFieldEditorParent());
-    //            addField(stringFieldEditor);
-    //
-    //        }
-    //
-    //    }
 
     /**
      * <p>

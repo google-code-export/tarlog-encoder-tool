@@ -44,7 +44,9 @@ public class EncoderTool extends ApplicationWindow {
 
     private static final String ENCODERS_FILE     = "encoders.properties";
     private static final String ENCODERS_PROPERTY = "encoders";
-    
+
+    private static final String VERSION           = "0.1.0";
+
     private Properties          properties;
     private Text                targetText;
     private Text                sourceText;
@@ -86,7 +88,7 @@ public class EncoderTool extends ApplicationWindow {
     @Override
     protected Control createContents(Composite parent) {
         shell = getShell();
-        shell.setText("Encoder Tool");
+        shell.setText("Encoder Tool " + VERSION);
         shell.setSize(1000, 700);
         Image image = getImage();
         if (image != null) {
@@ -169,6 +171,8 @@ public class EncoderTool extends ApplicationWindow {
                     groups.put(groupName, group);
                 }
                 final Composite composite = new Composite(group, SWT.NULL);
+                composite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true,
+                    true));
                 RowLayout layout = new RowLayout();
                 layout.type = SWT.HORIZONTAL;
                 composite.setLayout(layout);

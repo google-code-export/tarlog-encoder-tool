@@ -2,7 +2,6 @@ package tarlog.encoder.tool.encoders;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.Properties;
 import java.util.zip.Deflater;
 import java.util.zip.DeflaterOutputStream;
 
