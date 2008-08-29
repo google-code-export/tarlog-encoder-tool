@@ -34,18 +34,24 @@ public class CreatePropertiesDialog extends CreateField {
     private static final String   NAME        = "Name";
     private static final String[] columnNames = { NAME, VALUE };
 
+    private boolean               enabled     = true;
+
     public CreatePropertiesDialog(DynamicInputDialog inputDialog) {
         super(inputDialog);
     }
 
     public Control createDialog(Font font, Composite parent,
         final FieldWrapper fieldWrapper, String fieldName) {
+
+        enabled = !(fieldWrapper.inputField.readonly() || !fieldWrapper.inputField.enabled());
+
         Group group = new Group(parent, SWT.NONE);
         group.setText(fieldName);
         group.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 2, 1));
         group.setLayout(new GridLayout(2, false));
 
         final Table table = createTable(group);
+        table.setEnabled(enabled);
 
         final List<Pair> tableInput = new ArrayList<Pair>();
         Object value = getValue(fieldWrapper.field);
@@ -105,11 +111,12 @@ public class CreatePropertiesDialog extends CreateField {
         gridLayout.marginWidth = 0;
         gridLayout.marginHeight = 0;
         buttonsComposite.setLayout(gridLayout);
-        buttonsComposite.setLayoutData(new GridData(SWT.LEFT, SWT.UP, false,
+        buttonsComposite.setLayoutData(new GridData(SWT.LEFT, SWT.TOP, false,
             false));
         Button addButton = new Button(buttonsComposite, SWT.PUSH);
+        addButton.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
         addButton.setText("Add");
-
+        addButton.setEnabled(enabled);
         final Table table = tableViewer.getTable();
         @SuppressWarnings("unchecked")
         final List<Pair> tableInput = (List<Pair>) table.getData();
@@ -125,6 +132,9 @@ public class CreatePropertiesDialog extends CreateField {
         //        addButton.setSize(convertHorizontalDLUsToPixels(6));
         Button removeButton = new Button(buttonsComposite, SWT.PUSH);
         removeButton.setText("Remove");
+        removeButton.setEnabled(enabled);
+        removeButton.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true,
+            false));
         // make the buttons equal size
         addButton.setSize(removeButton.getSize());
         removeButton.addSelectionListener(new SelectionAdapter() {
@@ -148,7 +158,6 @@ public class CreatePropertiesDialog extends CreateField {
 
             @Override
             public String getColumnText(Object element, int columnIndex) {
-                @SuppressWarnings("unchecked")
                 Pair entry = (Pair) element;
                 return columnIndex == 0 ? entry.key : entry.value;
             }

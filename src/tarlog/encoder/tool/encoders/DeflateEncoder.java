@@ -12,12 +12,9 @@ import tarlog.encoder.tool.api.fields.InputField;
 
 public class DeflateEncoder extends AbstractEncoder {
 
-    @InputField(name="GZIP compatible compression")
-    private boolean            nowrap   = true;
-    
-    @InputField
-    private Properties properties;
-    
+    @InputField(name = "GZIP compatible compression")
+    private boolean nowrap = true;
+
     @Override
     public String getGroup() {
         return InflaterEncoder.DEFLATER;
