@@ -11,7 +11,6 @@ public class MyUrlEncoder extends AbstractEncoder {
 
     public static final String URL_ENCODING = "URL Encoding";
 
-
     @Override
     public String getGroup() {
         return URL_ENCODING;
@@ -22,7 +21,6 @@ public class MyUrlEncoder extends AbstractEncoder {
         return "Encode";
     }
     
-    
     @Override
     public Object encode(String source) {
         try {
@@ -32,5 +30,4 @@ public class MyUrlEncoder extends AbstractEncoder {
             return null;
         }
     }
-
 }

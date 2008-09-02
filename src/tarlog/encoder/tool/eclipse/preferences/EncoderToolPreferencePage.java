@@ -54,6 +54,8 @@ public class EncoderToolPreferencePage
 		}, getFieldEditorParent()));
 		addField(
 			new StringFieldEditor(PreferenceConstants.P_STRING, "A &text preference:", getFieldEditorParent()));
+		
+		addField(new PathEditor("path_editor", "Path editor", null, getFieldEditorParent()));
 	}
 
 	/* (non-Javadoc)

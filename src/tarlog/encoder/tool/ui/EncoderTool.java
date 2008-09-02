@@ -12,6 +12,12 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.TreeSet;
 
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.MenuManager;
+import org.eclipse.jface.preference.IPreferenceNode;
+import org.eclipse.jface.preference.PreferenceDialog;
+import org.eclipse.jface.preference.PreferenceManager;
+import org.eclipse.jface.preference.PreferenceNode;
 import org.eclipse.jface.window.ApplicationWindow;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
@@ -36,6 +42,7 @@ import org.eclipse.swt.widgets.Text;
 import tarlog.encoder.tool.Utils;
 import tarlog.encoder.tool.api.AbstractEncoder;
 import tarlog.encoder.tool.api.Initiable;
+import tarlog.encoder.tool.eclipse.preferences.EncoderToolPreferencePage;
 
 /**
  *
@@ -52,6 +59,7 @@ public class EncoderTool extends ApplicationWindow {
     private Text                sourceText;
     private Composite           leftComposite;
     private Shell               shell;
+    private boolean             standalone        = false;
 
     public EncoderTool() {
         super(null);
@@ -67,6 +75,7 @@ public class EncoderTool extends ApplicationWindow {
         properties.load(getClass().getClassLoader().getResourceAsStream(
             propertiesFile));
         setBlockOnOpen(true);
+        addMenuBar();
         open();
     }
 
@@ -82,6 +91,46 @@ public class EncoderTool extends ApplicationWindow {
             return new Image(shell.getDisplay(), load[0]);
         } catch (FileNotFoundException e) {
             return null;
+        }
+    }
+
+    @Override
+    protected MenuManager createMenuManager() {
+        MenuManager menuManager = super.createMenuManager();
+        if (standalone) {
+            // create menu only when stand alone
+                    MenuManager fileMenuManager = new MenuManager("&File");
+                    menuManager.add(new OpenPreferencesAction());
+                    menuManager.add(fileMenuManager);
+                    
+            //        SaveAction saveAction = new SaveAction();
+            //        saveAction.setAccelerator(SWT.CTRL | 'S');
+            //        fileMenuManager.add(saveAction);
+            //        LoadAction loadAction = new LoadAction();
+            //        loadAction.setAccelerator(SWT.CTRL | 'O');
+            //        fileMenuManager.add(loadAction);
+            //        menuManager.add(fileMenuManager);
+
+        }
+        return menuManager;
+    }
+    
+    private class OpenPreferencesAction extends Action {
+        
+        public OpenPreferencesAction() {
+            super("Preferences");
+        }
+        
+        @Override
+        public void run() {
+            EncoderToolPreferencePage page = new EncoderToolPreferencePage();
+            PreferenceManager mgr = new PreferenceManager();
+            IPreferenceNode node = new PreferenceNode("1", page);
+            mgr.addToRoot(node);
+            PreferenceDialog dialog = new PreferenceDialog(shell, mgr);
+            dialog.create();
+            dialog.setMessage(page.getTitle());
+            dialog.open();
         }
     }
 
@@ -249,6 +298,7 @@ public class EncoderTool extends ApplicationWindow {
      */
     public static void main(String[] args) throws Exception {
         EncoderTool encoderTool = new EncoderTool();
+        encoderTool.standalone = true;
         encoderTool.init();
     }
 }
