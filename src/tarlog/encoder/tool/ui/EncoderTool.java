@@ -99,10 +99,10 @@ public class EncoderTool extends ApplicationWindow {
         MenuManager menuManager = super.createMenuManager();
         if (standalone) {
             // create menu only when stand alone
-                    MenuManager fileMenuManager = new MenuManager("&File");
-                    menuManager.add(new OpenPreferencesAction());
-                    menuManager.add(fileMenuManager);
-                    
+            MenuManager fileMenuManager = new MenuManager("&File");
+            menuManager.add(new OpenPreferencesAction());
+            menuManager.add(fileMenuManager);
+
             //        SaveAction saveAction = new SaveAction();
             //        saveAction.setAccelerator(SWT.CTRL | 'S');
             //        fileMenuManager.add(saveAction);
@@ -114,23 +114,29 @@ public class EncoderTool extends ApplicationWindow {
         }
         return menuManager;
     }
-    
+
     private class OpenPreferencesAction extends Action {
-        
+
         public OpenPreferencesAction() {
             super("Preferences");
         }
-        
+
         @Override
         public void run() {
-            EncoderToolPreferencePage page = new EncoderToolPreferencePage();
-            PreferenceManager mgr = new PreferenceManager();
-            IPreferenceNode node = new PreferenceNode("1", page);
-            mgr.addToRoot(node);
-            PreferenceDialog dialog = new PreferenceDialog(shell, mgr);
-            dialog.create();
-            dialog.setMessage(page.getTitle());
-            dialog.open();
+            try {
+                EncoderToolPreferencePage page = new EncoderToolPreferencePage(
+                    "encoder.properties");
+                page.setTitle("Encoder Pr");
+                PreferenceManager mgr = new PreferenceManager();
+                IPreferenceNode node = new PreferenceNode("1", page);
+                mgr.addToRoot(node);
+                PreferenceDialog dialog = new PreferenceDialog(shell, mgr);
+                dialog.create();
+                dialog.setMessage(page.getTitle());
+                dialog.open();
+            } catch (IOException e) {
+                Utils.showException(shell, e);
+            }
         }
     }
 
