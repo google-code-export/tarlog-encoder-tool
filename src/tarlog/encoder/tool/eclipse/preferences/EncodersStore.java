@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.eclipse.jface.preference.IPreferenceStore;
+
 public class EncodersStore {
 
     private static final String        GROUP_SEP = "\r\n$$\r\n";
@@ -18,15 +20,16 @@ public class EncodersStore {
      * 
      */
 
-    public static EncodersStore fromString(String string) {
-        EncodersStore encodersStore = new EncodersStore();
+    public EncodersStore(IPreferenceStore preferenceStore) {
+        this(preferenceStore.getString(EncodersStore.class.getName()));
+    }
+
+    public EncodersStore(String string) {
         String[] split = string.split(GROUP_SEP);
         for (String str : split) {
             String[] groupSplit = str.split(GROUP_KEY);
-            encodersStore.store.put(groupSplit[0],
-                EncodersGroup.fromString(groupSplit[1]));
+            store.put(groupSplit[0], new EncodersGroup(groupSplit[1]));
         }
-        return encodersStore;
     }
 
     @Override
@@ -57,13 +60,11 @@ public class EncodersStore {
             return stringBuilder.toString();
         }
 
-        static EncodersGroup fromString(String string) {
-            EncodersGroup encodersGroup = new EncodersGroup();
+        EncodersGroup(String string) {
             String[] split = string.split(EncodersGroup.SEP);
             for (String str : split) {
-                encodersGroup.list.add(EncoderDef.fromString(str));
+                list.add(new EncoderDef(str));
             }
-            return encodersGroup;
         }
     }
 
@@ -90,13 +91,11 @@ public class EncodersStore {
             return stringBuilder.toString();
         }
 
-        static EncoderDef fromString(String string) {
-            EncoderDef encoderDef = new EncoderDef();
+        EncoderDef(String string) {
             String[] fields = string.split(FIELD_SEP);
-            encoderDef.name = fields[0];
-            encoderDef.className = fields[1];
-            encoderDef.classPath = fields[2].split(CLASSPATH_SEP);
-            return encoderDef;
+            name = fields[0];
+            className = fields[1];
+            classPath = fields[2].split(CLASSPATH_SEP);
         }
 
     }
