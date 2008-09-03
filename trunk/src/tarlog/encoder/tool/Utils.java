@@ -1,5 +1,8 @@
 package tarlog.encoder.tool;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
 import org.eclipse.core.runtime.IStatus;
@@ -80,4 +83,28 @@ public class Utils {
         }
         return null;
     }
+    
+//    public static String getStringNotNullInput(Shell parentShell,
+//        String dialogTitle, String dialogMessage, String initialValue) {
+//        InputDialog inputDialog = new InputDialog(parentShell, dialogTitle,
+//            dialogMessage, initialValue, new IInputValidator() {
+//
+//                public String isValid(String newText) {
+//                    if (newText.trim().equals("")) {
+//                        return "Cannot be empty";
+//                    }
+//                    Pattern pattern = Pattern.compile("\\w");
+//                    Matcher matcher = pattern.matcher(newText);
+//                    if (!matcher.matches()) {
+//                        
+//                    }
+//                    return null;
+//                }
+//            });
+//        int rc = inputDialog.open();
+//        if (rc == Dialog.OK) {
+//            return inputDialog.getValue().trim();
+//        }
+//        return null;
+//    }
 }

@@ -1,58 +1,107 @@
 package tarlog.encoder.tool.eclipse.preferences;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
+import java.util.regex.Matcher;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 
-public class EncodersStore {
+import tarlog.encoder.tool.api.fields.InputField;
+import tarlog.encoder.tool.api.fields.Validator;
 
-    private static final String        GROUP_SEP = "\r\n$$\r\n";
-    private static final String        GROUP_KEY = "===\r\n";
+class EncodersStore {
 
-    private Map<String, EncodersGroup> store     = new HashMap<String, EncodersGroup>();
+    private static final String GROUP_SEP = "\r\n$$\r\n";
+
+    private List<EncodersGroup> store     = new ArrayList<EncodersGroup>();
 
     /**
      * group encoder name className classpath
      * 
      */
 
+    /**
+     * <p>
+     * Returns copy of store
+     * <p>
+     * Performs shallow copy
+     */
+    public EncodersGroup[] getStore() {
+        return store.toArray(new EncodersGroup[store.size()]);
+    }
+
     public EncodersStore(IPreferenceStore preferenceStore) {
         this(preferenceStore.getString(EncodersStore.class.getName()));
     }
 
     public EncodersStore(String string) {
+        if ("".equals(string)) {
+            return;
+        }
         String[] split = string.split(GROUP_SEP);
         for (String str : split) {
-            String[] groupSplit = str.split(GROUP_KEY);
-            store.put(groupSplit[0], new EncodersGroup(groupSplit[1]));
+            store.add(new EncodersGroup(str));
         }
+    }
+
+    public void store(IPreferenceStore preferenceStore) {
+        preferenceStore.setValue(EncodersStore.class.getName(), toString());
+    }
+
+    public void newGroup(String groupName) {
+        EncodersGroup encodersGroup = new EncodersGroup();
+        encodersGroup.groupName = groupName;
+        store.add(encodersGroup);
+
+    }
+
+    public Object getGroup(String groupName) {
+        for (EncodersGroup group : store) {
+            if (group.groupName.equals(groupName)) {
+                return group;
+            }
+        }
+        return null;
     }
 
     @Override
     public String toString() {
         StringBuilder stringBuilder = new StringBuilder();
-        for (Entry<String, EncodersGroup> entry : store.entrySet()) {
-            stringBuilder.append(entry.getKey());
-            stringBuilder.append(GROUP_KEY);
-            stringBuilder.append(entry.getValue().toString());
+        for (EncodersGroup entry : store) {
+            stringBuilder.append(entry.toString());
             stringBuilder.append(GROUP_SEP);
         }
         return stringBuilder.toString();
     }
 
+    /**
+     * 
+     */
     public static class EncodersGroup {
 
-        List<EncoderDef>    list = new ArrayList<EncoderDef>();
+        String                      groupName;
+        List<EncoderDef>            list      = new ArrayList<EncoderDef>();
+        private final static String GROUP_KEY = "===\r\n";
+        private final static String SEP       = "\r\n%%%";
 
-        final static String SEP  = "\r\n%%%";
+        private EncodersGroup(String string) {
+            String[] group = string.split(GROUP_KEY);
+            groupName = group[0];
+            String[] split = group[1].split(EncodersGroup.SEP);
+            for (String str : split) {
+                list.add(new EncoderDef(str));
+            }
+        }
+
+        private EncodersGroup() {
+
+        }
 
         @Override
         public String toString() {
             StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder.append(groupName);
+            stringBuilder.append(GROUP_KEY);
             for (EncoderDef encoderDef : list) {
                 stringBuilder.append(encoderDef.toString());
                 stringBuilder.append(EncodersGroup.SEP);
@@ -60,22 +109,34 @@ public class EncodersStore {
             return stringBuilder.toString();
         }
 
-        EncodersGroup(String string) {
-            String[] split = string.split(EncodersGroup.SEP);
-            for (String str : split) {
-                list.add(new EncoderDef(str));
-            }
-        }
     }
 
-    public static class EncoderDef {
+    /**
+     * 
+     */
+    public static class EncoderDef implements Validator {
 
-        static final String FIELD_SEP     = "^^";
-        static final String CLASSPATH_SEP = ";";
+        private static final String FIELD_SEP     = "^^";
+        private static final String CLASSPATH_SEP = ";";
 
-        String              name;
-        String              className;
-        String[]            classPath;
+        @InputField(name = "Name")
+        String                      name;
+        
+        @InputField(name = "Class name")
+        String                      className;
+        
+        String[]                    classPath;
+
+        EncoderDef() {
+            
+        }
+        
+        EncoderDef(String string) {
+            String[] fields = string.split(FIELD_SEP);
+            name = fields[0];
+            className = fields[1];
+            classPath = fields[2].split(CLASSPATH_SEP);
+        }
 
         @Override
         public String toString() {
@@ -91,13 +152,16 @@ public class EncodersStore {
             return stringBuilder.toString();
         }
 
-        EncoderDef(String string) {
-            String[] fields = string.split(FIELD_SEP);
-            name = fields[0];
-            className = fields[1];
-            classPath = fields[2].split(CLASSPATH_SEP);
+        public String isValid() {
+            if (name == null) {
+                return "Encoder name cannot be empty";
+            }
+            Matcher matcher = EncoderToolPreferencePage.WORD_PATTERN.matcher(name);
+            if (!matcher.matches()) {
+                return "Encoder name must be a word";
+            }
+            return null;
         }
-
     }
 
 }

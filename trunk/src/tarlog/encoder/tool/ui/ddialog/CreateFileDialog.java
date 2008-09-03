@@ -4,6 +4,8 @@ import java.io.File;
 import java.lang.reflect.Field;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.layout.GridData;
@@ -15,15 +17,13 @@ import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Text;
 
-import tarlog.encoder.tool.api.AbstractEncoder.FieldWrapper;
 import tarlog.encoder.tool.api.fields.InputFileField;
 import tarlog.encoder.tool.api.fields.InputFileField.FileFieldType;
 import tarlog.encoder.tool.ui.AbstractSelectionListener;
 import tarlog.encoder.tool.ui.ddialog.DynamicInputDialog.FieldControl;
+import tarlog.encoder.tool.ui.ddialog.DynamicInputDialog.FieldWrapper;
 
 public class CreateFileDialog extends CreateField {
-
-
 
     public CreateFileDialog(DynamicInputDialog inputDialog) {
         super(inputDialog);
@@ -43,7 +43,7 @@ public class CreateFileDialog extends CreateField {
             | (fieldWrapper.inputField.readonly() ? SWT.READ_ONLY : SWT.NONE));
         layoutData = new GridData(SWT.FILL, SWT.CENTER, true, false);
         text.setLayoutData(layoutData);
-        Object value = getValue(fieldWrapper.field);
+        Object value = fieldWrapper.initialValue;
         if (value != null) {
             String fileName = ((File) value).getAbsolutePath();
             text.setText(fileName);
@@ -90,7 +90,15 @@ public class CreateFileDialog extends CreateField {
                 }
             }
         });
+        if (inputDialog.validator != null) {
+            text.addModifyListener(new ModifyListener() {
 
+                public void modifyText(ModifyEvent e) {
+                    inputDialog.setFields();
+                    inputDialog.validateInput();
+                }
+            });
+        }
         fieldControls.add(new FieldControl() {
 
             public Field getField() {
