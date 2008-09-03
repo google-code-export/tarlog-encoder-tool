@@ -32,6 +32,7 @@ import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
+import tarlog.encoder.tool.Utils;
 import tarlog.encoder.tool.eclipse.Activator;
 import tarlog.encoder.tool.eclipse.preferences.EncodersStore.EncoderDef;
 import tarlog.encoder.tool.eclipse.preferences.EncodersStore.EncodersGroup;
@@ -72,6 +73,21 @@ public class EncoderToolPreferencePage extends PreferencePage implements
     }
 
     public void init(IWorkbench workbench) {
+    }
+    
+    @Override
+    public boolean performOk() {
+        IPreferenceStore preferenceStore = getPreferenceStore();
+        encodersStore.store(preferenceStore);
+        if (preferenceStore instanceof PreferenceStore) {
+            try {
+                ((PreferenceStore)preferenceStore).save();
+            } catch (IOException e) {
+                Utils.showException(getShell(), e);
+                return false;
+            }
+        }
+        return super.performOk();
     }
 
     @Override
@@ -181,7 +197,15 @@ public class EncoderToolPreferencePage extends PreferencePage implements
     }
 
     private void initialize() {
-        encodersStore = new EncodersStore(getPreferenceStore());
+        IPreferenceStore preferenceStore = getPreferenceStore();
+        if (preferenceStore instanceof PreferenceStore) {
+            try {
+                ((PreferenceStore)preferenceStore).load();
+            } catch (IOException e) {
+                Utils.showException(getShell(), e);
+            }
+        }
+        encodersStore = new EncodersStore(preferenceStore);
     }
 
     private class LabelProvider implements ILabelProvider {
@@ -195,6 +219,9 @@ public class EncoderToolPreferencePage extends PreferencePage implements
             if (element == null) {
                 return null;
             }
+            if (element instanceof String) {
+                return (String) element;
+            }
             if (element instanceof EncodersGroup) {
                 EncodersGroup encodersGroup = (EncodersGroup) element;
                 return "Group: " + encodersGroup.groupName;
@@ -203,6 +230,16 @@ public class EncoderToolPreferencePage extends PreferencePage implements
                 EncoderDef encoderDef = (EncoderDef) element;
                 return "Encoder: " + encoderDef.name;
             }
+
+            if (element instanceof EncoderClassWrapper) {
+                EncoderClassWrapper classWrapper = (EncoderClassWrapper) element;
+                return "Class: " + classWrapper.className;
+            }
+            
+            if (element instanceof EncoderClasspathWrapper) {
+                return "Classpath:";
+            }
+            
             System.out.println("LabelProvider.getText() "
                 + element.getClass().getName());
             return null;
@@ -230,6 +267,26 @@ public class EncoderToolPreferencePage extends PreferencePage implements
 
     }
 
+    private class EncoderClassWrapper {
+
+        String className;
+
+        public EncoderClassWrapper(String className) {
+            super();
+            this.className = className;
+        }
+    }
+
+    private class EncoderClasspathWrapper {
+
+        String[] classpath;
+
+        public EncoderClasspathWrapper(String[] classpath) {
+            super();
+            this.classpath = classpath;
+        }
+    }
+
     private class ContentProvider implements ITreeContentProvider {
 
         public Object[] getChildren(Object parentElement) {
@@ -239,9 +296,13 @@ public class EncoderToolPreferencePage extends PreferencePage implements
             }
             if (parentElement instanceof EncoderDef) {
                 EncoderDef encoderDef = (EncoderDef) parentElement;
-                return new Object[] { encoderDef.name, encoderDef.className,
-                    encoderDef.classPath };
-
+                return new Object[] {
+                    new EncoderClassWrapper(encoderDef.className),
+                    new EncoderClasspathWrapper(encoderDef.classPath) };
+            }
+            if (parentElement instanceof EncoderClasspathWrapper) {
+                EncoderClasspathWrapper classpathWrapper = (EncoderClasspathWrapper) parentElement;
+                return classpathWrapper.classpath;
             }
             System.out.println("ContentProvider.getChildren() "
                 + parentElement.getClass().getName());
@@ -265,6 +326,15 @@ public class EncoderToolPreferencePage extends PreferencePage implements
             if (element instanceof EncoderDef) {
                 return true;
             }
+            
+            if (element instanceof EncoderClassWrapper) {
+                return false;
+            }
+
+            if (element instanceof EncoderClasspathWrapper) {
+                return true;
+            }
+
             System.out.println("ContentProvider.hasChildren() "
                 + element.getClass().getName());
             return false;
