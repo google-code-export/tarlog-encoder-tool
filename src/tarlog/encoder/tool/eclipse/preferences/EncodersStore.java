@@ -2,6 +2,7 @@ package tarlog.encoder.tool.eclipse.preferences;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -11,7 +12,7 @@ import tarlog.encoder.tool.api.fields.Validator;
 
 class EncodersStore {
 
-    private static final String GROUP_SEP = "\r\n$$\r\n";
+    private static final String GROUP_SEP = "$$$$$";
 
     private List<EncodersGroup> store     = new ArrayList<EncodersGroup>();
 
@@ -38,9 +39,9 @@ class EncodersStore {
         if ("".equals(string)) {
             return;
         }
-        String[] split = string.split(GROUP_SEP);
-        for (String str : split) {
-            store.add(new EncodersGroup(str));
+        StringTokenizer stringTokenizer = new StringTokenizer(string, GROUP_SEP);
+        while (stringTokenizer.hasMoreTokens()) {
+            store.add(new EncodersGroup(stringTokenizer.nextToken()));
         }
     }
 
@@ -81,15 +82,18 @@ class EncodersStore {
 
         String                      groupName;
         List<EncoderDef>            list      = new ArrayList<EncoderDef>();
-        private final static String GROUP_KEY = "===\r\n";
-        private final static String SEP       = "\r\n%%%";
+        private final static String GROUP_KEY = "@@@";
+        private final static String SEP       = "%%%";
 
         private EncodersGroup(String string) {
-            String[] group = string.split(GROUP_KEY);
-            groupName = group[0];
-            String[] split = group[1].split(EncodersGroup.SEP);
-            for (String str : split) {
-                list.add(new EncoderDef(str));
+            StringTokenizer tokenizer = new StringTokenizer(string, GROUP_KEY);
+            groupName = tokenizer.nextToken();
+            if (tokenizer.countTokens() >= 1) {
+                StringTokenizer split = new StringTokenizer(
+                    tokenizer.nextToken(), EncodersGroup.SEP);
+                while (split.hasMoreTokens()) {
+                    list.add(new EncoderDef(split.nextToken()));
+                }
             }
         }
 
@@ -121,21 +125,31 @@ class EncodersStore {
 
         @InputField(name = "Name")
         String                      name;
-        
+
         @InputField(name = "Class name")
         String                      className;
-        
+
         String[]                    classPath;
 
         EncoderDef() {
-            
+
         }
-        
+
         EncoderDef(String string) {
-            String[] fields = string.split(FIELD_SEP);
-            name = fields[0];
-            className = fields[1];
-            classPath = fields[2].split(CLASSPATH_SEP);
+            StringTokenizer tokenizer = new StringTokenizer(string, FIELD_SEP);
+            name = tokenizer.nextToken();
+            if (tokenizer.countTokens() >= 1) {
+                className = tokenizer.nextToken();
+                if (tokenizer.countTokens() >= 1) {
+                    StringTokenizer stringTokenizer = new StringTokenizer(
+                        tokenizer.nextToken(), CLASSPATH_SEP);
+                    int countTokens = stringTokenizer.countTokens();
+                    classPath = new String[countTokens];
+                    for (int i = 0; i < countTokens; ++i) {
+                        classPath[i] = stringTokenizer.nextToken();
+                    }
+                }
+            }
         }
 
         @Override
@@ -145,9 +159,11 @@ class EncodersStore {
             stringBuilder.append(FIELD_SEP);
             stringBuilder.append(className);
             stringBuilder.append(FIELD_SEP);
-            for (String cls : classPath) {
-                stringBuilder.append(cls);
-                stringBuilder.append(CLASSPATH_SEP);
+            if (classPath != null) {
+                for (String cls : classPath) {
+                    stringBuilder.append(cls);
+                    stringBuilder.append(CLASSPATH_SEP);
+                }
             }
             return stringBuilder.toString();
         }
