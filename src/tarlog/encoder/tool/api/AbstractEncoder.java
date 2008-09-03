@@ -1,10 +1,6 @@
 package tarlog.encoder.tool.api;
 
 import java.io.UnsupportedEncodingException;
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import org.eclipse.jface.dialogs.Dialog;
@@ -14,9 +10,9 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
 import tarlog.encoder.tool.Utils;
-import tarlog.encoder.tool.api.fields.InputField;
 import tarlog.encoder.tool.ui.AbstractSelectionListener;
 import tarlog.encoder.tool.ui.ddialog.DynamicInputDialog;
+import tarlog.encoder.tool.ui.ddialog.DynamicInputDialog.FieldWrapper;
 
 /**
  * Basic class for all encoders. The implementing class should extend from this
@@ -102,46 +98,13 @@ public abstract class AbstractEncoder extends AbstractSelectionListener {
      * @return Dialog.OK or Dialog.CANCEL
      */
     protected int openInputDialog() {
-        List<FieldWrapper> fields = getInputFields();
+        List<FieldWrapper> fields = DynamicInputDialog.getInputFields(this);
         if (!fields.isEmpty()) {
-            return new DynamicInputDialog(shell, String.format("Input for %s",getName()), this, fields).open();
+            return new DynamicInputDialog(shell, String.format("Input for %s",
+                getName()), this, fields).open();
         }
         // in case dialog was not opened, it's like OK was pressed
         return Dialog.OK;
-    }
-
-    @SuppressWarnings("unchecked")
-    private List<FieldWrapper> getInputFields() {
-        List<FieldWrapper> fields = new ArrayList<FieldWrapper>();
-        Class<? extends AbstractEncoder> clazz = getClass();
-        while (clazz != AbstractEncoder.class) {
-            for (Field field : clazz.getDeclaredFields()) {
-                InputField inputField = field.getAnnotation(InputField.class);
-                if (inputField != null) {
-                    fields.add(new FieldWrapper(field, inputField));
-                }
-            }
-            clazz = (Class<? extends AbstractEncoder>) clazz.getSuperclass();
-        }
-        Collections.sort(fields, new Comparator<FieldWrapper>() {
-
-            public int compare(FieldWrapper o1, FieldWrapper o2) {
-                return o1.inputField.order() - o2.inputField.order();
-            }
-        });
-        return fields;
-    }
-
-    public class FieldWrapper {
-
-        public InputField inputField;
-        public Field      field;
-
-        FieldWrapper(Field field, InputField inputField) {
-            this.field = field;
-            this.inputField = inputField;
-        }
-
     }
 
     /**

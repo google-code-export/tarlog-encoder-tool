@@ -10,8 +10,10 @@ import org.eclipse.jface.dialogs.Dialog;
 import tarlog.encoder.tool.Utils;
 import tarlog.encoder.tool.api.fields.InputField;
 import tarlog.encoder.tool.api.fields.TextField;
+import tarlog.encoder.tool.api.fields.Validator;
 
-public abstract class KeyStoreAwareEncoder extends AbstractEncoder {
+public abstract class KeyStoreAwareEncoder extends AbstractEncoder implements
+    Validator {
 
     protected KeyStore keystore;
 
@@ -25,6 +27,13 @@ public abstract class KeyStoreAwareEncoder extends AbstractEncoder {
     @InputField(name = "Key Store Password", order = -100)
     @TextField(password = true)
     private String     password;
+
+    public String isValid() {
+        if (file == null || !file.isFile()) {
+            return "Key Store File cannot be empty";
+        }
+        return null;
+    }
 
     @Override
     protected int beforeEncode() {

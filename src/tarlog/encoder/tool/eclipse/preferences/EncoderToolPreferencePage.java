@@ -1,21 +1,41 @@
 package tarlog.encoder.tool.eclipse.preferences;
 
 import java.io.IOException;
-import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-import org.eclipse.jface.preference.*;
+import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.jface.dialogs.IInputValidator;
+import org.eclipse.jface.dialogs.InputDialog;
+import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.preference.PreferencePage;
+import org.eclipse.jface.preference.PreferenceStore;
+import org.eclipse.jface.viewers.ILabelProvider;
+import org.eclipse.jface.viewers.ILabelProviderListener;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.ITreeContentProvider;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.ui.IWorkbenchPreferencePage;
+import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.IWorkbench;
+import org.eclipse.ui.IWorkbenchPreferencePage;
 
 import tarlog.encoder.tool.eclipse.Activator;
+import tarlog.encoder.tool.eclipse.preferences.EncodersStore.EncoderDef;
+import tarlog.encoder.tool.eclipse.preferences.EncodersStore.EncodersGroup;
+import tarlog.encoder.tool.ui.ddialog.DynamicInputDialog;
 
 /**
  * This class represents a preference page that is contributed to the
@@ -31,6 +51,13 @@ import tarlog.encoder.tool.eclipse.Activator;
 public class EncoderToolPreferencePage extends PreferencePage implements
     IWorkbenchPreferencePage {
 
+    public static final Pattern WORD_PATTERN = Pattern.compile("\\w*");
+
+    private EncodersStore       encodersStore;
+    private TreeViewer          treeViewer;
+
+    private Button              addEncoderButton;
+
     public EncoderToolPreferencePage() {
         this(Activator.getDefault().getPreferenceStore());
     }
@@ -44,23 +71,228 @@ public class EncoderToolPreferencePage extends PreferencePage implements
         setDescription("A demonstration of a preference page implementation");
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * org.eclipse.ui.IWorkbenchPreferencePage#init(org.eclipse.ui.IWorkbench)
-     */
     public void init(IWorkbench workbench) {
     }
 
     @Override
     protected Control createContents(Composite parent) {
-        Composite composite = new Composite(parent, SWT.BORDER);
-        composite.setLayout(new GridLayout());
-        composite.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, true, true));
-        TreeViewer treeViewer = new TreeViewer(composite);
+        initialize();
 
+        Composite composite = new Composite(parent, SWT.NONE);
+        composite.setLayout(new GridLayout(2, false));
+        composite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+        createTree(composite);
+        createButtons(composite);
         return composite;
+    }
+
+    private void createButtons(Composite parent) {
+        Composite composite = new Composite(parent, SWT.NONE);
+        composite.setLayout(new GridLayout());
+        composite.setLayoutData(new GridData(SWT.CENTER, SWT.FILL, false, true));
+
+        createAddGroupButton(composite);
+        addEncoderButton = createAddEncoderButton(composite);
+    }
+
+    private void createAddGroupButton(Composite composite) {
+        Button addGroupButton = new Button(composite, SWT.PUSH);
+        addGroupButton.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true,
+            false));
+        addGroupButton.setText("Add Group");
+
+        addGroupButton.addSelectionListener(new SelectionAdapter() {
+
+            public void widgetSelected(SelectionEvent event) {
+                InputDialog inputDialog = new InputDialog(getShell(),
+                    "Enter group name", "Enter group name", "",
+                    new IInputValidator() {
+
+                        public String isValid(String newText) {
+                            if (newText.trim().equals("")) {
+                                return "Group name cannot be empty";
+                            }
+                            Matcher matcher = WORD_PATTERN.matcher(newText);
+                            if (!matcher.matches()) {
+                                return "Group name must be a word";
+                            }
+                            if (encodersStore.getGroup(newText) != null) {
+                                return "Group name must be unique";
+                            }
+                            return null;
+                        }
+                    });
+                int rc = inputDialog.open();
+                if (rc == Dialog.OK) {
+                    encodersStore.newGroup(inputDialog.getValue());
+                    treeViewer.refresh();
+                }
+
+            }
+        });
+    }
+
+    private Button createAddEncoderButton(Composite composite) {
+        Button button = new Button(composite, SWT.PUSH);
+        button.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
+        button.setText("Add Encoder");
+        button.setEnabled(false);
+        button.addSelectionListener(new SelectionAdapter() {
+
+            public void widgetSelected(SelectionEvent event) {
+                Object firstElement = ((TreeSelection) treeViewer.getSelection()).getFirstElement();
+                EncodersGroup encodersGroup = (EncodersGroup) firstElement;
+
+                EncodersStore.EncoderDef encoderDef = new EncodersStore.EncoderDef();
+                DynamicInputDialog dynamicInputDialog = new DynamicInputDialog(
+                    getShell(), "Add Encoder", encoderDef);
+                int rc = dynamicInputDialog.open();
+
+                if (rc == Dialog.OK) {
+                    encodersGroup.list.add(encoderDef);
+                    treeViewer.refresh();
+                }
+
+            }
+        });
+        return button;
+    }
+
+    private void createTree(Composite parent) {
+        treeViewer = new TreeViewer(parent);
+        Tree tree = treeViewer.getTree();
+        tree.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+        tree.setLayout(new FillLayout());
+        tree.setVisible(true);
+        treeViewer.setContentProvider(new ContentProvider());
+        treeViewer.setLabelProvider(new LabelProvider());
+        treeViewer.setInput(encodersStore);
+        treeViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+
+            public void selectionChanged(SelectionChangedEvent event) {
+                Object firstElement = ((TreeSelection) event.getSelection()).getFirstElement();
+                if (firstElement instanceof EncodersGroup) {
+                    addEncoderButton.setEnabled(true);
+                } else {
+                    addEncoderButton.setEnabled(false);
+                }
+            }
+        });
+    }
+
+    private void initialize() {
+        encodersStore = new EncodersStore(getPreferenceStore());
+    }
+
+    private class LabelProvider implements ILabelProvider {
+
+        public Image getImage(Object element) {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        public String getText(Object element) {
+            if (element == null) {
+                return null;
+            }
+            if (element instanceof EncodersGroup) {
+                EncodersGroup encodersGroup = (EncodersGroup) element;
+                return "Group: " + encodersGroup.groupName;
+            }
+            if (element instanceof EncoderDef) {
+                EncoderDef encoderDef = (EncoderDef) element;
+                return "Encoder: " + encoderDef.name;
+            }
+            System.out.println("LabelProvider.getText() "
+                + element.getClass().getName());
+            return null;
+        }
+
+        public void addListener(ILabelProviderListener listener) {
+            // TODO Auto-generated method stub
+
+        }
+
+        public void dispose() {
+            // TODO Auto-generated method stub
+
+        }
+
+        public boolean isLabelProperty(Object element, String property) {
+            // TODO Auto-generated method stub
+            return false;
+        }
+
+        public void removeListener(ILabelProviderListener listener) {
+            // TODO Auto-generated method stub
+
+        }
+
+    }
+
+    private class ContentProvider implements ITreeContentProvider {
+
+        public Object[] getChildren(Object parentElement) {
+            if (parentElement instanceof EncodersGroup) {
+                EncodersGroup encodersGroup = (EncodersGroup) parentElement;
+                return encodersGroup.list.toArray();
+            }
+            if (parentElement instanceof EncoderDef) {
+                EncoderDef encoderDef = (EncoderDef) parentElement;
+                return new Object[] { encoderDef.name, encoderDef.className,
+                    encoderDef.classPath };
+
+            }
+            System.out.println("ContentProvider.getChildren() "
+                + parentElement.getClass().getName());
+            return null;
+        }
+
+        public Object getParent(Object element) {
+            System.out.println("ContentProvider.getParent() ");
+            return null;
+        }
+
+        public boolean hasChildren(Object element) {
+            if (element == null) {
+                return false;
+            }
+            if (element instanceof EncodersGroup) {
+                EncodersGroup encodersGroup = (EncodersGroup) element;
+                return encodersGroup.list.size() > 0;
+
+            }
+            if (element instanceof EncoderDef) {
+                return true;
+            }
+            System.out.println("ContentProvider.hasChildren() "
+                + element.getClass().getName());
+            return false;
+        }
+
+        public Object[] getElements(Object inputElement) {
+            if (inputElement == null) {
+                return new Object[0];
+            }
+            if (inputElement instanceof EncodersStore) {
+                EncodersStore encodersStore = (EncodersStore) inputElement;
+                return encodersStore.getStore();
+            }
+            System.out.println("ContentProvider.getElements() "
+                + inputElement.getClass().getName());
+            return null;
+        }
+
+        public void dispose() {
+            // TODO Auto-generated method stub
+
+        }
+
+        public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
+            // TODO Auto-generated method stub
+
+        }
+
     }
 
 }

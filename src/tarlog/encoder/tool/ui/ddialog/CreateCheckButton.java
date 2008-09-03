@@ -10,8 +10,8 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 
-import tarlog.encoder.tool.api.AbstractEncoder.FieldWrapper;
 import tarlog.encoder.tool.ui.ddialog.DynamicInputDialog.FieldControl;
+import tarlog.encoder.tool.ui.ddialog.DynamicInputDialog.FieldWrapper;
 
 public class CreateCheckButton extends CreateField {
 
@@ -31,10 +31,11 @@ public class CreateCheckButton extends CreateField {
         button.setLayoutData(data);
 
         button.setText(fieldName);
-        Boolean value = (Boolean) getValue(fieldWrapper.field);
+        Boolean value = (Boolean) fieldWrapper.initialValue;
         if (value != null) {
             button.setSelection(value.booleanValue());
         }
+
         fieldControls.add(new FieldControl() {
 
             public Field getField() {

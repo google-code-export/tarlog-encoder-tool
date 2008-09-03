@@ -1,7 +1,5 @@
 package tarlog.encoder.tool.ui.ddialog;
 
-import java.lang.reflect.AccessibleObject;
-import java.lang.reflect.Field;
 import java.util.List;
 
 import org.eclipse.swt.SWT;
@@ -11,7 +9,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 
-import tarlog.encoder.tool.Utils;
 import tarlog.encoder.tool.ui.ddialog.DynamicInputDialog.FieldControl;
 
 public abstract class CreateField {
@@ -41,20 +38,6 @@ public abstract class CreateField {
         //                data.widthHint = convertHorizontalDLUsToPixels(IDialogConstants.MINIMUM_MESSAGE_AREA_WIDTH);
         label.setLayoutData(data);
         label.setFont(font);
-    }
-
-    protected Object getValue(Field field) {
-        try {
-            AccessibleObject.setAccessible(new Field[] { field }, true);
-            //            field.setAccessible(true);
-            return field.get(object);
-        } catch (IllegalArgumentException e) {
-            Utils.showException(shell, e);
-            throw new RuntimeException(e);
-        } catch (IllegalAccessException e) {
-            Utils.showException(shell, e);
-            throw new RuntimeException(e);
-        }
     }
 
 }

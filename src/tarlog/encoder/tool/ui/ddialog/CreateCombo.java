@@ -3,18 +3,17 @@ package tarlog.encoder.tool.ui.ddialog;
 import java.lang.reflect.Field;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 
-import tarlog.encoder.tool.api.AbstractEncoder.FieldWrapper;
 import tarlog.encoder.tool.api.fields.TextField;
 import tarlog.encoder.tool.ui.ddialog.DynamicInputDialog.FieldControl;
-
+import tarlog.encoder.tool.ui.ddialog.DynamicInputDialog.FieldWrapper;
 
 public class CreateCombo extends CreateField {
-
-
 
     public CreateCombo(DynamicInputDialog inputDialog) {
         super(inputDialog);
@@ -30,9 +29,18 @@ public class CreateCombo extends CreateField {
         for (Enum<?> enumConstant : enumConstants) {
             combo.add(enumConstant.name());
         }
-        Object value = getValue(fieldWrapper.field);
+        Object value = fieldWrapper.initialValue;
         if (value != null) {
             combo.setText(((Enum<?>) value).name());
+        }
+        if (inputDialog.validator != null) {
+            combo.addModifyListener(new ModifyListener() {
+
+                public void modifyText(ModifyEvent e) {
+                    inputDialog.setFields();
+                    inputDialog.validateInput();
+                }
+            });
         }
         fieldControls.add(new FieldControl() {
 
@@ -62,9 +70,18 @@ public class CreateCombo extends CreateField {
                 combo.add(val);
             }
         }
-        Object value = getValue(fieldWrapper.field);
+        Object value = fieldWrapper.initialValue;
         if (value != null) {
             combo.setText((String) value);
+        }
+        if (inputDialog.validator != null) {
+            combo.addModifyListener(new ModifyListener() {
+
+                public void modifyText(ModifyEvent e) {
+                    inputDialog.setFields();
+                    inputDialog.validateInput();
+                }
+            });
         }
         fieldControls.add(new FieldControl() {
 

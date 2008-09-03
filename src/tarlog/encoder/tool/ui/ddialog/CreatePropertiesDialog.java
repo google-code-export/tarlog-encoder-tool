@@ -24,9 +24,9 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 
-import tarlog.encoder.tool.api.AbstractEncoder.FieldWrapper;
 import tarlog.encoder.tool.ui.AbstractTableLabelProvider;
 import tarlog.encoder.tool.ui.ddialog.DynamicInputDialog.FieldControl;
+import tarlog.encoder.tool.ui.ddialog.DynamicInputDialog.FieldWrapper;
 
 public class CreatePropertiesDialog extends CreateField {
 
@@ -54,7 +54,7 @@ public class CreatePropertiesDialog extends CreateField {
         table.setEnabled(enabled);
 
         final List<Pair> tableInput = new ArrayList<Pair>();
-        Object value = getValue(fieldWrapper.field);
+        Object value = fieldWrapper.initialValue;
 
         if (value instanceof Properties) {
             Properties props = (Properties) value;
