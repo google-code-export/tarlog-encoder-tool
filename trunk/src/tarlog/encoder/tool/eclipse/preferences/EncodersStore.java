@@ -9,7 +9,9 @@ import java.util.regex.Matcher;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 
+import tarlog.encoder.tool.api.fields.InputDirectoryField;
 import tarlog.encoder.tool.api.fields.InputField;
+import tarlog.encoder.tool.api.fields.InputFileField;
 import tarlog.encoder.tool.api.fields.InputListField;
 import tarlog.encoder.tool.api.fields.Validator;
 import tarlog.encoder.tool.api.fields.InputListField.InputType;
@@ -135,7 +137,9 @@ class EncodersStore {
         String                      className;
 
         @InputField(name = "Classpath")
-        @InputListField(inputType = { InputType.FILE, InputType.FOLDER })
+        @InputFileField
+        @InputDirectoryField
+        @InputListField(inputType = { InputType.UP, InputType.DOWN })
         URL[]                       classPath;
 
         EncoderDef() {

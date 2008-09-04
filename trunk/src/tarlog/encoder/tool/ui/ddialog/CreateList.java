@@ -20,6 +20,8 @@ import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.List;
 
 import tarlog.encoder.tool.Utils;
+import tarlog.encoder.tool.api.fields.InputDirectoryField;
+import tarlog.encoder.tool.api.fields.InputFileField;
 import tarlog.encoder.tool.api.fields.InputListField;
 import tarlog.encoder.tool.api.fields.ListConverter;
 import tarlog.encoder.tool.api.fields.InputListField.InputType;
@@ -72,7 +74,7 @@ public class CreateList extends CreateField {
         }
 
         Composite composite = new Composite(parent, SWT.NONE);
-        GridData layoutData = new GridData(SWT.FILL, SWT.CENTER, true, false);
+        GridData layoutData = new GridData(SWT.FILL, SWT.FILL, false, true);
         composite.setLayoutData(layoutData);
         GridLayout layout = new GridLayout(2, false);
         layout.marginWidth = 0;
@@ -80,11 +82,11 @@ public class CreateList extends CreateField {
 
         list = new List(composite,
             (fieldWrapper.inputField.readonly() ? SWT.READ_ONLY : SWT.NONE)
-                | SWT.MULTI | SWT.BORDER);
+                | SWT.SINGLE | SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
 
         layoutData = new GridData(SWT.FILL, SWT.FILL, true, true);
-        layoutData.heightHint = inputDialog.convertVerticalDLUsToPixels(30);
-        layoutData.widthHint = inputDialog.convertHorizontalDLUsToPixels(70);
+        layoutData.heightHint = inputDialog.convertVerticalDLUsToPixels(50);
+        layoutData.widthHint = inputDialog.convertHorizontalDLUsToPixels(90);
         list.setLayoutData(layoutData);
 
         Object[] value = (Object[]) fieldWrapper.initialValue;
@@ -102,7 +104,7 @@ public class CreateList extends CreateField {
         //            });
         //        }
 
-        addButtons(composite, inputListFieldAnnotation);
+        addButtons(composite, fieldWrapper);
 
         fieldControls.add(new FieldControl() {
 
@@ -117,32 +119,101 @@ public class CreateList extends CreateField {
         return list;
     }
 
-    private void addButtons(Composite parent,
-        InputListField inputListFieldAnnotation) {
-        Composite composite = new Composite(parent, SWT.BORDER);
-        GridData layoutData = new GridData(SWT.FILL, SWT.TOP, true, true);
+    private void addButtons(Composite parent, FieldWrapper fieldWrapper) {
+        Composite composite = new Composite(parent, SWT.NONE);
+        GridData layoutData = new GridData(SWT.FILL, SWT.TOP, false, true);
         composite.setLayoutData(layoutData);
         GridLayout layout = new GridLayout();
         layout.marginWidth = 0;
+        layout.marginHeight = 0;
+        composite.setLayout(layout);
 
-        if (inputListFieldAnnotation == null) {
+        InputListField inputListField = fieldWrapper.field.getAnnotation(InputListField.class);
+        InputDirectoryField inputDirectoryField = fieldWrapper.field.getAnnotation(InputDirectoryField.class);
+        InputFileField inputFileField = fieldWrapper.field.getAnnotation(InputFileField.class);
+
+        if (inputDirectoryField == null && inputListField == null
+            && inputFileField == null) {
             createStringInputButton(composite);
         } else {
-            for (InputType inputType : inputListFieldAnnotation.inputType()) {
-                if (inputType == InputType.FILE) {
-                    createFileInputButton(composite);
-                } else if (inputType == InputType.FOLDER) {
-                    createFolderInputButton(composite);
-                } else if (inputType == InputType.STRING) {
-                    createStringInputButton(composite);
+            if (inputDirectoryField != null) {
+                createFolderInputButton(composite);
+            }
+            if (inputFileField != null) {
+                createFileInputButton(composite);
+            }
+            if (inputListField != null) {
+                for (InputType inputType : inputListField.inputType()) {
+                    if (inputType == InputType.UP) {
+                        createUpButton(composite);
+                    } else if (inputType == InputType.DOWN) {
+                        createDownButton(composite);
+                    } else if (inputType == InputType.STRING) {
+                        createStringInputButton(composite);
+                    }
                 }
             }
         }
+        createRemoveButton(composite);
+    }
+
+    private void createUpButton(Composite composite) {
+        final Button button = new Button(composite, SWT.PUSH);
+        button.setLayoutData(new GridData(SWT.FILL, SWT.TOP, false, false));
+        button.setText("Up");
+        button.addSelectionListener(new AbstractSelectionListener() {
+
+            public void widgetSelected(SelectionEvent e) {
+                int selectionIndex = list.getSelectionIndex();
+                if (selectionIndex > 0) {
+                    String item = list.getItem(selectionIndex);
+                    list.setItem(selectionIndex,
+                        list.getItem(selectionIndex - 1));
+                    list.setItem(selectionIndex - 1, item);
+                    list.setSelection(selectionIndex - 1);
+                }
+            }
+        });
+    }
+
+    private void createDownButton(Composite composite) {
+        final Button button = new Button(composite, SWT.PUSH);
+        button.setLayoutData(new GridData(SWT.FILL, SWT.TOP, false, false));
+        button.setText("Down");
+        button.addSelectionListener(new AbstractSelectionListener() {
+
+            public void widgetSelected(SelectionEvent e) {
+                int selectionIndex = list.getSelectionIndex();
+                if (selectionIndex != -1
+                    && selectionIndex < list.getItemCount() - 1) {
+                    String item = list.getItem(selectionIndex);
+                    list.setItem(selectionIndex,
+                        list.getItem(selectionIndex + 1));
+                    list.setItem(selectionIndex + 1, item);
+                    list.setSelection(selectionIndex + 1);
+                }
+            }
+        });
+    }
+
+    private void createRemoveButton(Composite composite) {
+        final Button button = new Button(composite, SWT.PUSH);
+        button.setLayoutData(new GridData(SWT.FILL, SWT.TOP, false, false));
+        button.setText("Remove");
+        button.addSelectionListener(new AbstractSelectionListener() {
+
+            public void widgetSelected(SelectionEvent e) {
+                int selectionIndex;
+                while ((selectionIndex = list.getSelectionIndex()) != -1) {
+                    list.remove(selectionIndex);
+                }
+            }
+        });
     }
 
     private void createFileInputButton(Composite composite) {
         final Button button = new Button(composite, SWT.PUSH);
-        button.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false));
+        button.setLayoutData(new GridData(SWT.FILL, SWT.TOP, false, false));
         button.setText("Add File");
         button.addSelectionListener(new AbstractSelectionListener() {
 

@@ -10,20 +10,11 @@ import java.lang.annotation.Target;
  * Specifies file fields in addition to the regular input fields. Putting this
  * annotation without the <tt>InputField</tt> annotation will do nothing.
  * <p>
- * File fields can be of the following types: directory, file.
- * <p>
- * It's possible to define the filter path for the dialogs.
- * <p>
- * In addition it's possible to define filter extensions for the file dialogs.
+ * It's possible to define the filter path and filter extensions for the dialog.
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
 public @interface InputFileField {
-
-    /**
-     * type of the file field. Can be either file or directory.
-     */
-    FileFieldType fileFieldType() default FileFieldType.file;
 
     /**
      * Set the file extensions which the file dialog will use to filter the
@@ -51,6 +42,7 @@ public @interface InputFileField {
      */
     String[] filterNames() default {};
 
+    
     /**
      * <p>
      * Sets the directory path that the dialog will use to the argument, which
@@ -62,8 +54,4 @@ public @interface InputFileField {
      * '/' or '\' can be used as a path separator.
      */
     String filterPath() default "";
-
-    public enum FileFieldType {
-        file, directory
-    }
 }

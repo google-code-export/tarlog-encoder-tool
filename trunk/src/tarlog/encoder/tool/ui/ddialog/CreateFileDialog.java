@@ -17,8 +17,8 @@ import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Text;
 
+import tarlog.encoder.tool.api.fields.InputDirectoryField;
 import tarlog.encoder.tool.api.fields.InputFileField;
-import tarlog.encoder.tool.api.fields.InputFileField.FileFieldType;
 import tarlog.encoder.tool.ui.AbstractSelectionListener;
 import tarlog.encoder.tool.ui.ddialog.DynamicInputDialog.FieldControl;
 import tarlog.encoder.tool.ui.ddialog.DynamicInputDialog.FieldWrapper;
@@ -50,6 +50,14 @@ public class CreateFileDialog extends CreateField {
         }
 
         final InputFileField fileFieldAnnotation = fieldWrapper.field.getAnnotation(InputFileField.class);
+        final InputDirectoryField directoryField = fieldWrapper.field.getAnnotation(InputDirectoryField.class);
+
+        if (fileFieldAnnotation != null && directoryField != null) {
+            throw new RuntimeException(String.format(
+                "Only one of %s or %s is permitted.",
+                InputFileField.class.getName(),
+                InputDirectoryField.class.getName()));
+        }
 
         final Button button = new Button(composite, SWT.PUSH);
         button.setEnabled(!fieldWrapper.inputField.readonly());
@@ -58,32 +66,33 @@ public class CreateFileDialog extends CreateField {
         button.addSelectionListener(new AbstractSelectionListener() {
 
             public void widgetSelected(SelectionEvent e) {
-                FileFieldType fileFieldType = FileFieldType.file;
-                String[] filterExtensions = null;
-                String[] filterNames = null;
                 String filterPath = null;
+                String file = null;
                 if (fileFieldAnnotation != null) {
-                    fileFieldType = fileFieldAnnotation.fileFieldType();
-                    filterExtensions = fileFieldAnnotation.filterExtensions().length > 0 ? fileFieldAnnotation.filterExtensions()
+                    String[] filterExtensions = fileFieldAnnotation.filterExtensions().length > 0 ? fileFieldAnnotation.filterExtensions()
                         : null;
-                    filterNames = fileFieldAnnotation.filterNames().length > 0 ? fileFieldAnnotation.filterNames()
+                    String[] filterNames = fileFieldAnnotation.filterNames().length > 0 ? fileFieldAnnotation.filterNames()
                         : null;
                     filterPath = fileFieldAnnotation.filterPath().equals("") ? null
                         : fileFieldAnnotation.filterPath();
-                }
-                String file = null;
-                if (fileFieldType == FileFieldType.file) {
+
                     FileDialog fileDialog = new FileDialog(shell);
                     fileDialog.setFileName(text.getText());
                     fileDialog.setFilterExtensions(filterExtensions);
                     fileDialog.setFilterNames(filterNames);
                     fileDialog.setFilterPath(filterPath);
                     file = fileDialog.open();
-                } else {
+                } else if (directoryField != null) {
+                    filterPath = directoryField.filterPath().equals("") ? null
+                        : directoryField.filterPath();
                     DirectoryDialog directoryDialog = new DirectoryDialog(shell);
                     directoryDialog.setText(text.getText());
                     directoryDialog.setFilterPath(filterPath);
                     file = directoryDialog.open();
+                } else {
+                    FileDialog fileDialog = new FileDialog(shell);
+                    fileDialog.setFileName(text.getText());
+                    file = fileDialog.open();
                 }
                 if (file != null) {
                     text.setText(file);
