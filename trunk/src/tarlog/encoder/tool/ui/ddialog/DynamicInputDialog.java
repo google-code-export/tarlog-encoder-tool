@@ -24,7 +24,7 @@ import org.eclipse.swt.widgets.Text;
 
 import tarlog.encoder.tool.Utils;
 import tarlog.encoder.tool.api.fields.InputField;
-import tarlog.encoder.tool.api.fields.TextField;
+import tarlog.encoder.tool.api.fields.InputTextField;
 import tarlog.encoder.tool.api.fields.Validator;
 
 public class DynamicInputDialog extends Dialog {
@@ -101,7 +101,7 @@ public class DynamicInputDialog extends Dialog {
             final Class<?> fieldType = fieldWrapper.field.getType();
             Control control;
             if (fieldType.equals(String.class)) {
-                TextField textField = fieldWrapper.field.getAnnotation(TextField.class);
+                InputTextField textField = fieldWrapper.field.getAnnotation(InputTextField.class);
                 if (textField != null && textField.values().length > 0) {
                     control = new CreateCombo(this).createComboField(
                         parent.getFont(), composite, fieldWrapper, fieldName,
@@ -127,6 +127,9 @@ public class DynamicInputDialog extends Dialog {
             } else if (fieldType.equals(Properties.class)) {
                 control = new CreatePropertiesDialog(this).createDialog(
                     parent.getFont(), composite, fieldWrapper, fieldName);
+            } else if (fieldType.isArray()) {
+                control = new CreateList(this).createField(parent.getFont(),
+                    composite, fieldWrapper, fieldName);
             } else {
                 throw new RuntimeException("Unsupported type : "
                     + fieldType.getName());
@@ -153,7 +156,7 @@ public class DynamicInputDialog extends Dialog {
         validateInput();
         return contents;
     }
-    
+
     protected void validateInput() {
         String errorMessage = null;
         if (validator != null) {
@@ -223,7 +226,6 @@ public class DynamicInputDialog extends Dialog {
                 Utils.showException(getShell(), e);
             }
         }
-    
 
     }
 

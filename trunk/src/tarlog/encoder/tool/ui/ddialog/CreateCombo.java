@@ -9,7 +9,7 @@ import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 
-import tarlog.encoder.tool.api.fields.TextField;
+import tarlog.encoder.tool.api.fields.InputTextField;
 import tarlog.encoder.tool.ui.ddialog.DynamicInputDialog.FieldControl;
 import tarlog.encoder.tool.ui.ddialog.DynamicInputDialog.FieldWrapper;
 
@@ -64,7 +64,7 @@ public class CreateCombo extends CreateField {
         createLabel(font, parent, fieldName);
         final Combo combo = new Combo(parent, SWT.DROP_DOWN
             | (fieldWrapper.inputField.readonly() ? SWT.READ_ONLY : SWT.NONE));
-        TextField textField = fieldWrapper.field.getAnnotation(TextField.class);
+        InputTextField textField = fieldWrapper.field.getAnnotation(InputTextField.class);
         if (textField != null) {
             for (String val : textField.values()) {
                 combo.add(val);

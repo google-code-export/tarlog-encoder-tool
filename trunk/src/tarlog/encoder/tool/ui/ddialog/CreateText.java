@@ -10,7 +10,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Text;
 
-import tarlog.encoder.tool.api.fields.TextField;
+import tarlog.encoder.tool.api.fields.InputTextField;
 import tarlog.encoder.tool.ui.ddialog.DynamicInputDialog.FieldControl;
 import tarlog.encoder.tool.ui.ddialog.DynamicInputDialog.FieldWrapper;
 
@@ -23,7 +23,7 @@ public class CreateText extends CreateField {
     public Text createField(Font font, Composite parent,
         final FieldWrapper fieldWrapper, String fieldName) {
         createLabel(font, parent, fieldName);
-        TextField textField = fieldWrapper.field.getAnnotation(TextField.class);
+        InputTextField textField = fieldWrapper.field.getAnnotation(InputTextField.class);
         boolean isMultiline = textField != null ? textField.multiline() : false;
         boolean isPassword = textField != null ? textField.password() : false;
         final Text text = new Text(parent, (isMultiline ? SWT.MULTI

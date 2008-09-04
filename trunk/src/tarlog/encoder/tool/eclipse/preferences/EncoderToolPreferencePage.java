@@ -1,6 +1,7 @@
 package tarlog.encoder.tool.eclipse.preferences;
 
 import java.io.IOException;
+import java.net.URL;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -74,14 +75,14 @@ public class EncoderToolPreferencePage extends PreferencePage implements
 
     public void init(IWorkbench workbench) {
     }
-    
+
     @Override
     public boolean performOk() {
         IPreferenceStore preferenceStore = getPreferenceStore();
         encodersStore.store(preferenceStore);
         if (preferenceStore instanceof PreferenceStore) {
             try {
-                ((PreferenceStore)preferenceStore).save();
+                ((PreferenceStore) preferenceStore).save();
             } catch (IOException e) {
                 Utils.showException(getShell(), e);
                 return false;
@@ -197,15 +198,15 @@ public class EncoderToolPreferencePage extends PreferencePage implements
     }
 
     private void initialize() {
-        IPreferenceStore preferenceStore = getPreferenceStore();
-        if (preferenceStore instanceof PreferenceStore) {
-            try {
-                ((PreferenceStore)preferenceStore).load();
-            } catch (IOException e) {
-                Utils.showException(getShell(), e);
+        try {
+            IPreferenceStore preferenceStore = getPreferenceStore();
+            if (preferenceStore instanceof PreferenceStore) {
+                ((PreferenceStore) preferenceStore).load();
             }
+            encodersStore = new EncodersStore(preferenceStore);
+        } catch (IOException e) {
+            Utils.showException(getShell(), e);
         }
-        encodersStore = new EncodersStore(preferenceStore);
     }
 
     private class LabelProvider implements ILabelProvider {
@@ -222,6 +223,9 @@ public class EncoderToolPreferencePage extends PreferencePage implements
             if (element instanceof String) {
                 return (String) element;
             }
+            if (element instanceof URL) {
+                return element.toString();
+            }
             if (element instanceof EncodersGroup) {
                 EncodersGroup encodersGroup = (EncodersGroup) element;
                 return "Group: " + encodersGroup.groupName;
@@ -235,11 +239,11 @@ public class EncoderToolPreferencePage extends PreferencePage implements
                 EncoderClassWrapper classWrapper = (EncoderClassWrapper) element;
                 return "Class: " + classWrapper.className;
             }
-            
+
             if (element instanceof EncoderClasspathWrapper) {
                 return "Classpath:";
             }
-            
+
             System.out.println("LabelProvider.getText() "
                 + element.getClass().getName());
             return null;
@@ -279,9 +283,9 @@ public class EncoderToolPreferencePage extends PreferencePage implements
 
     private class EncoderClasspathWrapper {
 
-        String[] classpath;
+        URL[] classpath;
 
-        public EncoderClasspathWrapper(String[] classpath) {
+        public EncoderClasspathWrapper(URL[] classpath) {
             super();
             this.classpath = classpath;
         }
@@ -326,13 +330,18 @@ public class EncoderToolPreferencePage extends PreferencePage implements
             if (element instanceof EncoderDef) {
                 return true;
             }
-            
+
             if (element instanceof EncoderClassWrapper) {
                 return false;
             }
 
+            if (element instanceof URL) {
+                return false;
+            }
+
             if (element instanceof EncoderClasspathWrapper) {
-                return true;
+                EncoderClasspathWrapper classpathWrapper = (EncoderClasspathWrapper) element;
+                return (classpathWrapper.classpath != null && classpathWrapper.classpath.length > 0);
             }
 
             System.out.println("ContentProvider.hasChildren() "

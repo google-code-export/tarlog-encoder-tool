@@ -1,5 +1,7 @@
 package tarlog.encoder.tool.eclipse.preferences;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
@@ -8,7 +10,10 @@ import java.util.regex.Matcher;
 import org.eclipse.jface.preference.IPreferenceStore;
 
 import tarlog.encoder.tool.api.fields.InputField;
+import tarlog.encoder.tool.api.fields.InputListField;
+import tarlog.encoder.tool.api.fields.ListConverter;
 import tarlog.encoder.tool.api.fields.Validator;
+import tarlog.encoder.tool.api.fields.InputListField.InputType;
 
 class EncodersStore {
 
@@ -31,11 +36,12 @@ class EncodersStore {
         return store.toArray(new EncodersGroup[store.size()]);
     }
 
-    public EncodersStore(IPreferenceStore preferenceStore) {
+    public EncodersStore(IPreferenceStore preferenceStore)
+        throws MalformedURLException {
         this(preferenceStore.getString(EncodersStore.class.getName()));
     }
 
-    public EncodersStore(String string) {
+    public EncodersStore(String string) throws MalformedURLException {
         if ("".equals(string)) {
             return;
         }
@@ -85,7 +91,7 @@ class EncodersStore {
         private final static String GROUP_KEY = "@@@";
         private final static String SEP       = "%%%";
 
-        private EncodersGroup(String string) {
+        private EncodersGroup(String string) throws MalformedURLException {
             StringTokenizer tokenizer = new StringTokenizer(string, GROUP_KEY);
             groupName = tokenizer.nextToken();
             if (tokenizer.countTokens() >= 1) {
@@ -129,13 +135,15 @@ class EncodersStore {
         @InputField(name = "Class name")
         String                      className;
 
-        String[]                    classPath;
+        @InputField(name = "Classpath")
+        @InputListField(inputType = { InputType.FILE, InputType.FOLDER })
+        URL[]                       classPath;
 
         EncoderDef() {
 
         }
 
-        EncoderDef(String string) {
+        EncoderDef(String string) throws MalformedURLException {
             StringTokenizer tokenizer = new StringTokenizer(string, FIELD_SEP);
             name = tokenizer.nextToken();
             if (tokenizer.countTokens() >= 1) {
@@ -144,9 +152,9 @@ class EncodersStore {
                     StringTokenizer stringTokenizer = new StringTokenizer(
                         tokenizer.nextToken(), CLASSPATH_SEP);
                     int countTokens = stringTokenizer.countTokens();
-                    classPath = new String[countTokens];
+                    classPath = new URL[countTokens];
                     for (int i = 0; i < countTokens; ++i) {
-                        classPath[i] = stringTokenizer.nextToken();
+                        classPath[i] = new URL(stringTokenizer.nextToken());
                     }
                 }
             }
@@ -160,8 +168,8 @@ class EncodersStore {
             stringBuilder.append(className);
             stringBuilder.append(FIELD_SEP);
             if (classPath != null) {
-                for (String cls : classPath) {
-                    stringBuilder.append(cls);
+                for (URL cls : classPath) {
+                    stringBuilder.append(cls.toString());
                     stringBuilder.append(CLASSPATH_SEP);
                 }
             }
@@ -178,6 +186,7 @@ class EncodersStore {
             }
             return null;
         }
+
     }
 
 }
