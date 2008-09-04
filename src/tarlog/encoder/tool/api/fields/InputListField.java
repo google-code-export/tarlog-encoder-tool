@@ -14,8 +14,19 @@ public @interface InputListField {
 
     InputType[] inputType() default InputType.STRING;
 
+    /**
+     * <p>
+     * STRING - String input will be added
+     * <p>
+     * PROVIDED - The input should be specified using additional annotation.
+     * Using the property will do nothing, if any additional input selected.
+     * <p>
+     * UP - UP button will be added
+     * <p>
+     * DOWN - DOWN button will be added
+     */
     public enum InputType {
-        STRING, FILE, FOLDER
+        STRING, PROVIDED, UP, DOWN
     }
 
 }
