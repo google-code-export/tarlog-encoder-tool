@@ -52,7 +52,7 @@ public class EncoderTool extends ApplicationWindow {
     private static final String ENCODERS_FILE     = "encoders.properties";
     private static final String ENCODERS_PROPERTY = "encoders";
 
-    private static final String VERSION           = "0.1.0";
+    private static final String VERSION           = "0.2.0";
 
     private Properties          properties;
     private Text                targetText;
@@ -75,7 +75,9 @@ public class EncoderTool extends ApplicationWindow {
         properties.load(getClass().getClassLoader().getResourceAsStream(
             propertiesFile));
         setBlockOnOpen(true);
-        addMenuBar();
+        if (standalone) {
+            addMenuBar();
+        }
         open();
     }
 
@@ -97,21 +99,20 @@ public class EncoderTool extends ApplicationWindow {
     @Override
     protected MenuManager createMenuManager() {
         MenuManager menuManager = super.createMenuManager();
-        if (standalone) {
-            // create menu only when stand alone
-            MenuManager fileMenuManager = new MenuManager("&File");
-            menuManager.add(new OpenPreferencesAction());
-            menuManager.add(fileMenuManager);
 
-            //        SaveAction saveAction = new SaveAction();
-            //        saveAction.setAccelerator(SWT.CTRL | 'S');
-            //        fileMenuManager.add(saveAction);
-            //        LoadAction loadAction = new LoadAction();
-            //        loadAction.setAccelerator(SWT.CTRL | 'O');
-            //        fileMenuManager.add(loadAction);
-            //        menuManager.add(fileMenuManager);
+        // create menu only when stand alone
+        MenuManager fileMenuManager = new MenuManager("&File");
+        fileMenuManager.add(new OpenPreferencesAction());
+        menuManager.add(fileMenuManager);
 
-        }
+        //        SaveAction saveAction = new SaveAction();
+        //        saveAction.setAccelerator(SWT.CTRL | 'S');
+        //        fileMenuManager.add(saveAction);
+        //        LoadAction loadAction = new LoadAction();
+        //        loadAction.setAccelerator(SWT.CTRL | 'O');
+        //        fileMenuManager.add(loadAction);
+        //        menuManager.add(fileMenuManager);
+
         return menuManager;
     }
 
