@@ -11,7 +11,6 @@ import org.eclipse.jface.preference.IPreferenceStore;
 
 import tarlog.encoder.tool.api.fields.InputField;
 import tarlog.encoder.tool.api.fields.InputListField;
-import tarlog.encoder.tool.api.fields.ListConverter;
 import tarlog.encoder.tool.api.fields.Validator;
 import tarlog.encoder.tool.api.fields.InputListField.InputType;
 
