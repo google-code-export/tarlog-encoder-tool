@@ -138,12 +138,9 @@ public class DynamicInputDialog extends Dialog {
             control.setEnabled(fieldWrapper.inputField.enabled());
         }
         errorMessageText = new Text(composite, SWT.READ_ONLY | SWT.WRAP);
-        errorMessageText.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL
-            | GridData.HORIZONTAL_ALIGN_FILL));
+        errorMessageText.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 2, 1));
         errorMessageText.setBackground(errorMessageText.getDisplay().getSystemColor(
             SWT.COLOR_WIDGET_BACKGROUND));
-        // Set the error message text
-        // See https://bugs.eclipse.org/bugs/show_bug.cgi?id=66292
         setErrorMessage(errorMessage);
 
         applyDialogFont(composite);

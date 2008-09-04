@@ -83,7 +83,8 @@ public class CreateList extends CreateField {
                 | SWT.MULTI | SWT.BORDER);
 
         layoutData = new GridData(SWT.FILL, SWT.FILL, true, true);
-        layoutData.heightHint = inputDialog.convertHorizontalDLUsToPixels(30);
+        layoutData.heightHint = inputDialog.convertVerticalDLUsToPixels(30);
+        layoutData.widthHint = inputDialog.convertHorizontalDLUsToPixels(70);
         list.setLayoutData(layoutData);
 
         Object[] value = (Object[]) fieldWrapper.initialValue;
@@ -116,8 +117,14 @@ public class CreateList extends CreateField {
         return list;
     }
 
-    private void addButtons(Composite composite,
+    private void addButtons(Composite parent,
         InputListField inputListFieldAnnotation) {
+        Composite composite = new Composite(parent, SWT.BORDER);
+        GridData layoutData = new GridData(SWT.FILL, SWT.TOP, true, true);
+        composite.setLayoutData(layoutData);
+        GridLayout layout = new GridLayout();
+        layout.marginWidth = 0;
+
         if (inputListFieldAnnotation == null) {
             createStringInputButton(composite);
         } else {

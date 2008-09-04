@@ -1,7 +1,6 @@
 package tarlog.encoder.tool.eclipse.preferences;
 
 import java.io.IOException;
-import java.net.URL;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -11,18 +10,13 @@ import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.preference.PreferenceStore;
-import org.eclipse.jface.viewers.ILabelProvider;
-import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
-import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.jface.viewers.TreeViewer;
-import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -59,6 +53,8 @@ public class EncoderToolPreferencePage extends PreferencePage implements
     private TreeViewer          treeViewer;
 
     private Button              addEncoderButton;
+
+    private Button              editButton;
 
     public EncoderToolPreferencePage() {
         this(Activator.getDefault().getPreferenceStore());
@@ -110,6 +106,7 @@ public class EncoderToolPreferencePage extends PreferencePage implements
 
         createAddGroupButton(composite);
         addEncoderButton = createAddEncoderButton(composite);
+        editButton = createEditButton(composite);
     }
 
     private void createAddGroupButton(Composite composite) {
@@ -121,32 +118,39 @@ public class EncoderToolPreferencePage extends PreferencePage implements
         addGroupButton.addSelectionListener(new SelectionAdapter() {
 
             public void widgetSelected(SelectionEvent event) {
-                InputDialog inputDialog = new InputDialog(getShell(),
-                    "Enter group name", "Enter group name", "",
-                    new IInputValidator() {
-
-                        public String isValid(String newText) {
-                            if (newText.trim().equals("")) {
-                                return "Group name cannot be empty";
-                            }
-                            Matcher matcher = WORD_PATTERN.matcher(newText);
-                            if (!matcher.matches()) {
-                                return "Group name must be a word";
-                            }
-                            if (encodersStore.getGroup(newText) != null) {
-                                return "Group name must be unique";
-                            }
-                            return null;
-                        }
-                    });
-                int rc = inputDialog.open();
-                if (rc == Dialog.OK) {
-                    encodersStore.newGroup(inputDialog.getValue());
-                    treeViewer.refresh();
-                }
-
+                editGroupName("");
             }
         });
+    }
+
+    private Button createEditButton(Composite composite) {
+        Button button = new Button(composite, SWT.PUSH);
+        button.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
+        button.setText("Edit");
+        button.setEnabled(false);
+        button.addSelectionListener(new SelectionAdapter() {
+
+            public void widgetSelected(SelectionEvent event) {
+                TreeSelection selection = (TreeSelection) treeViewer.getSelection();
+                Object firstElement = selection.getFirstElement();
+                if (firstElement instanceof EncodersGroup) {
+                    EncodersGroup group = (EncodersGroup) firstElement;
+                    String name = editGroupName(group.groupName);
+                    if (name != null) {
+                        group.groupName = name;
+                        treeViewer.refresh();
+                    }
+                } else if (firstElement instanceof EncoderDef) {
+                    DynamicInputDialog dynamicInputDialog = new DynamicInputDialog(
+                        getShell(), "Edit Encoder", firstElement);
+                    int rc = dynamicInputDialog.open();
+                    if (rc == Dialog.OK) {
+                        treeViewer.refresh();
+                    }
+                }
+            }
+        });
+        return button;
     }
 
     private Button createAddEncoderButton(Composite composite) {
@@ -160,7 +164,7 @@ public class EncoderToolPreferencePage extends PreferencePage implements
                 Object firstElement = ((TreeSelection) treeViewer.getSelection()).getFirstElement();
                 EncodersGroup encodersGroup = (EncodersGroup) firstElement;
 
-                EncodersStore.EncoderDef encoderDef = new EncodersStore.EncoderDef();
+                EncoderDef encoderDef = new EncoderDef();
                 DynamicInputDialog dynamicInputDialog = new DynamicInputDialog(
                     getShell(), "Add Encoder", encoderDef);
                 int rc = dynamicInputDialog.open();
@@ -190,8 +194,13 @@ public class EncoderToolPreferencePage extends PreferencePage implements
                 Object firstElement = ((TreeSelection) event.getSelection()).getFirstElement();
                 if (firstElement instanceof EncodersGroup) {
                     addEncoderButton.setEnabled(true);
+                    editButton.setEnabled(true);
+                } else if (firstElement instanceof EncoderDef) {
+                    addEncoderButton.setEnabled(false);
+                    editButton.setEnabled(true);
                 } else {
                     addEncoderButton.setEnabled(false);
+                    editButton.setEnabled(false);
                 }
             }
         });
@@ -209,169 +218,38 @@ public class EncoderToolPreferencePage extends PreferencePage implements
         }
     }
 
-    private class LabelProvider implements ILabelProvider {
+    private String editGroupName(String string) {
+        InputDialog inputDialog = new InputDialog(getShell(),
+            "Enter group name", "Enter group name", string,
+            new IInputValidator() {
 
-        public Image getImage(Object element) {
-            // TODO Auto-generated method stub
-            return null;
+                public String isValid(String newText) {
+                    if (newText.trim().equals("")) {
+                        return "Group name cannot be empty";
+                    }
+                    Matcher matcher = WORD_PATTERN.matcher(newText);
+                    if (!matcher.matches()) {
+                        return "Group name must be a word";
+                    }
+                    if (encodersStore.getGroup(newText) != null) {
+                        return "Group name must be unique";
+                    }
+                    return null;
+                }
+            });
+        int rc = inputDialog.open();
+        if (rc == Dialog.OK) {
+            if ("".equals(string)) {
+                // new group
+                encodersStore.newGroup(inputDialog.getValue());
+                treeViewer.refresh();
+                return inputDialog.getValue();
+            } else {
+                return inputDialog.getValue();
+            }
         }
-
-        public String getText(Object element) {
-            if (element == null) {
-                return null;
-            }
-            if (element instanceof String) {
-                return (String) element;
-            }
-            if (element instanceof URL) {
-                return element.toString();
-            }
-            if (element instanceof EncodersGroup) {
-                EncodersGroup encodersGroup = (EncodersGroup) element;
-                return "Group: " + encodersGroup.groupName;
-            }
-            if (element instanceof EncoderDef) {
-                EncoderDef encoderDef = (EncoderDef) element;
-                return "Encoder: " + encoderDef.name;
-            }
-
-            if (element instanceof EncoderClassWrapper) {
-                EncoderClassWrapper classWrapper = (EncoderClassWrapper) element;
-                return "Class: " + classWrapper.className;
-            }
-
-            if (element instanceof EncoderClasspathWrapper) {
-                return "Classpath:";
-            }
-
-            System.out.println("LabelProvider.getText() "
-                + element.getClass().getName());
-            return null;
-        }
-
-        public void addListener(ILabelProviderListener listener) {
-            // TODO Auto-generated method stub
-
-        }
-
-        public void dispose() {
-            // TODO Auto-generated method stub
-
-        }
-
-        public boolean isLabelProperty(Object element, String property) {
-            // TODO Auto-generated method stub
-            return false;
-        }
-
-        public void removeListener(ILabelProviderListener listener) {
-            // TODO Auto-generated method stub
-
-        }
-
+        return null;
     }
 
-    private class EncoderClassWrapper {
-
-        String className;
-
-        public EncoderClassWrapper(String className) {
-            super();
-            this.className = className;
-        }
-    }
-
-    private class EncoderClasspathWrapper {
-
-        URL[] classpath;
-
-        public EncoderClasspathWrapper(URL[] classpath) {
-            super();
-            this.classpath = classpath;
-        }
-    }
-
-    private class ContentProvider implements ITreeContentProvider {
-
-        public Object[] getChildren(Object parentElement) {
-            if (parentElement instanceof EncodersGroup) {
-                EncodersGroup encodersGroup = (EncodersGroup) parentElement;
-                return encodersGroup.list.toArray();
-            }
-            if (parentElement instanceof EncoderDef) {
-                EncoderDef encoderDef = (EncoderDef) parentElement;
-                return new Object[] {
-                    new EncoderClassWrapper(encoderDef.className),
-                    new EncoderClasspathWrapper(encoderDef.classPath) };
-            }
-            if (parentElement instanceof EncoderClasspathWrapper) {
-                EncoderClasspathWrapper classpathWrapper = (EncoderClasspathWrapper) parentElement;
-                return classpathWrapper.classpath;
-            }
-            System.out.println("ContentProvider.getChildren() "
-                + parentElement.getClass().getName());
-            return null;
-        }
-
-        public Object getParent(Object element) {
-            System.out.println("ContentProvider.getParent() ");
-            return null;
-        }
-
-        public boolean hasChildren(Object element) {
-            if (element == null) {
-                return false;
-            }
-            if (element instanceof EncodersGroup) {
-                EncodersGroup encodersGroup = (EncodersGroup) element;
-                return encodersGroup.list.size() > 0;
-
-            }
-            if (element instanceof EncoderDef) {
-                return true;
-            }
-
-            if (element instanceof EncoderClassWrapper) {
-                return false;
-            }
-
-            if (element instanceof URL) {
-                return false;
-            }
-
-            if (element instanceof EncoderClasspathWrapper) {
-                EncoderClasspathWrapper classpathWrapper = (EncoderClasspathWrapper) element;
-                return (classpathWrapper.classpath != null && classpathWrapper.classpath.length > 0);
-            }
-
-            System.out.println("ContentProvider.hasChildren() "
-                + element.getClass().getName());
-            return false;
-        }
-
-        public Object[] getElements(Object inputElement) {
-            if (inputElement == null) {
-                return new Object[0];
-            }
-            if (inputElement instanceof EncodersStore) {
-                EncodersStore encodersStore = (EncodersStore) inputElement;
-                return encodersStore.getStore();
-            }
-            System.out.println("ContentProvider.getElements() "
-                + inputElement.getClass().getName());
-            return null;
-        }
-
-        public void dispose() {
-            // TODO Auto-generated method stub
-
-        }
-
-        public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
-            // TODO Auto-generated method stub
-
-        }
-
-    }
-
+    
 }
