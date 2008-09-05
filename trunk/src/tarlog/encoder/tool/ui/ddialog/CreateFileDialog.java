@@ -62,7 +62,13 @@ public class CreateFileDialog extends CreateField {
         final Button button = new Button(composite, SWT.PUSH);
         button.setEnabled(!fieldWrapper.inputField.readonly());
         button.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false));
-        button.setText("...");
+        if (fileFieldAnnotation != null) {
+            button.setText(fileFieldAnnotation.buttonText());
+        } else if (directoryField != null) {
+            button.setText(directoryField.buttonText());
+        } else {
+            button.setText("...");
+        }
         button.addSelectionListener(new AbstractSelectionListener() {
 
             public void widgetSelected(SelectionEvent e) {

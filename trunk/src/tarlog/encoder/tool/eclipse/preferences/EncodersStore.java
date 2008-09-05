@@ -2,6 +2,7 @@ package tarlog.encoder.tool.eclipse.preferences;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
@@ -9,6 +10,7 @@ import java.util.regex.Matcher;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 
+import tarlog.encoder.tool.api.AbstractEncoder;
 import tarlog.encoder.tool.api.fields.InputDirectoryField;
 import tarlog.encoder.tool.api.fields.InputField;
 import tarlog.encoder.tool.api.fields.InputFileField;
@@ -137,8 +139,9 @@ class EncodersStore {
         String                      className;
 
         @InputField(name = "Classpath")
-        @InputFileField
-        @InputDirectoryField
+        @InputFileField(buttonText = "Add jar", filterExtensions = { "*.jar",
+            "*.*" })
+        @InputDirectoryField(buttonText = "Add class folder")
         @InputListField(inputType = { InputType.UP, InputType.DOWN })
         URL[]                       classPath;
 
@@ -183,9 +186,28 @@ class EncodersStore {
             if (name == null) {
                 return "Encoder name cannot be empty";
             }
+            if (name.equals("")) {
+                return "Encoder name cannot be empty";
+            }
             Matcher matcher = EncoderToolPreferencePage.WORD_PATTERN.matcher(name);
             if (!matcher.matches()) {
                 return "Encoder name must be a word";
+            }
+            if (className == null) {
+                return "Encoder name cannot be empty";
+            }
+            if (className.equals("")) {
+                return "Encoder name cannot be empty";
+            }
+            ClassLoader classLoader = classPath == null ? getClass().getClassLoader()
+                : new URLClassLoader(classPath, getClass().getClassLoader());
+            try {
+                Class<?> encoderClass = classLoader.loadClass(className);
+                if (!AbstractEncoder.class.isAssignableFrom(encoderClass)) {
+                    return "The encoder class must be instance of AbstractEncoder";
+                }
+            } catch (ClassNotFoundException e) {
+                return "Class not found";
             }
             return null;
         }
