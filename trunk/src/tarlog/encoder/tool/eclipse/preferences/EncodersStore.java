@@ -5,7 +5,6 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -20,14 +19,7 @@ import tarlog.encoder.tool.api.fields.InputListField.InputType;
 
 class EncodersStore {
 
-    private static final String GROUP_SEP = "$$$$$";
-
-    private List<EncodersGroup> store     = new ArrayList<EncodersGroup>();
-
-    /**
-     * group encoder name className classpath
-     * 
-     */
+    private List<EncodersGroup> store = new ArrayList<EncodersGroup>();
 
     /**
      * <p>
@@ -41,21 +33,17 @@ class EncodersStore {
 
     public EncodersStore(IPreferenceStore preferenceStore)
         throws MalformedURLException {
-        this(preferenceStore.getString(EncodersStore.class.getName()));
-    }
-
-    public EncodersStore(String string) throws MalformedURLException {
-        if ("".equals(string)) {
-            return;
-        }
-        StringTokenizer stringTokenizer = new StringTokenizer(string, GROUP_SEP);
-        while (stringTokenizer.hasMoreTokens()) {
-            store.add(new EncodersGroup(stringTokenizer.nextToken()));
+        int groupsAmount = preferenceStore.getInt(EncodersStore.class.getName());
+        for (int i = 0; i < groupsAmount; ++i) {
+            store.add(new EncodersGroup(i, preferenceStore));
         }
     }
 
     public void store(IPreferenceStore preferenceStore) {
-        preferenceStore.setValue(EncodersStore.class.getName(), toString());
+        preferenceStore.setValue(EncodersStore.class.getName(), store.size());
+        for (int i = 0; i < store.size(); ++i) {
+            store.get(i).store(i, preferenceStore);
+        }
     }
 
     public void newGroup(String groupName) {
@@ -74,54 +62,38 @@ class EncodersStore {
         return null;
     }
 
-    @Override
-    public String toString() {
-        StringBuilder stringBuilder = new StringBuilder();
-        for (EncodersGroup entry : store) {
-            stringBuilder.append(entry.toString());
-            stringBuilder.append(GROUP_SEP);
-        }
-        return stringBuilder.toString();
-    }
-
     /**
      * 
      */
     public static class EncodersGroup {
 
-        String                      groupName;
-        List<EncoderDef>            list      = new ArrayList<EncoderDef>();
-        private final static String GROUP_KEY = "@@@";
-        private final static String SEP       = "%%%";
+        String           groupName;
+        List<EncoderDef> list = new ArrayList<EncoderDef>();
 
-        private EncodersGroup(String string) throws MalformedURLException {
-            StringTokenizer tokenizer = new StringTokenizer(string, GROUP_KEY);
-            groupName = tokenizer.nextToken();
-            if (tokenizer.countTokens() >= 1) {
-                StringTokenizer split = new StringTokenizer(
-                    tokenizer.nextToken(), EncodersGroup.SEP);
-                while (split.hasMoreTokens()) {
-                    list.add(new EncoderDef(split.nextToken()));
-                }
+        public EncodersGroup(int i, IPreferenceStore preferenceStore)
+            throws MalformedURLException {
+            groupName = preferenceStore.getString(getClass().getName() + "."
+                + String.valueOf(i) + ".group");
+            int encodersAmount = preferenceStore.getInt(getClass().getName()
+                + "." + String.valueOf(i) + ".encoders");
+            for (int j = 0; j < encodersAmount; ++j) {
+                list.add(new EncoderDef(i, j, preferenceStore));
+            }
+        }
+
+        public void store(int i, IPreferenceStore preferenceStore) {
+            preferenceStore.setValue(getClass().getName() + "."
+                + String.valueOf(i) + ".group", groupName);
+            preferenceStore.setValue(getClass().getName() + "."
+                + String.valueOf(i) + ".encoders", list.size());
+            for (int j = 0; j < list.size(); ++j) {
+                list.get(j).store(i, j, preferenceStore);
             }
         }
 
         private EncodersGroup() {
 
         }
-
-        @Override
-        public String toString() {
-            StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.append(groupName);
-            stringBuilder.append(GROUP_KEY);
-            for (EncoderDef encoderDef : list) {
-                stringBuilder.append(encoderDef.toString());
-                stringBuilder.append(EncodersGroup.SEP);
-            }
-            return stringBuilder.toString();
-        }
-
     }
 
     /**
@@ -129,57 +101,51 @@ class EncodersStore {
      */
     public static class EncoderDef implements Validator {
 
-        private static final String FIELD_SEP     = "^^";
-        private static final String CLASSPATH_SEP = ";";
-
         @InputField(name = "Name")
-        String                      name;
+        String name;
 
         @InputField(name = "Class name")
-        String                      className;
+        String className;
 
         @InputField(name = "Classpath")
         @InputFileField(buttonText = "Add jar", filterExtensions = { "*.jar",
             "*.*" })
         @InputDirectoryField(buttonText = "Add class folder")
         @InputListField(inputType = { InputType.UP, InputType.DOWN })
-        URL[]                       classPath;
+        URL[]  classPath;
 
         EncoderDef() {
 
         }
 
-        EncoderDef(String string) throws MalformedURLException {
-            StringTokenizer tokenizer = new StringTokenizer(string, FIELD_SEP);
-            name = tokenizer.nextToken();
-            if (tokenizer.countTokens() >= 1) {
-                className = tokenizer.nextToken();
-                if (tokenizer.countTokens() >= 1) {
-                    StringTokenizer stringTokenizer = new StringTokenizer(
-                        tokenizer.nextToken(), CLASSPATH_SEP);
-                    int countTokens = stringTokenizer.countTokens();
-                    classPath = new URL[countTokens];
-                    for (int i = 0; i < countTokens; ++i) {
-                        classPath[i] = new URL(stringTokenizer.nextToken());
-                    }
-                }
+        private EncoderDef(int i, int j, IPreferenceStore preferenceStore)
+            throws MalformedURLException {
+            String prefix = getClass().getName() + "." + String.valueOf(i)
+                + "." + String.valueOf(j) + ".";
+            name = preferenceStore.getString(prefix + "name");
+            className = preferenceStore.getString(prefix + "className");
+            int classPathLength = preferenceStore.getInt(prefix + "classPath");
+            classPath = new URL[classPathLength];
+            for (int k = 0; k < classPathLength; ++k) {
+                classPath[k] = new URL(preferenceStore.getString(prefix
+                    + "classPath." + String.valueOf(k)));
             }
         }
 
-        @Override
-        public String toString() {
-            StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.append(name);
-            stringBuilder.append(FIELD_SEP);
-            stringBuilder.append(className);
-            stringBuilder.append(FIELD_SEP);
+        private void store(int i, int j, IPreferenceStore preferenceStore) {
+            String prefix = getClass().getName() + "." + String.valueOf(i)
+                + "." + String.valueOf(j) + ".";
+            preferenceStore.setValue(prefix + "name", name);
+            preferenceStore.setValue(prefix + "className", className);
             if (classPath != null) {
-                for (URL cls : classPath) {
-                    stringBuilder.append(cls.toString());
-                    stringBuilder.append(CLASSPATH_SEP);
+                preferenceStore.setValue(prefix + "classPath", classPath.length);
+                for (int k = 0; k < classPath.length; ++k) {
+                    preferenceStore.setValue(prefix + "classPath."
+                        + String.valueOf(k), classPath[k].toString());
                 }
+            } else {
+                preferenceStore.setValue(prefix + "classPath", 0);
             }
-            return stringBuilder.toString();
         }
 
         public String isValid() {
