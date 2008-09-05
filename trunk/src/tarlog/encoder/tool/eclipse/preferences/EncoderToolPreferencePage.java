@@ -53,8 +53,13 @@ public class EncoderToolPreferencePage extends PreferencePage implements
     private TreeViewer          treeViewer;
 
     private Button              addEncoderButton;
-
     private Button              editButton;
+
+    private Button              upButton;
+
+    private Button              downButton;
+
+    private Button              removeButton;
 
     public EncoderToolPreferencePage() {
         this(Activator.getDefault().getPreferenceStore());
@@ -66,7 +71,7 @@ public class EncoderToolPreferencePage extends PreferencePage implements
 
     private EncoderToolPreferencePage(IPreferenceStore preferencePage) {
         setPreferenceStore(preferencePage);
-        setDescription("A demonstration of a preference page implementation");
+        //        setDescription("A demonstration of a preference page implementation");
     }
 
     public void init(IWorkbench workbench) {
@@ -107,6 +112,9 @@ public class EncoderToolPreferencePage extends PreferencePage implements
         createAddGroupButton(composite);
         addEncoderButton = createAddEncoderButton(composite);
         editButton = createEditButton(composite);
+        removeButton = createRemoveButton(composite);
+        upButton = createUpButton(composite);
+        downButton = createDownButton(composite);
     }
 
     private void createAddGroupButton(Composite composite) {
@@ -179,6 +187,85 @@ public class EncoderToolPreferencePage extends PreferencePage implements
         return button;
     }
 
+    private Button createUpButton(Composite composite) {
+        Button button = new Button(composite, SWT.PUSH);
+        button.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
+        button.setText("Up");
+        button.setEnabled(false);
+        button.addSelectionListener(new SelectionAdapter() {
+
+            public void widgetSelected(SelectionEvent event) {
+                TreeSelection selection = (TreeSelection) treeViewer.getSelection();
+                Object firstElement = selection.getFirstElement();
+
+                if (firstElement instanceof EncodersGroup) {
+                    EncodersGroup group = (EncodersGroup) firstElement;
+                    encodersStore.moveUp(group);
+                } else if (firstElement instanceof EncoderDef) {
+                    EncodersGroup group = (EncodersGroup) selection.getPaths()[0].getFirstSegment();
+                    EncoderDef encoderDef = (EncoderDef) firstElement;
+                    group.moveUp(encoderDef);
+                }
+                treeViewer.refresh();
+                treeViewer.setSelection(treeViewer.getSelection());
+
+            }
+        });
+        return button;
+    }
+
+    private Button createDownButton(Composite composite) {
+        Button button = new Button(composite, SWT.PUSH);
+        button.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
+        button.setText("Down");
+        button.setEnabled(false);
+        button.addSelectionListener(new SelectionAdapter() {
+
+            public void widgetSelected(SelectionEvent event) {
+                TreeSelection selection = (TreeSelection) treeViewer.getSelection();
+                Object firstElement = selection.getFirstElement();
+
+                if (firstElement instanceof EncodersGroup) {
+                    EncodersGroup group = (EncodersGroup) firstElement;
+                    encodersStore.moveDown(group);
+                } else if (firstElement instanceof EncoderDef) {
+                    EncodersGroup group = (EncodersGroup) selection.getPaths()[0].getFirstSegment();
+                    EncoderDef encoderDef = (EncoderDef) firstElement;
+                    group.moveDown(encoderDef);
+                }
+                treeViewer.refresh();
+                treeViewer.setSelection(treeViewer.getSelection());
+            }
+        });
+        return button;
+    }
+
+    private Button createRemoveButton(Composite composite) {
+        Button button = new Button(composite, SWT.PUSH);
+        button.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
+        button.setText("Remove");
+        button.setEnabled(false);
+        button.addSelectionListener(new SelectionAdapter() {
+
+            public void widgetSelected(SelectionEvent event) {
+                TreeSelection selection = (TreeSelection) treeViewer.getSelection();
+                Object firstElement = selection.getFirstElement();
+
+                if (firstElement instanceof EncodersGroup) {
+                    EncodersGroup group = (EncodersGroup) firstElement;
+                    encodersStore.remove(group);
+                } else if (firstElement instanceof EncoderDef) {
+                    EncodersGroup group = (EncodersGroup) selection.getPaths()[0].getFirstSegment();
+                    EncoderDef encoderDef = (EncoderDef) firstElement;
+                    group.remove(encoderDef);
+                }
+                treeViewer.refresh();
+                treeViewer.setSelection(treeViewer.getSelection());
+            }
+        });
+        return button;
+    }
+
     private void createTree(Composite parent) {
         treeViewer = new TreeViewer(parent);
         Tree tree = treeViewer.getTree();
@@ -191,16 +278,29 @@ public class EncoderToolPreferencePage extends PreferencePage implements
         treeViewer.addSelectionChangedListener(new ISelectionChangedListener() {
 
             public void selectionChanged(SelectionChangedEvent event) {
-                Object firstElement = ((TreeSelection) event.getSelection()).getFirstElement();
+                TreeSelection selection = (TreeSelection) event.getSelection();
+                Object firstElement = selection.getFirstElement();
                 if (firstElement instanceof EncodersGroup) {
+                    EncodersGroup group = (EncodersGroup) firstElement;
                     addEncoderButton.setEnabled(true);
                     editButton.setEnabled(true);
+                    removeButton.setEnabled(true);
+                    downButton.setEnabled(encodersStore.canMoveDown(group));
+                    upButton.setEnabled(encodersStore.canMoveUp(group));
                 } else if (firstElement instanceof EncoderDef) {
+                    EncodersGroup group = (EncodersGroup) selection.getPaths()[0].getFirstSegment();
+                    EncoderDef encoderDef = (EncoderDef) firstElement;
                     addEncoderButton.setEnabled(false);
+                    removeButton.setEnabled(true);
                     editButton.setEnabled(true);
+                    downButton.setEnabled(group.canMoveDown(encoderDef));
+                    upButton.setEnabled(group.canMoveUp(encoderDef));
                 } else {
+                    removeButton.setEnabled(false);
                     addEncoderButton.setEnabled(false);
                     editButton.setEnabled(false);
+                    downButton.setEnabled(false);
+                    upButton.setEnabled(false);
                 }
             }
         });
@@ -251,5 +351,4 @@ public class EncoderToolPreferencePage extends PreferencePage implements
         return null;
     }
 
-    
 }
