@@ -334,7 +334,7 @@ public class CreateList extends CreateField {
             for (int i = 0; i < list.length; i++) {
                 array[i] = list[i].toString();
             }
-            return null;
+            return array;
         }
     }
 }
