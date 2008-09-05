@@ -16,6 +16,8 @@ import java.lang.annotation.Target;
 @Target(ElementType.FIELD)
 public @interface InputFileField {
 
+    String buttonText() default "...";
+    
     /**
      * Set the file extensions which the file dialog will use to filter the
      * files it shows to the argument, which may be null.

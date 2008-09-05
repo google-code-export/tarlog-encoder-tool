@@ -43,7 +43,7 @@ public class CreateList extends CreateField {
     }
 
     @SuppressWarnings("unchecked")
-    public List createField(Font font, Composite parent,
+    public Composite createField(Font font, Composite parent,
         final FieldWrapper fieldWrapper, String fieldName) {
         createLabel(font, parent, fieldName);
 
@@ -116,7 +116,7 @@ public class CreateList extends CreateField {
                 return converter.fromList(list.getItems());
             }
         });
-        return list;
+        return composite;
     }
 
     private void addButtons(Composite parent, FieldWrapper fieldWrapper) {
@@ -137,10 +137,10 @@ public class CreateList extends CreateField {
             createStringInputButton(composite);
         } else {
             if (inputDirectoryField != null) {
-                createFolderInputButton(composite);
+                createFolderInputButton(composite, inputDirectoryField);
             }
             if (inputFileField != null) {
-                createFileInputButton(composite);
+                createFileInputButton(composite, inputFileField);
             }
             if (inputListField != null) {
                 for (InputType inputType : inputListField.inputType()) {
@@ -159,7 +159,7 @@ public class CreateList extends CreateField {
 
     private void createUpButton(Composite composite) {
         final Button button = new Button(composite, SWT.PUSH);
-        button.setLayoutData(new GridData(SWT.FILL, SWT.TOP, false, false));
+        button.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
         button.setText("Up");
         button.addSelectionListener(new AbstractSelectionListener() {
 
@@ -178,7 +178,7 @@ public class CreateList extends CreateField {
 
     private void createDownButton(Composite composite) {
         final Button button = new Button(composite, SWT.PUSH);
-        button.setLayoutData(new GridData(SWT.FILL, SWT.TOP, false, false));
+        button.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
         button.setText("Down");
         button.addSelectionListener(new AbstractSelectionListener() {
 
@@ -198,7 +198,7 @@ public class CreateList extends CreateField {
 
     private void createRemoveButton(Composite composite) {
         final Button button = new Button(composite, SWT.PUSH);
-        button.setLayoutData(new GridData(SWT.FILL, SWT.TOP, false, false));
+        button.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
         button.setText("Remove");
         button.addSelectionListener(new AbstractSelectionListener() {
 
@@ -211,15 +211,26 @@ public class CreateList extends CreateField {
         });
     }
 
-    private void createFileInputButton(Composite composite) {
+    private void createFileInputButton(Composite composite,
+        final InputFileField inputFileField) {
         final Button button = new Button(composite, SWT.PUSH);
-        button.setLayoutData(new GridData(SWT.FILL, SWT.TOP, false, false));
-        button.setText("Add File");
+        button.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
+        button.setText(inputFileField.buttonText());
         button.addSelectionListener(new AbstractSelectionListener() {
 
             public void widgetSelected(SelectionEvent e) {
                 String file = null;
                 FileDialog fileDialog = new FileDialog(shell);
+                String[] filterExtensions = inputFileField.filterExtensions().length > 0 ? inputFileField.filterExtensions()
+                    : null;
+                String[] filterNames = inputFileField.filterNames().length > 0 ? inputFileField.filterNames()
+                    : null;
+                String filterPath = inputFileField.filterPath().equals("") ? null
+                    : inputFileField.filterPath();
+                fileDialog.setFilterExtensions(filterExtensions);
+                fileDialog.setFilterNames(filterNames);
+                fileDialog.setFilterPath(filterPath);
+
                 file = fileDialog.open();
                 if (file != null) {
                     list.add(file);
@@ -228,15 +239,19 @@ public class CreateList extends CreateField {
         });
     }
 
-    private void createFolderInputButton(Composite composite) {
+    private void createFolderInputButton(Composite composite,
+        final InputDirectoryField inputDirectoryField) {
         final Button button = new Button(composite, SWT.PUSH);
-        button.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false));
-        button.setText("Add Folder");
+        button.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
+        button.setText(inputDirectoryField.buttonText());
         button.addSelectionListener(new AbstractSelectionListener() {
 
             public void widgetSelected(SelectionEvent e) {
                 String file = null;
                 DirectoryDialog directoryDialog = new DirectoryDialog(shell);
+                String filterPath = inputDirectoryField.filterPath().equals("") ? null
+                    : inputDirectoryField.filterPath();
+                directoryDialog.setFilterPath(filterPath);
                 file = directoryDialog.open();
                 if (file != null) {
                     list.add(file);
@@ -247,7 +262,7 @@ public class CreateList extends CreateField {
 
     private void createStringInputButton(Composite composite) {
         final Button button = new Button(composite, SWT.PUSH);
-        button.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false));
+        button.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
         button.setText("Add");
         button.addSelectionListener(new AbstractSelectionListener() {
 

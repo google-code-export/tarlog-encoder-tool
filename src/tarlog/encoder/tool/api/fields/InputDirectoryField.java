@@ -16,6 +16,8 @@ import java.lang.annotation.Target;
 @Target(ElementType.FIELD)
 public @interface InputDirectoryField {
 
+    String buttonText() default "...";
+
     /**
      * <p>
      * Sets the directory path that the dialog will use to the argument, which
