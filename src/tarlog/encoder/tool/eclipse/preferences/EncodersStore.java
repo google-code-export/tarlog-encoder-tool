@@ -4,6 +4,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
 
@@ -20,6 +21,37 @@ import tarlog.encoder.tool.api.fields.InputListField.InputType;
 class EncodersStore {
 
     private List<EncodersGroup> store = new ArrayList<EncodersGroup>();
+
+    public void moveUp(EncodersGroup group) {
+        int indexOf = store.indexOf(group);
+        if (indexOf > 0) {
+            Collections.swap(store, indexOf, indexOf - 1);
+        }
+    }
+
+    public void remove(EncodersGroup group) {
+        store.remove(group);
+
+    }
+
+    public boolean canMoveUp(EncodersGroup group) {
+        int indexOf = store.indexOf(group);
+        return (indexOf > 0);
+    }
+
+    public void moveDown(EncodersGroup group) {
+        int indexOf = store.indexOf(group);
+        int size = store.size();
+        if (indexOf < size - 1) {
+            Collections.swap(store, indexOf, indexOf + 1);
+        }
+    }
+
+    public boolean canMoveDown(EncodersGroup group) {
+        int indexOf = store.indexOf(group);
+        int size = store.size();
+        return (indexOf < size - 1);
+    }
 
     /**
      * <p>
@@ -70,6 +102,32 @@ class EncodersStore {
         String           groupName;
         List<EncoderDef> list = new ArrayList<EncoderDef>();
 
+        public void moveUp(EncoderDef encoderDef) {
+            int indexOf = list.indexOf(encoderDef);
+            if (indexOf > 0) {
+                Collections.swap(list, indexOf, indexOf - 1);
+            }
+        }
+
+        public boolean canMoveUp(EncoderDef def) {
+            int indexOf = list.indexOf(def);
+            return (indexOf > 0);
+        }
+
+        public void moveDown(EncoderDef encoderDef) {
+            int indexOf = list.indexOf(encoderDef);
+            int size = list.size();
+            if (indexOf < size - 1) {
+                Collections.swap(list, indexOf, indexOf + 1);
+            }
+        }
+
+        public boolean canMoveDown(EncoderDef def) {
+            int indexOf = list.indexOf(def);
+            int size = list.size();
+            return (indexOf < size - 1);
+        }
+
         public EncodersGroup(int i, IPreferenceStore preferenceStore)
             throws MalformedURLException {
             groupName = preferenceStore.getString(getClass().getName() + "."
@@ -93,6 +151,10 @@ class EncodersStore {
 
         private EncodersGroup() {
 
+        }
+
+        public void remove(EncoderDef encoderDef) {
+            list.remove(encoderDef);
         }
     }
 
