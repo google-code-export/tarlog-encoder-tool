@@ -8,17 +8,11 @@ import org.apache.commons.codec.binary.Base64;
 import tarlog.encoder.tool.Utils;
 import tarlog.encoder.tool.api.AbstractEncoder;
 
-
 /**
  *
  */
 public class ToBase64Encoder extends AbstractEncoder {
 
-    @Override
-    public String getGroup() {
-        return FromBase64Encoder.BASE64;
-    }
-    
     @Override
     public String encode(String source) {
         try {
@@ -32,11 +26,6 @@ public class ToBase64Encoder extends AbstractEncoder {
     @Override
     public Object encode(byte[] source) {
         return new String(Base64.encodeBase64(source));
-    }
-    
-    @Override
-    public String getName() {
-        return "To Base64";
     }
 
 }

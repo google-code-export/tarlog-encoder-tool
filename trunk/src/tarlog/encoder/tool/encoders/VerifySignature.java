@@ -11,10 +11,8 @@ import tarlog.encoder.tool.api.fields.InputTextField;
 
 public class VerifySignature extends KeyStoreAwareEncoder {
 
-    public static final String  SIGNATURES = "Digital Signatures";
-
     @InputField(name = "Algorithm", readonly = true)
-    private SignatureAlgorithms algorithm  = SignatureAlgorithms.SHA1withDSA;
+    private SignatureAlgorithms algorithm = SignatureAlgorithms.SHA1withDSA;
 
     @InputField(name = "Certificate Alias")
     private String              alias;
@@ -22,16 +20,6 @@ public class VerifySignature extends KeyStoreAwareEncoder {
     @InputField(name = "Signature")
     @InputTextField(multiline = true)
     private String              signature;
-
-    @Override
-    public String getName() {
-        return "Verify Signature";
-    }
-
-    @Override
-    public String getGroup() {
-        return SIGNATURES;
-    }
 
     @Override
     public Object encode(byte[] source) {

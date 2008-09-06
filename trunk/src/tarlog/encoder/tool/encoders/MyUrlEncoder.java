@@ -6,21 +6,8 @@ import java.net.URLEncoder;
 import tarlog.encoder.tool.Utils;
 import tarlog.encoder.tool.api.AbstractEncoder;
 
-
 public class MyUrlEncoder extends AbstractEncoder {
 
-    public static final String URL_ENCODING = "URL Encoding";
-
-    @Override
-    public String getGroup() {
-        return URL_ENCODING;
-    }
-    
-    @Override
-    public String getName() {
-        return "Encode";
-    }
-    
     @Override
     public Object encode(String source) {
         try {

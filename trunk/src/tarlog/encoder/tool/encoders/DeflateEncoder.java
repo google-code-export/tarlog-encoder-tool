@@ -14,15 +14,6 @@ public class DeflateEncoder extends AbstractEncoder {
     @InputField(name = "GZIP compatible compression")
     private boolean nowrap = true;
 
-    @Override
-    public String getGroup() {
-        return InflaterEncoder.DEFLATER;
-    }
-
-    @Override
-    public String getName() {
-        return "Deflate";
-    }
 
     @Override
     public Object encode(byte[] source) {

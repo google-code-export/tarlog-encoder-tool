@@ -18,28 +18,36 @@ import tarlog.encoder.tool.api.fields.InputListField;
 import tarlog.encoder.tool.api.fields.Validator;
 import tarlog.encoder.tool.api.fields.InputListField.InputType;
 
-class EncodersStore {
+public class EncodersStore {
 
     private List<EncodersGroup> store = new ArrayList<EncodersGroup>();
 
-    public void moveUp(EncodersGroup group) {
+    public EncodersStore(IPreferenceStore preferenceStore)
+        throws MalformedURLException {
+        int groupsAmount = preferenceStore.getInt(EncodersStore.class.getName());
+        for (int i = 0; i < groupsAmount; ++i) {
+            store.add(new EncodersGroup(i, preferenceStore));
+        }
+    }
+
+    void moveUp(EncodersGroup group) {
         int indexOf = store.indexOf(group);
         if (indexOf > 0) {
             Collections.swap(store, indexOf, indexOf - 1);
         }
     }
 
-    public void remove(EncodersGroup group) {
+    void remove(EncodersGroup group) {
         store.remove(group);
 
     }
 
-    public boolean canMoveUp(EncodersGroup group) {
+    boolean canMoveUp(EncodersGroup group) {
         int indexOf = store.indexOf(group);
         return (indexOf > 0);
     }
 
-    public void moveDown(EncodersGroup group) {
+    void moveDown(EncodersGroup group) {
         int indexOf = store.indexOf(group);
         int size = store.size();
         if (indexOf < size - 1) {
@@ -47,7 +55,7 @@ class EncodersStore {
         }
     }
 
-    public boolean canMoveDown(EncodersGroup group) {
+    boolean canMoveDown(EncodersGroup group) {
         int indexOf = store.indexOf(group);
         int size = store.size();
         return (indexOf < size - 1);
@@ -63,14 +71,6 @@ class EncodersStore {
         return store.toArray(new EncodersGroup[store.size()]);
     }
 
-    public EncodersStore(IPreferenceStore preferenceStore)
-        throws MalformedURLException {
-        int groupsAmount = preferenceStore.getInt(EncodersStore.class.getName());
-        for (int i = 0; i < groupsAmount; ++i) {
-            store.add(new EncodersGroup(i, preferenceStore));
-        }
-    }
-
     public void store(IPreferenceStore preferenceStore) {
         preferenceStore.setValue(EncodersStore.class.getName(), store.size());
         for (int i = 0; i < store.size(); ++i) {
@@ -80,14 +80,14 @@ class EncodersStore {
 
     public void newGroup(String groupName) {
         EncodersGroup encodersGroup = new EncodersGroup();
-        encodersGroup.groupName = groupName;
+        encodersGroup.setGroupName(groupName);
         store.add(encodersGroup);
 
     }
 
     public Object getGroup(String groupName) {
         for (EncodersGroup group : store) {
-            if (group.groupName.equals(groupName)) {
+            if (group.getGroupName().equals(groupName)) {
                 return group;
             }
         }
@@ -99,8 +99,23 @@ class EncodersStore {
      */
     public static class EncodersGroup {
 
-        String           groupName;
-        List<EncoderDef> list = new ArrayList<EncoderDef>();
+        private String           groupName;
+        private List<EncoderDef> list = new ArrayList<EncoderDef>();
+
+        private EncodersGroup() {
+
+        }
+
+        public EncodersGroup(int i, IPreferenceStore preferenceStore)
+            throws MalformedURLException {
+            groupName = preferenceStore.getString(getClass().getName() + "."
+                + String.valueOf(i) + ".group");
+            int encodersAmount = preferenceStore.getInt(getClass().getName()
+                + "." + String.valueOf(i) + ".encoders");
+            for (int j = 0; j < encodersAmount; ++j) {
+                list.add(new EncoderDef(i, j, preferenceStore));
+            }
+        }
 
         public void moveUp(EncoderDef encoderDef) {
             int indexOf = list.indexOf(encoderDef);
@@ -128,17 +143,6 @@ class EncodersStore {
             return (indexOf < size - 1);
         }
 
-        public EncodersGroup(int i, IPreferenceStore preferenceStore)
-            throws MalformedURLException {
-            groupName = preferenceStore.getString(getClass().getName() + "."
-                + String.valueOf(i) + ".group");
-            int encodersAmount = preferenceStore.getInt(getClass().getName()
-                + "." + String.valueOf(i) + ".encoders");
-            for (int j = 0; j < encodersAmount; ++j) {
-                list.add(new EncoderDef(i, j, preferenceStore));
-            }
-        }
-
         public void store(int i, IPreferenceStore preferenceStore) {
             preferenceStore.setValue(getClass().getName() + "."
                 + String.valueOf(i) + ".group", groupName);
@@ -149,12 +153,24 @@ class EncodersStore {
             }
         }
 
-        private EncodersGroup() {
-
-        }
-
         public void remove(EncoderDef encoderDef) {
             list.remove(encoderDef);
+        }
+
+        public void setGroupName(String groupName) {
+            this.groupName = groupName;
+        }
+
+        public String getGroupName() {
+            return groupName;
+        }
+
+        public void setList(List<EncoderDef> list) {
+            this.list = list;
+        }
+
+        public List<EncoderDef> getList() {
+            return list;
         }
     }
 
@@ -165,6 +181,10 @@ class EncodersStore {
 
         @InputField(name = "Name")
         String name;
+
+        public String getName() {
+            return name;
+        }
 
         @InputField(name = "Class name")
         String className;
@@ -227,10 +247,8 @@ class EncodersStore {
             if (className.equals("")) {
                 return "Encoder name cannot be empty";
             }
-            ClassLoader classLoader = classPath == null ? getClass().getClassLoader()
-                : new URLClassLoader(classPath, getClass().getClassLoader());
             try {
-                Class<?> encoderClass = classLoader.loadClass(className);
+                Class<?> encoderClass = getEncoderClass();
                 if (!AbstractEncoder.class.isAssignableFrom(encoderClass)) {
                     return "The encoder class must be instance of AbstractEncoder";
                 }
@@ -238,6 +256,13 @@ class EncodersStore {
                 return "Class not found";
             }
             return null;
+        }
+
+        public Class<?> getEncoderClass() throws ClassNotFoundException {
+            ClassLoader classLoader = classPath == null ? getClass().getClassLoader()
+                : new URLClassLoader(classPath, getClass().getClassLoader());
+            return classLoader.loadClass(className);
+
         }
 
     }

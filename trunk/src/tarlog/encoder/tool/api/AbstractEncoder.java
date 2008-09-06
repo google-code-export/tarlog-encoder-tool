@@ -23,6 +23,7 @@ import tarlog.encoder.tool.ui.ddialog.DynamicInputDialog.FieldWrapper;
  */
 public abstract class AbstractEncoder extends AbstractSelectionListener {
 
+    private String  name;
     private Text    targetText;
     private Text    sourceText;
     protected Shell shell;
@@ -151,11 +152,6 @@ public abstract class AbstractEncoder extends AbstractSelectionListener {
         }
     }
 
-    /**
-     * @return the name of the encoder
-     */
-    public abstract String getName();
-
     public void setTarget(Text targetText) {
         this.targetText = targetText;
     }
@@ -164,14 +160,16 @@ public abstract class AbstractEncoder extends AbstractSelectionListener {
         this.sourceText = sourceText;
     }
 
-    public void setShell(Shell shell) {
+    final public void setShell(Shell shell) {
         this.shell = shell;
     }
 
-    /**
-     * @return the group of the current encoder. Override to change the group.
-     */
-    public String getGroup() {
-        return "Default";
+    final public void setName(String name) {
+        this.name = name;
     }
+
+    final public String getName() {
+        return name;
+    }
+
 }

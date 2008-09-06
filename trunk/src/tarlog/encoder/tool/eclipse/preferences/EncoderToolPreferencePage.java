@@ -47,19 +47,18 @@ import tarlog.encoder.tool.ui.ddialog.DynamicInputDialog;
 public class EncoderToolPreferencePage extends PreferencePage implements
     IWorkbenchPreferencePage {
 
-    public static final Pattern WORD_PATTERN = Pattern.compile("\\w*");
+    public static final Pattern WORD_PATTERN = Pattern.compile("\\w.*\\w");
 
     private EncodersStore       encodersStore;
     private TreeViewer          treeViewer;
 
     private Button              addEncoderButton;
     private Button              editButton;
-
     private Button              upButton;
-
     private Button              downButton;
-
     private Button              removeButton;
+
+    private Button addGroupButton;
 
     public EncoderToolPreferencePage() {
         this(Activator.getDefault().getPreferenceStore());
@@ -109,7 +108,7 @@ public class EncoderToolPreferencePage extends PreferencePage implements
         composite.setLayout(new GridLayout());
         composite.setLayoutData(new GridData(SWT.CENTER, SWT.FILL, false, true));
 
-        createAddGroupButton(composite);
+        addGroupButton = createAddGroupButton(composite);
         addEncoderButton = createAddEncoderButton(composite);
         editButton = createEditButton(composite);
         removeButton = createRemoveButton(composite);
@@ -117,7 +116,7 @@ public class EncoderToolPreferencePage extends PreferencePage implements
         downButton = createDownButton(composite);
     }
 
-    private void createAddGroupButton(Composite composite) {
+    private Button createAddGroupButton(Composite composite) {
         Button addGroupButton = new Button(composite, SWT.PUSH);
         addGroupButton.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true,
             false));
@@ -129,6 +128,7 @@ public class EncoderToolPreferencePage extends PreferencePage implements
                 editGroupName("");
             }
         });
+        return addGroupButton;
     }
 
     private Button createEditButton(Composite composite) {
@@ -143,9 +143,9 @@ public class EncoderToolPreferencePage extends PreferencePage implements
                 Object firstElement = selection.getFirstElement();
                 if (firstElement instanceof EncodersGroup) {
                     EncodersGroup group = (EncodersGroup) firstElement;
-                    String name = editGroupName(group.groupName);
+                    String name = editGroupName(group.getGroupName());
                     if (name != null) {
-                        group.groupName = name;
+                        group.setGroupName(name);
                         treeViewer.refresh();
                     }
                 } else if (firstElement instanceof EncoderDef) {
@@ -178,7 +178,7 @@ public class EncoderToolPreferencePage extends PreferencePage implements
                 int rc = dynamicInputDialog.open();
 
                 if (rc == Dialog.OK) {
-                    encodersGroup.list.add(encoderDef);
+                    encodersGroup.getList().add(encoderDef);
                     treeViewer.refresh();
                 }
 
@@ -282,6 +282,7 @@ public class EncoderToolPreferencePage extends PreferencePage implements
                 Object firstElement = selection.getFirstElement();
                 if (firstElement instanceof EncodersGroup) {
                     EncodersGroup group = (EncodersGroup) firstElement;
+                    addGroupButton.setEnabled(true);
                     addEncoderButton.setEnabled(true);
                     editButton.setEnabled(true);
                     removeButton.setEnabled(true);
@@ -290,12 +291,14 @@ public class EncoderToolPreferencePage extends PreferencePage implements
                 } else if (firstElement instanceof EncoderDef) {
                     EncodersGroup group = (EncodersGroup) selection.getPaths()[0].getFirstSegment();
                     EncoderDef encoderDef = (EncoderDef) firstElement;
+                    addGroupButton.setEnabled(false);
                     addEncoderButton.setEnabled(false);
                     removeButton.setEnabled(true);
                     editButton.setEnabled(true);
                     downButton.setEnabled(group.canMoveDown(encoderDef));
                     upButton.setEnabled(group.canMoveUp(encoderDef));
                 } else {
+                    addGroupButton.setEnabled(false);
                     removeButton.setEnabled(false);
                     addEncoderButton.setEnabled(false);
                     editButton.setEnabled(false);

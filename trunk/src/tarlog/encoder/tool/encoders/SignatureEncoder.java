@@ -22,16 +22,6 @@ public class SignatureEncoder extends KeyStoreAwareEncoder {
     private String              password;
 
     @Override
-    public String getName() {
-        return "Create Signature";
-    }
-
-    @Override
-    public String getGroup() {
-        return VerifySignature.SIGNATURES;
-    }
-
-    @Override
     public Object encode(byte[] source) {
         try {
             Signature sig = Signature.getInstance(algorithm.name());

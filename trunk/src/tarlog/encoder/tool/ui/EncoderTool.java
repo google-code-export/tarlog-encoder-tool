@@ -5,19 +5,17 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.TreeSet;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.MenuManager;
+import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.preference.IPreferenceNode;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferenceDialog;
 import org.eclipse.jface.preference.PreferenceManager;
 import org.eclipse.jface.preference.PreferenceNode;
+import org.eclipse.jface.preference.PreferenceStore;
 import org.eclipse.jface.window.ApplicationWindow;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
@@ -42,24 +40,30 @@ import org.eclipse.swt.widgets.Text;
 import tarlog.encoder.tool.Utils;
 import tarlog.encoder.tool.api.AbstractEncoder;
 import tarlog.encoder.tool.api.Initiable;
+import tarlog.encoder.tool.eclipse.Activator;
 import tarlog.encoder.tool.eclipse.preferences.EncoderToolPreferencePage;
+import tarlog.encoder.tool.eclipse.preferences.EncodersStore;
+import tarlog.encoder.tool.eclipse.preferences.EncodersStore.EncoderDef;
+import tarlog.encoder.tool.eclipse.preferences.EncodersStore.EncodersGroup;
 
 /**
  *
  */
 public class EncoderTool extends ApplicationWindow {
 
-    private static final String ENCODERS_FILE     = "encoders.properties";
-    private static final String ENCODERS_PROPERTY = "encoders";
+    //    private static final String ENCODERS_FILE      = "encoders.properties";
+    private static final String ENCODER_PROPERTIES = "encoder.properties";
+    //    private static final String ENCODERS_PROPERTY  = "encoders";
 
-    private static final String VERSION           = "0.2.0";
+    private static final String VERSION            = "0.2.0";
 
-    private Properties          properties;
+    //    private Properties          properties;
     private Text                targetText;
     private Text                sourceText;
     private Composite           leftComposite;
     private Shell               shell;
-    private boolean             standalone        = false;
+    private boolean             standalone         = false;
+    private EncodersStore       encodersStore;
 
     public EncoderTool() {
         super(null);
@@ -67,18 +71,33 @@ public class EncoderTool extends ApplicationWindow {
 
     public void init() throws IOException {
 
-        properties = new Properties();
+        //        properties = new Properties();
+        //
+        //        String propertiesFile = System.getProperty(ENCODERS_PROPERTY,
+        //            ENCODERS_FILE);
+        //
+        //        properties.load(getClass().getClassLoader().getResourceAsStream(
+        //            propertiesFile));
 
-        String propertiesFile = System.getProperty(ENCODERS_PROPERTY,
-            ENCODERS_FILE);
-
-        properties.load(getClass().getClassLoader().getResourceAsStream(
-            propertiesFile));
         setBlockOnOpen(true);
         if (standalone) {
             addMenuBar();
         }
+        initEncodersStore();
         open();
+    }
+
+    private void initEncodersStore() throws IOException {
+        IPreferenceStore preferenceStore;
+        if (standalone) {
+            PreferenceStore store = new PreferenceStore(ENCODER_PROPERTIES);
+            store.load();
+            preferenceStore = store;
+        } else {
+            preferenceStore = Activator.getDefault().getPreferenceStore();
+        }
+        encodersStore = new EncodersStore(preferenceStore);
+
     }
 
     private Image getImage() {
@@ -126,15 +145,18 @@ public class EncoderTool extends ApplicationWindow {
         public void run() {
             try {
                 EncoderToolPreferencePage page = new EncoderToolPreferencePage(
-                    "encoder.properties");
-                page.setTitle("Encoder Pr");
+                    ENCODER_PROPERTIES);
+                page.setTitle("Encoder Tool");
                 PreferenceManager mgr = new PreferenceManager();
                 IPreferenceNode node = new PreferenceNode("1", page);
                 mgr.addToRoot(node);
                 PreferenceDialog dialog = new PreferenceDialog(shell, mgr);
                 dialog.create();
                 dialog.setMessage(page.getTitle());
-                dialog.open();
+                int rc = dialog.open();
+                if (rc == Dialog.OK) {
+                    reload();
+                }
             } catch (IOException e) {
                 Utils.showException(shell, e);
             }
@@ -202,65 +224,68 @@ public class EncoderTool extends ApplicationWindow {
 
     }
 
+    private void reload() throws IOException {
+        for (Control control : leftComposite.getChildren()) {
+            if (!control.isDisposed()) {
+                control.dispose();
+            }
+        }
+        initEncodersStore();
+        load();
+        leftComposite.layout(true, true);
+    }
+
     private void load() {
         final List<Button> radioButtons = new ArrayList<Button>();
 
-        @SuppressWarnings("unchecked")
-        TreeSet<String> names = new TreeSet(properties.keySet());
-        Map<String, Group> groups = new HashMap<String, Group>();
-        for (Iterator<String> itr = names.iterator(); itr.hasNext();) {
-            try {
-                @SuppressWarnings("unchecked")
-                Class<AbstractEncoder> clazz = (Class<AbstractEncoder>) Class.forName(properties.getProperty(itr.next()));
-                final AbstractEncoder encoder = clazz.newInstance();
-                encoder.setSource(sourceText);
-                encoder.setTarget(targetText);
-                encoder.setShell(shell);
-                String groupName = encoder.getGroup();
-                Group group = groups.get(groupName);
-                if (group == null) {
-                    group = new Group(leftComposite, SWT.NONE);
-                    group.setText(groupName);
-                    group.setLayout(new GridLayout());
-                    group.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true,
-                        true));
-                    groups.put(groupName, group);
-                }
-                final Composite composite = new Composite(group, SWT.NULL);
-                composite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true,
-                    true));
-                RowLayout layout = new RowLayout();
-                layout.type = SWT.HORIZONTAL;
-                composite.setLayout(layout);
-                final Button button = new Button(composite, SWT.RADIO);
-                radioButtons.add(button);
-                button.setText(encoder.getName());
-                button.addSelectionListener(new AbstractSelectionListener() {
-
-                    public void widgetSelected(SelectionEvent e) {
-                        for (Button radioButton : radioButtons) {
-                            if (e.getSource() != radioButton) {
-                                radioButton.setSelection(false);
-                            }
-                        }
-
-                    }
-                });
-                button.addSelectionListener(encoder);
-                if (encoder instanceof Initiable) {
-                    Button fileButton = new Button(composite, SWT.ARROW);
-                    fileButton.setText("...");
-                    fileButton.addSelectionListener(new AbstractSelectionListener() {
+        for (EncodersGroup encodersGroup : encodersStore.getStore()) {
+            Group group = new Group(leftComposite, SWT.NONE);
+            group.setText(encodersGroup.getGroupName());
+            group.setLayout(new GridLayout());
+            group.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+            for (EncoderDef encoderDef : encodersGroup.getList()) {
+                try {
+                    @SuppressWarnings("unchecked")
+                    Class<AbstractEncoder> clazz = (Class<AbstractEncoder>) encoderDef.getEncoderClass();
+                    final AbstractEncoder encoder = clazz.newInstance();
+                    encoder.setSource(sourceText);
+                    encoder.setTarget(targetText);
+                    encoder.setName(encoderDef.getName());
+                    encoder.setShell(shell);
+                    final Composite composite = new Composite(group, SWT.NULL);
+                    composite.setLayoutData(new GridData(SWT.FILL, SWT.FILL,
+                        true, true));
+                    RowLayout layout = new RowLayout();
+                    layout.type = SWT.HORIZONTAL;
+                    composite.setLayout(layout);
+                    final Button button = new Button(composite, SWT.RADIO);
+                    radioButtons.add(button);
+                    button.setText(encoder.getName());
+                    button.addSelectionListener(new AbstractSelectionListener() {
 
                         public void widgetSelected(SelectionEvent e) {
-                            ((Initiable) encoder).init();
-                            leftComposite.setSize(leftComposite.computeSize(
-                                SWT.DEFAULT, SWT.DEFAULT));
+                            for (Button radioButton : radioButtons) {
+                                if (e.getSource() != radioButton) {
+                                    radioButton.setSelection(false);
+                                }
+                            }
                         }
                     });
+                    button.addSelectionListener(encoder);
+                    if (encoder instanceof Initiable) {
+                        Button fileButton = new Button(composite, SWT.ARROW);
+                        fileButton.addSelectionListener(new AbstractSelectionListener() {
+
+                            public void widgetSelected(SelectionEvent e) {
+                                ((Initiable) encoder).init();
+                                leftComposite.setSize(leftComposite.computeSize(
+                                    SWT.DEFAULT, SWT.DEFAULT));
+                            }
+                        });
+                    }
+                } catch (Exception e) {
+                    Utils.showException(shell, e);
                 }
-            } catch (Exception e) {
-                Utils.showException(shell, e);
             }
         }
         leftComposite.setSize(leftComposite.computeSize(SWT.DEFAULT,
