@@ -1,6 +1,7 @@
 package tarlog.encoder.tool.eclipse.preferences;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -58,7 +59,9 @@ public class EncoderToolPreferencePage extends PreferencePage implements
     private Button              downButton;
     private Button              removeButton;
 
-    private Button addGroupButton;
+    private Button              addGroupButton;
+
+    private Composite           contentsComposite;
 
     public EncoderToolPreferencePage() {
         this(Activator.getDefault().getPreferenceStore());
@@ -95,12 +98,27 @@ public class EncoderToolPreferencePage extends PreferencePage implements
     protected Control createContents(Composite parent) {
         initialize();
 
-        Composite composite = new Composite(parent, SWT.NONE);
-        composite.setLayout(new GridLayout(2, false));
-        composite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-        createTree(composite);
-        createButtons(composite);
-        return composite;
+        contentsComposite = new Composite(parent, SWT.NONE);
+        contentsComposite.setLayout(new GridLayout(2, false));
+        contentsComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true,
+            true));
+        fillContents();
+        return contentsComposite;
+    }
+
+    private void fillContents() {
+        createTree(contentsComposite);
+        createButtons(contentsComposite);
+    }
+
+    private void reloadContents() {
+        for (Control control : contentsComposite.getChildren()) {
+            if (!control.isDisposed()) {
+                control.dispose();
+            }
+        }
+        fillContents();
+        contentsComposite.layout();
     }
 
     private void createButtons(Composite parent) {
@@ -313,9 +331,11 @@ public class EncoderToolPreferencePage extends PreferencePage implements
         try {
             IPreferenceStore preferenceStore = getPreferenceStore();
             if (preferenceStore instanceof PreferenceStore) {
+                // stand-alone
                 ((PreferenceStore) preferenceStore).load();
+                PreferenceInitializer.loadDefault(preferenceStore);
             }
-            encodersStore = new EncodersStore(preferenceStore);
+            encodersStore = new EncodersStore(preferenceStore, false);
         } catch (IOException e) {
             Utils.showException(getShell(), e);
         }
@@ -354,4 +374,14 @@ public class EncoderToolPreferencePage extends PreferencePage implements
         return null;
     }
 
+    @Override
+    protected void performDefaults() {
+        try {
+            encodersStore = new EncodersStore(getPreferenceStore(), true);
+        } catch (MalformedURLException e) {
+            throw new RuntimeException(e);
+        }
+        super.performDefaults();
+        reloadContents();
+    }
 }
