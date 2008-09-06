@@ -22,11 +22,12 @@ public class EncodersStore {
 
     private List<EncodersGroup> store = new ArrayList<EncodersGroup>();
 
-    public EncodersStore(IPreferenceStore preferenceStore)
+    public EncodersStore(IPreferenceStore preferenceStore, boolean isDefault)
         throws MalformedURLException {
-        int groupsAmount = preferenceStore.getInt(EncodersStore.class.getName());
+        int groupsAmount = isDefault ? preferenceStore.getDefaultInt(EncodersStore.class.getName())
+            : preferenceStore.getInt(EncodersStore.class.getName());
         for (int i = 0; i < groupsAmount; ++i) {
-            store.add(new EncodersGroup(i, preferenceStore));
+            store.add(new EncodersGroup(i, preferenceStore, isDefault));
         }
     }
 
@@ -106,14 +107,18 @@ public class EncodersStore {
 
         }
 
-        public EncodersGroup(int i, IPreferenceStore preferenceStore)
-            throws MalformedURLException {
-            groupName = preferenceStore.getString(getClass().getName() + "."
-                + String.valueOf(i) + ".group");
-            int encodersAmount = preferenceStore.getInt(getClass().getName()
-                + "." + String.valueOf(i) + ".encoders");
+        public EncodersGroup(int i, IPreferenceStore preferenceStore,
+            boolean isDefault) throws MalformedURLException {
+            String groupStr = getClass().getName() + "." + String.valueOf(i)
+                + ".group";
+            groupName = isDefault ? preferenceStore.getDefaultString(groupStr)
+                : preferenceStore.getString(groupStr);
+            String encodersStr = getClass().getName() + "." + String.valueOf(i)
+                + ".encoders";
+            int encodersAmount = isDefault ? preferenceStore.getDefaultInt(encodersStr)
+                : preferenceStore.getInt(encodersStr);
             for (int j = 0; j < encodersAmount; ++j) {
-                list.add(new EncoderDef(i, j, preferenceStore));
+                list.add(new EncoderDef(i, j, preferenceStore, isDefault));
             }
         }
 
@@ -200,17 +205,25 @@ public class EncodersStore {
 
         }
 
-        private EncoderDef(int i, int j, IPreferenceStore preferenceStore)
-            throws MalformedURLException {
+        private EncoderDef(int i, int j, IPreferenceStore preferenceStore,
+            boolean isDefault) throws MalformedURLException {
             String prefix = getClass().getName() + "." + String.valueOf(i)
                 + "." + String.valueOf(j) + ".";
-            name = preferenceStore.getString(prefix + "name");
-            className = preferenceStore.getString(prefix + "className");
-            int classPathLength = preferenceStore.getInt(prefix + "classPath");
+            name = isDefault ? preferenceStore.getDefaultString(prefix + "name")
+                : preferenceStore.getString(prefix + "name");
+            className = isDefault ? preferenceStore.getDefaultString(prefix
+                + "className")
+                : preferenceStore.getString(prefix + "className");
+            int classPathLength = isDefault ? preferenceStore.getDefaultInt(prefix
+                + "classPath")
+                : preferenceStore.getInt(prefix + "classPath");
             classPath = new URL[classPathLength];
             for (int k = 0; k < classPathLength; ++k) {
-                classPath[k] = new URL(preferenceStore.getString(prefix
-                    + "classPath." + String.valueOf(k)));
+                classPath[k] = new URL(
+                    isDefault ? preferenceStore.getDefaultString(prefix
+                        + "classPath." + String.valueOf(k))
+                        : preferenceStore.getString(prefix + "classPath."
+                            + String.valueOf(k)));
             }
         }
 

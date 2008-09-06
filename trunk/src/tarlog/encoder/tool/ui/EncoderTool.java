@@ -96,7 +96,7 @@ public class EncoderTool extends ApplicationWindow {
         } else {
             preferenceStore = Activator.getDefault().getPreferenceStore();
         }
-        encodersStore = new EncodersStore(preferenceStore);
+        encodersStore = new EncodersStore(preferenceStore, false);
 
     }
 
