@@ -14,7 +14,7 @@ class ContentProvider implements ITreeContentProvider {
     public Object[] getChildren(Object parentElement) {
         if (parentElement instanceof EncodersGroup) {
             EncodersGroup encodersGroup = (EncodersGroup) parentElement;
-            return encodersGroup.list.toArray();
+            return encodersGroup.getList().toArray();
         }
         if (parentElement instanceof EncoderDef) {
             EncoderDef encoderDef = (EncoderDef) parentElement;
@@ -42,7 +42,7 @@ class ContentProvider implements ITreeContentProvider {
         }
         if (element instanceof EncodersGroup) {
             EncodersGroup encodersGroup = (EncodersGroup) element;
-            return encodersGroup.list.size() > 0;
+            return encodersGroup.getList().size() > 0;
 
         }
         if (element instanceof EncoderDef) {

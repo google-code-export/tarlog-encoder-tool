@@ -40,7 +40,7 @@
       <page
             class="tarlog.encoder.tool.eclipse.preferences.EncoderToolPreferencePage"
             id="tarlog.encoder.tool.eclipse.preferences.EncoderToolPreferencePage"
-            name="Encoder Tool Preferences">
+            name="Encoder Tool">
       </page>
    </extension>
    <extension

@@ -31,16 +31,6 @@ public class X509CertificateEncoder extends AbstractEncoder {
     private String              signature;
 
     @Override
-    public String getName() {
-        return "X509 Signature Verifier";
-    }
-
-    @Override
-    public String getGroup() {
-        return VerifySignature.SIGNATURES;
-    }
-
-    @Override
     protected int beforeEncode() {
         int inputStatus = super.beforeEncode();
         if (inputStatus != Dialog.OK) {

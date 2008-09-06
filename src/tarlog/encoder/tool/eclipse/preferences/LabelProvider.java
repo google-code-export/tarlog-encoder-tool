@@ -21,7 +21,7 @@ class LabelProvider extends AbstractLabelProvider {
         }
         if (element instanceof EncodersGroup) {
             EncodersGroup encodersGroup = (EncodersGroup) element;
-            return "Group: " + encodersGroup.groupName;
+            return "Group: " + encodersGroup.getGroupName();
         }
         if (element instanceof EncoderDef) {
             EncoderDef encoderDef = (EncoderDef) element;

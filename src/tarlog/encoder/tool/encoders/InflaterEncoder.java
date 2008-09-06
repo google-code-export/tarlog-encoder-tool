@@ -8,20 +8,8 @@ import tarlog.encoder.tool.api.fields.InputField;
 
 public class InflaterEncoder extends AbstractEncoder {
 
-    public static final String DEFLATER = "Deflater";
-    
-    @InputField(name="GZIP compatible compression")
-    private boolean            nowrap   = true;
-
-    @Override
-    public String getGroup() {
-        return InflaterEncoder.DEFLATER;
-    }
-
-    @Override
-    public String getName() {
-        return "Inflate";
-    }
+    @InputField(name = "GZIP compatible compression")
+    private boolean nowrap = true;
 
     @Override
     public Object encode(byte[] source) {
