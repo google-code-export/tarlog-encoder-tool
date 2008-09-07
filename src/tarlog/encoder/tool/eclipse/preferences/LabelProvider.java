@@ -2,8 +2,8 @@ package tarlog.encoder.tool.eclipse.preferences;
 
 import java.net.URL;
 
-import tarlog.encoder.tool.eclipse.preferences.EncodersStore.EncoderDef;
-import tarlog.encoder.tool.eclipse.preferences.EncodersStore.EncodersGroup;
+import tarlog.encoder.tool.eclipse.preferences.PropertiesStore.EncoderDef;
+import tarlog.encoder.tool.eclipse.preferences.PropertiesStore.EncodersGroup;
 import tarlog.encoder.tool.ui.AbstractLabelProvider;
 
 class LabelProvider extends AbstractLabelProvider {

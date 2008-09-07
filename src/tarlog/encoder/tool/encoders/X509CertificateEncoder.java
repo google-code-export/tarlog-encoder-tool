@@ -15,8 +15,10 @@ import tarlog.encoder.tool.Utils;
 import tarlog.encoder.tool.api.AbstractEncoder;
 import tarlog.encoder.tool.api.fields.InputField;
 import tarlog.encoder.tool.api.fields.InputTextField;
+import tarlog.encoder.tool.api.fields.Validator;
 
-public class X509CertificateEncoder extends AbstractEncoder {
+public class X509CertificateEncoder extends AbstractEncoder implements
+    Validator {
 
     private X509Certificate     cert;
 
@@ -29,6 +31,16 @@ public class X509CertificateEncoder extends AbstractEncoder {
     @InputField(name = "Signature")
     @InputTextField(multiline = true)
     private String              signature;
+
+    public String isValid() {
+        if (file == null || file.equals("")) {
+            return "Certificate File cannot be empty";
+        }
+        if (signature == null || signature.equals("")) {
+            return "Signature cannot be empty";
+        }
+        return null;
+    }
 
     @Override
     protected int beforeEncode() {
@@ -43,7 +55,7 @@ public class X509CertificateEncoder extends AbstractEncoder {
             inStream.close();
             return Dialog.OK;
         } catch (Exception e) {
-            Utils.showException(shell, e);
+            showException(e);
             return Dialog.CANCEL;
         }
     }
@@ -52,13 +64,12 @@ public class X509CertificateEncoder extends AbstractEncoder {
     public Object encode(byte[] source) {
         try {
             PublicKey publicKey = cert.getPublicKey();
-            System.out.println("Using public key: " + publicKey.toString());
             Signature sig = Signature.getInstance(algorithm.name());
             sig.initVerify(publicKey);
             sig.update(source);
             return String.valueOf(sig.verify(Utils.bytesFromHex(signature)));
         } catch (Exception e) {
-            Utils.showException(shell, e);
+            showException(e);
             return null;
         }
     }

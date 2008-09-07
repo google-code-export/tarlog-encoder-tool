@@ -18,14 +18,14 @@ import tarlog.encoder.tool.api.fields.InputListField;
 import tarlog.encoder.tool.api.fields.Validator;
 import tarlog.encoder.tool.api.fields.InputListField.InputType;
 
-public class EncodersStore {
+public class PropertiesStore {
 
     private List<EncodersGroup> store = new ArrayList<EncodersGroup>();
 
-    public EncodersStore(IPreferenceStore preferenceStore, boolean isDefault)
+    public PropertiesStore(IPreferenceStore preferenceStore, boolean isDefault)
         throws MalformedURLException {
-        int groupsAmount = isDefault ? preferenceStore.getDefaultInt(EncodersStore.class.getName())
-            : preferenceStore.getInt(EncodersStore.class.getName());
+        int groupsAmount = isDefault ? preferenceStore.getDefaultInt(PropertiesStore.class.getName())
+            : preferenceStore.getInt(PropertiesStore.class.getName());
         for (int i = 0; i < groupsAmount; ++i) {
             store.add(new EncodersGroup(i, preferenceStore, isDefault));
         }
@@ -73,7 +73,7 @@ public class EncodersStore {
     }
 
     public void store(IPreferenceStore preferenceStore) {
-        preferenceStore.setValue(EncodersStore.class.getName(), store.size());
+        preferenceStore.setValue(PropertiesStore.class.getName(), store.size());
         for (int i = 0; i < store.size(); ++i) {
             store.get(i).store(i, preferenceStore);
         }
@@ -275,9 +275,7 @@ public class EncodersStore {
             ClassLoader classLoader = classPath == null ? getClass().getClassLoader()
                 : new URLClassLoader(classPath, getClass().getClassLoader());
             return classLoader.loadClass(className);
-
         }
-
     }
 
 }

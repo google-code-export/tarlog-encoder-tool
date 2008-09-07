@@ -30,8 +30,8 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 
 import tarlog.encoder.tool.Utils;
 import tarlog.encoder.tool.eclipse.Activator;
-import tarlog.encoder.tool.eclipse.preferences.EncodersStore.EncoderDef;
-import tarlog.encoder.tool.eclipse.preferences.EncodersStore.EncodersGroup;
+import tarlog.encoder.tool.eclipse.preferences.PropertiesStore.EncoderDef;
+import tarlog.encoder.tool.eclipse.preferences.PropertiesStore.EncodersGroup;
 import tarlog.encoder.tool.ui.ddialog.DynamicInputDialog;
 
 /**
@@ -50,7 +50,7 @@ public class EncoderToolPreferencePage extends PreferencePage implements
 
     public static final Pattern WORD_PATTERN = Pattern.compile("\\w.*\\w");
 
-    private EncodersStore       encodersStore;
+    private PropertiesStore     store;
     private TreeViewer          treeViewer;
 
     private Button              addEncoderButton;
@@ -82,7 +82,7 @@ public class EncoderToolPreferencePage extends PreferencePage implements
     @Override
     public boolean performOk() {
         IPreferenceStore preferenceStore = getPreferenceStore();
-        encodersStore.store(preferenceStore);
+        store.store(preferenceStore);
         if (preferenceStore instanceof PreferenceStore) {
             try {
                 ((PreferenceStore) preferenceStore).save();
@@ -218,7 +218,7 @@ public class EncoderToolPreferencePage extends PreferencePage implements
 
                 if (firstElement instanceof EncodersGroup) {
                     EncodersGroup group = (EncodersGroup) firstElement;
-                    encodersStore.moveUp(group);
+                    store.moveUp(group);
                 } else if (firstElement instanceof EncoderDef) {
                     EncodersGroup group = (EncodersGroup) selection.getPaths()[0].getFirstSegment();
                     EncoderDef encoderDef = (EncoderDef) firstElement;
@@ -245,7 +245,7 @@ public class EncoderToolPreferencePage extends PreferencePage implements
 
                 if (firstElement instanceof EncodersGroup) {
                     EncodersGroup group = (EncodersGroup) firstElement;
-                    encodersStore.moveDown(group);
+                    store.moveDown(group);
                 } else if (firstElement instanceof EncoderDef) {
                     EncodersGroup group = (EncodersGroup) selection.getPaths()[0].getFirstSegment();
                     EncoderDef encoderDef = (EncoderDef) firstElement;
@@ -271,7 +271,7 @@ public class EncoderToolPreferencePage extends PreferencePage implements
 
                 if (firstElement instanceof EncodersGroup) {
                     EncodersGroup group = (EncodersGroup) firstElement;
-                    encodersStore.remove(group);
+                    store.remove(group);
                 } else if (firstElement instanceof EncoderDef) {
                     EncodersGroup group = (EncodersGroup) selection.getPaths()[0].getFirstSegment();
                     EncoderDef encoderDef = (EncoderDef) firstElement;
@@ -285,14 +285,16 @@ public class EncoderToolPreferencePage extends PreferencePage implements
     }
 
     private void createTree(Composite parent) {
-        treeViewer = new TreeViewer(parent);
+        treeViewer = new TreeViewer(parent, SWT.SINGLE | SWT.H_SCROLL
+            | SWT.V_SCROLL | SWT.BORDER);
         Tree tree = treeViewer.getTree();
         tree.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
         tree.setLayout(new FillLayout());
         tree.setVisible(true);
         treeViewer.setContentProvider(new ContentProvider());
+        treeViewer.setAutoExpandLevel(2);
         treeViewer.setLabelProvider(new LabelProvider());
-        treeViewer.setInput(encodersStore);
+        treeViewer.setInput(store);
         treeViewer.addSelectionChangedListener(new ISelectionChangedListener() {
 
             public void selectionChanged(SelectionChangedEvent event) {
@@ -304,8 +306,8 @@ public class EncoderToolPreferencePage extends PreferencePage implements
                     addEncoderButton.setEnabled(true);
                     editButton.setEnabled(true);
                     removeButton.setEnabled(true);
-                    downButton.setEnabled(encodersStore.canMoveDown(group));
-                    upButton.setEnabled(encodersStore.canMoveUp(group));
+                    downButton.setEnabled(store.canMoveDown(group));
+                    upButton.setEnabled(store.canMoveUp(group));
                 } else if (firstElement instanceof EncoderDef) {
                     EncodersGroup group = (EncodersGroup) selection.getPaths()[0].getFirstSegment();
                     EncoderDef encoderDef = (EncoderDef) firstElement;
@@ -335,7 +337,7 @@ public class EncoderToolPreferencePage extends PreferencePage implements
                 ((PreferenceStore) preferenceStore).load();
                 PreferenceInitializer.loadDefault(preferenceStore);
             }
-            encodersStore = new EncodersStore(preferenceStore, false);
+            store = new PropertiesStore(preferenceStore, false);
         } catch (IOException e) {
             Utils.showException(getShell(), e);
         }
@@ -354,7 +356,7 @@ public class EncoderToolPreferencePage extends PreferencePage implements
                     if (!matcher.matches()) {
                         return "Group name must be a word";
                     }
-                    if (encodersStore.getGroup(newText) != null) {
+                    if (store.getGroup(newText) != null) {
                         return "Group name must be unique";
                     }
                     return null;
@@ -364,7 +366,7 @@ public class EncoderToolPreferencePage extends PreferencePage implements
         if (rc == Dialog.OK) {
             if ("".equals(string)) {
                 // new group
-                encodersStore.newGroup(inputDialog.getValue());
+                store.newGroup(inputDialog.getValue());
                 treeViewer.refresh();
                 return inputDialog.getValue();
             } else {
@@ -377,7 +379,7 @@ public class EncoderToolPreferencePage extends PreferencePage implements
     @Override
     protected void performDefaults() {
         try {
-            encodersStore = new EncodersStore(getPreferenceStore(), true);
+            store = new PropertiesStore(getPreferenceStore(), true);
         } catch (MalformedURLException e) {
             throw new RuntimeException(e);
         }

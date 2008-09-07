@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.util.zip.Deflater;
 import java.util.zip.DeflaterOutputStream;
 
-import tarlog.encoder.tool.Utils;
 import tarlog.encoder.tool.api.AbstractEncoder;
 import tarlog.encoder.tool.api.fields.InputField;
 
@@ -27,7 +26,7 @@ public class DeflateEncoder extends AbstractEncoder {
             deflaterStream.finish();
             return bytesOut.toByteArray();
         } catch (IOException e) {
-            Utils.showException(shell, e);
+            showException(e);
             return null;
         }
     }

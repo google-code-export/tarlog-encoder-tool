@@ -5,8 +5,8 @@ import java.net.URL;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 
-import tarlog.encoder.tool.eclipse.preferences.EncodersStore.EncoderDef;
-import tarlog.encoder.tool.eclipse.preferences.EncodersStore.EncodersGroup;
+import tarlog.encoder.tool.eclipse.preferences.PropertiesStore.EncoderDef;
+import tarlog.encoder.tool.eclipse.preferences.PropertiesStore.EncodersGroup;
 
 
 class ContentProvider implements ITreeContentProvider {
@@ -71,8 +71,8 @@ class ContentProvider implements ITreeContentProvider {
         if (inputElement == null) {
             return new Object[0];
         }
-        if (inputElement instanceof EncodersStore) {
-            EncodersStore encodersStore = (EncodersStore) inputElement;
+        if (inputElement instanceof PropertiesStore) {
+            PropertiesStore encodersStore = (PropertiesStore) inputElement;
             return encodersStore.getStore();
         }
         System.out.println("ContentProvider.getElements() "

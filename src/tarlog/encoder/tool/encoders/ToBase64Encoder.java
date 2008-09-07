@@ -5,7 +5,6 @@ import java.io.UnsupportedEncodingException;
 
 import org.apache.commons.codec.binary.Base64;
 
-import tarlog.encoder.tool.Utils;
 import tarlog.encoder.tool.api.AbstractEncoder;
 
 /**
@@ -18,7 +17,7 @@ public class ToBase64Encoder extends AbstractEncoder {
         try {
             return new String(Base64.encodeBase64(source.getBytes("UTF-8")));
         } catch (UnsupportedEncodingException e) {
-            Utils.showException(shell, e);
+            showException(e);
             return null;
         }
     }
