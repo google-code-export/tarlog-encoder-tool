@@ -3,7 +3,6 @@ package tarlog.encoder.tool.encoders;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 
-import tarlog.encoder.tool.Utils;
 import tarlog.encoder.tool.api.AbstractEncoder;
 
 public class MyUrlDecoder extends AbstractEncoder {
@@ -13,7 +12,7 @@ public class MyUrlDecoder extends AbstractEncoder {
         try {
             return URLDecoder.decode(source, "UTF-8");
         } catch (UnsupportedEncodingException e) {
-            Utils.showException(shell, e);
+            showException(e);
             return null;
         }
     }

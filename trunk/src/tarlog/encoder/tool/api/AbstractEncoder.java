@@ -172,4 +172,29 @@ public abstract class AbstractEncoder extends AbstractSelectionListener {
         return name;
     }
 
+    /**
+     * shows information message to user
+     * @param title - title
+     * @param text - message text
+     */
+    protected void showInformationMessage(String title, String text) {
+        Utils.showInformationMessage(shell, title, text);
+    }
+
+    /**
+     * shows exception dialog
+     * @param t - exception
+     */
+    protected void showException(Throwable t) {
+        Utils.showException(shell, t);
+    }
+
+    /**
+     * shows error message to user
+     * @param title - title
+     * @param text - message text
+     */
+    protected void showErrorMessage(String title, String text) {
+        Utils.showErrorMessage(shell, title, text);
+    }
 }

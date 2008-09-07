@@ -22,6 +22,21 @@ public class VerifySignature extends KeyStoreAwareEncoder {
     private String              signature;
 
     @Override
+    public String isValid() {
+        String valid = super.isValid();
+        if (valid != null) {
+            return valid;
+        }
+        if (alias == null || alias.equals("")) {
+            return "Certificate alias cannot be empty";
+        }
+        if (signature == null || signature.equals("")) {
+            return "Signature cannot be empty";
+        }
+        return null;
+    }
+    
+    @Override
     public Object encode(byte[] source) {
         try {
             Signature sig = Signature.getInstance(algorithm.name());
@@ -30,7 +45,7 @@ public class VerifySignature extends KeyStoreAwareEncoder {
             sig.update(source);
             return String.valueOf(sig.verify(Utils.bytesFromHex(signature)));
         } catch (Exception e) {
-            Utils.showException(shell, e);
+            showException(e);
             return null;
         }
     }

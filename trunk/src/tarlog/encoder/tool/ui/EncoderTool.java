@@ -42,43 +42,30 @@ import tarlog.encoder.tool.api.AbstractEncoder;
 import tarlog.encoder.tool.api.Initiable;
 import tarlog.encoder.tool.eclipse.Activator;
 import tarlog.encoder.tool.eclipse.preferences.EncoderToolPreferencePage;
-import tarlog.encoder.tool.eclipse.preferences.EncodersStore;
-import tarlog.encoder.tool.eclipse.preferences.EncodersStore.EncoderDef;
-import tarlog.encoder.tool.eclipse.preferences.EncodersStore.EncodersGroup;
+import tarlog.encoder.tool.eclipse.preferences.PropertiesStore;
+import tarlog.encoder.tool.eclipse.preferences.PropertiesStore.EncoderDef;
+import tarlog.encoder.tool.eclipse.preferences.PropertiesStore.EncodersGroup;
 
 /**
  *
  */
 public class EncoderTool extends ApplicationWindow {
 
-    //    private static final String ENCODERS_FILE      = "encoders.properties";
     private static final String ENCODER_PROPERTIES = "encoder.properties";
-    //    private static final String ENCODERS_PROPERTY  = "encoders";
-
     private static final String VERSION            = "0.2.0";
 
-    //    private Properties          properties;
     private Text                targetText;
     private Text                sourceText;
     private Composite           leftComposite;
     private Shell               shell;
     private boolean             standalone         = false;
-    private EncodersStore       encodersStore;
+    private PropertiesStore     propertiesStore;
 
     public EncoderTool() {
         super(null);
     }
 
     public void init() throws IOException {
-
-        //        properties = new Properties();
-        //
-        //        String propertiesFile = System.getProperty(ENCODERS_PROPERTY,
-        //            ENCODERS_FILE);
-        //
-        //        properties.load(getClass().getClassLoader().getResourceAsStream(
-        //            propertiesFile));
-
         setBlockOnOpen(true);
         if (standalone) {
             addMenuBar();
@@ -96,7 +83,7 @@ public class EncoderTool extends ApplicationWindow {
         } else {
             preferenceStore = Activator.getDefault().getPreferenceStore();
         }
-        encodersStore = new EncodersStore(preferenceStore, false);
+        propertiesStore = new PropertiesStore(preferenceStore, false);
 
     }
 
@@ -214,14 +201,20 @@ public class EncoderTool extends ApplicationWindow {
     }
 
     private void createLeftPart(Composite parent) {
-        final ScrolledComposite scrolledComposite = new ScrolledComposite(
-            parent, SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
-        leftComposite = new Composite(scrolledComposite, SWT.NONE);
-        scrolledComposite.setContent(leftComposite);
+        ScrolledComposite scrolledComposite = null;
+        scrolledComposite = new ScrolledComposite(parent, SWT.BORDER
+            | SWT.V_SCROLL | SWT.H_SCROLL);
+        scrolledComposite.setLayout(new GridLayout());
+        scrolledComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true,
+            true));
+        parent = scrolledComposite;
+
+        leftComposite = new Composite(parent, SWT.BORDER);
         GridLayout layout = new GridLayout();
         leftComposite.setLayout(layout);
-        leftComposite.setLayoutData(new GridData(GridData.FILL_BOTH));
+        leftComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
+        scrolledComposite.setContent(leftComposite);
     }
 
     private void reload() throws IOException {
@@ -238,11 +231,15 @@ public class EncoderTool extends ApplicationWindow {
     private void load() {
         final List<Button> radioButtons = new ArrayList<Button>();
 
-        for (EncodersGroup encodersGroup : encodersStore.getStore()) {
+        for (EncodersGroup encodersGroup : propertiesStore.getStore()) {
+            Composite grouping;
+
             Group group = new Group(leftComposite, SWT.NONE);
             group.setText(encodersGroup.getGroupName());
-            group.setLayout(new GridLayout());
-            group.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+            grouping = group;
+            grouping.setLayout(new GridLayout());
+            GridData layoutData = new GridData(SWT.FILL, SWT.FILL, true, true);
+            grouping.setLayoutData(layoutData);
             for (EncoderDef encoderDef : encodersGroup.getList()) {
                 try {
                     @SuppressWarnings("unchecked")
@@ -252,7 +249,8 @@ public class EncoderTool extends ApplicationWindow {
                     encoder.setTarget(targetText);
                     encoder.setName(encoderDef.getName());
                     encoder.setShell(shell);
-                    final Composite composite = new Composite(group, SWT.NULL);
+                    final Composite composite = new Composite(grouping,
+                        SWT.NONE);
                     composite.setLayoutData(new GridData(SWT.FILL, SWT.FILL,
                         true, true));
                     RowLayout layout = new RowLayout();

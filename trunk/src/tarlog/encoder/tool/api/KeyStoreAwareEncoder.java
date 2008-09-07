@@ -7,7 +7,6 @@ import java.security.KeyStoreException;
 
 import org.eclipse.jface.dialogs.Dialog;
 
-import tarlog.encoder.tool.Utils;
 import tarlog.encoder.tool.api.fields.InputField;
 import tarlog.encoder.tool.api.fields.InputTextField;
 import tarlog.encoder.tool.api.fields.Validator;
@@ -30,7 +29,7 @@ public abstract class KeyStoreAwareEncoder extends AbstractEncoder implements
 
     public String isValid() {
         if (file == null || !file.isFile()) {
-            return "Key Store File cannot be empty";
+            return "File cannot be empty";
         }
         return null;
     }
@@ -44,14 +43,14 @@ public abstract class KeyStoreAwareEncoder extends AbstractEncoder implements
         try {
             keystore = KeyStore.getInstance(type);
         } catch (KeyStoreException e) {
-            Utils.showException(shell, e);
+            showException(e);
             return Dialog.CANCEL;
         }
 
         try {
             keystore.load(new FileInputStream(file), password.toCharArray());
         } catch (Exception e) {
-            Utils.showException(shell, e);
+            showException(e);
             return Dialog.CANCEL;
         }
         return inputStatus;

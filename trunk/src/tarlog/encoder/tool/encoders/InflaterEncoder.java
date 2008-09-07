@@ -2,7 +2,6 @@ package tarlog.encoder.tool.encoders;
 
 import java.util.zip.Inflater;
 
-import tarlog.encoder.tool.Utils;
 import tarlog.encoder.tool.api.AbstractEncoder;
 import tarlog.encoder.tool.api.fields.InputField;
 
@@ -23,7 +22,7 @@ public class InflaterEncoder extends AbstractEncoder {
             System.arraycopy(tmpresult, 0, result, 0, resultLength);
             return result;
         } catch (Exception e) {
-            Utils.showException(shell, e);
+            showException(e);
             return null;
         }
     }
