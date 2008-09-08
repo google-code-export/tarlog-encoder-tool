@@ -4,12 +4,15 @@ import java.lang.reflect.Field;
 
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 
+import tarlog.encoder.tool.ui.ddialog.CreatePropertiesDialog.Pair;
 import tarlog.encoder.tool.ui.ddialog.DynamicInputDialog.FieldControl;
 import tarlog.encoder.tool.ui.ddialog.DynamicInputDialog.FieldWrapper;
 
@@ -35,6 +38,13 @@ public class CreateCheckButton extends CreateField {
         if (value != null) {
             button.setSelection(value.booleanValue());
         }
+
+        button.addSelectionListener(new SelectionAdapter() {
+            public void widgetSelected(SelectionEvent event) {
+                inputDialog.setFields();
+                inputDialog.validateInput();
+            }
+        });
 
         fieldControls.add(new FieldControl() {
 
