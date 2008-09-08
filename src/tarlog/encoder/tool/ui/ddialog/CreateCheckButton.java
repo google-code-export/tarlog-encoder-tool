@@ -12,7 +12,6 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 
-import tarlog.encoder.tool.ui.ddialog.CreatePropertiesDialog.Pair;
 import tarlog.encoder.tool.ui.ddialog.DynamicInputDialog.FieldControl;
 import tarlog.encoder.tool.ui.ddialog.DynamicInputDialog.FieldWrapper;
 
