@@ -209,7 +209,7 @@ public class EncoderTool extends ApplicationWindow {
             true));
         parent = scrolledComposite;
 
-        leftComposite = new Composite(parent, SWT.BORDER);
+        leftComposite = new Composite(parent, SWT.NONE);
         GridLayout layout = new GridLayout();
         leftComposite.setLayout(layout);
         leftComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));

@@ -128,7 +128,12 @@ public class CreatePropertiesDialog extends CreateField {
                 table.setSelection(tableInput.size() - 1);
             }
         });
-
+        addButton.addSelectionListener(new SelectionAdapter() {
+            public void widgetSelected(SelectionEvent event) {
+                inputDialog.setFields();
+                inputDialog.validateInput();
+            }
+        });
         //        addButton.setSize(convertHorizontalDLUsToPixels(6));
         Button removeButton = new Button(buttonsComposite, SWT.PUSH);
         removeButton.setText("Remove");
@@ -146,6 +151,12 @@ public class CreatePropertiesDialog extends CreateField {
                     tableViewer.refresh();
                     table.setSelection(selectionIndex);
                 }
+            }
+        });
+        removeButton.addSelectionListener(new SelectionAdapter() {
+            public void widgetSelected(SelectionEvent event) {
+                inputDialog.setFields();
+                inputDialog.validateInput();
             }
         });
     }

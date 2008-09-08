@@ -9,6 +9,7 @@ import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IInputValidator;
 import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.layout.GridData;
@@ -174,6 +175,12 @@ public class CreateList extends CreateField {
                 }
             }
         });
+        button.addSelectionListener(new SelectionAdapter() {
+            public void widgetSelected(SelectionEvent event) {
+                inputDialog.setFields();
+                inputDialog.validateInput();
+            }
+        });
     }
 
     private void createDownButton(Composite composite) {
@@ -194,6 +201,12 @@ public class CreateList extends CreateField {
                 }
             }
         });
+        button.addSelectionListener(new SelectionAdapter() {
+            public void widgetSelected(SelectionEvent event) {
+                inputDialog.setFields();
+                inputDialog.validateInput();
+            }
+        });
     }
 
     private void createRemoveButton(Composite composite) {
@@ -207,6 +220,12 @@ public class CreateList extends CreateField {
                 while ((selectionIndex = list.getSelectionIndex()) != -1) {
                     list.remove(selectionIndex);
                 }
+            }
+        });
+        button.addSelectionListener(new SelectionAdapter() {
+            public void widgetSelected(SelectionEvent event) {
+                inputDialog.setFields();
+                inputDialog.validateInput();
             }
         });
     }
@@ -237,6 +256,12 @@ public class CreateList extends CreateField {
                 }
             }
         });
+        button.addSelectionListener(new SelectionAdapter() {
+            public void widgetSelected(SelectionEvent event) {
+                inputDialog.setFields();
+                inputDialog.validateInput();
+            }
+        });
     }
 
     private void createFolderInputButton(Composite composite,
@@ -256,6 +281,12 @@ public class CreateList extends CreateField {
                 if (file != null) {
                     list.add(file);
                 }
+            }
+        });
+        button.addSelectionListener(new SelectionAdapter() {
+            public void widgetSelected(SelectionEvent event) {
+                inputDialog.setFields();
+                inputDialog.validateInput();
             }
         });
     }
@@ -288,6 +319,12 @@ public class CreateList extends CreateField {
                 if (rc == Dialog.OK) {
                     list.add(inputDialog.getValue());
                 }
+            }
+        });
+        button.addSelectionListener(new SelectionAdapter() {
+            public void widgetSelected(SelectionEvent event) {
+                inputDialog.setFields();
+                inputDialog.validateInput();
             }
         });
     }
