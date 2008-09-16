@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="Encoder Tool" default="build-stand-alone">
 
-	<property name="encoder.version" value="0.2.0" />
+	<property name="encoder.version" value="0.2.1" />
 	<property name="source" value="${basedir}/../src" />
 	<property name="target" value="${basedir}/../target" />
 	<property name="jar" value="${target}/jar" />
@@ -44,6 +44,11 @@
 		<copy todir="${jar}">
 			<fileset dir="${source}">
 				<exclude name="*.java" />
+			</fileset>
+		</copy>
+		<copy todir="${jar}">
+			<fileset dir="${basedir}/..">
+				<include name="encoder-default.properties" />
 			</fileset>
 		</copy>
 	</target>
@@ -90,6 +95,7 @@
 		<mkdir dir="${zip}" />
 		<copy todir="${zip}">
 			<fileset file="${lib}" includes="**/*.jar"></fileset>
+			<fileset file="${basedir}/../encoder.properties"></fileset>
 			<fileset file="${target}/${encoder.jar.name}"></fileset>
 			<fileset file="${source}" >
 				<include name="src/**/*.java"/>
