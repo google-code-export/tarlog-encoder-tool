@@ -7,7 +7,6 @@ import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.regex.Matcher;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 
@@ -16,6 +15,7 @@ import tarlog.encoder.tool.api.fields.InputDirectoryField;
 import tarlog.encoder.tool.api.fields.InputField;
 import tarlog.encoder.tool.api.fields.InputFileField;
 import tarlog.encoder.tool.api.fields.InputListField;
+import tarlog.encoder.tool.api.fields.InputTextField;
 import tarlog.encoder.tool.api.fields.Validator;
 import tarlog.encoder.tool.api.fields.InputListField.InputType;
 
@@ -185,14 +185,16 @@ public class PropertiesStore {
      */
     public static class EncoderDef implements Validator {
 
-        @InputField(name = "Name")
+        @InputField(name = "Name", required = true)
+        @InputTextField(validateNotEmpty = true, validationPattern = InputTextField.WORD_PATTERN, validationMessage = "Encoder name must be a word")
         String name;
 
         public String getName() {
             return name;
         }
 
-        @InputField(name = "Class name")
+        @InputField(name = "Class name", required = true)
+        @InputTextField(validateNotEmpty = true)
         String   className;
 
         @InputField(name = "Classpath")
@@ -244,22 +246,6 @@ public class PropertiesStore {
         }
 
         public String isValid() {
-            if (name == null) {
-                return "Encoder name cannot be empty";
-            }
-            if (name.equals("")) {
-                return "Encoder name cannot be empty";
-            }
-            Matcher matcher = EncoderToolPreferencePage.WORD_PATTERN.matcher(name);
-            if (!matcher.matches()) {
-                return "Encoder name must be a word";
-            }
-            if (className == null) {
-                return "Encoder name cannot be empty";
-            }
-            if (className.equals("")) {
-                return "Encoder name cannot be empty";
-            }
             try {
                 Class<?> encoderClass = getEncoderClass();
                 if (!AbstractEncoder.class.isAssignableFrom(encoderClass)) {

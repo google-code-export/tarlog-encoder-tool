@@ -1,6 +1,5 @@
 package tarlog.encoder.tool.ui;
 
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -52,7 +51,7 @@ import tarlog.encoder.tool.eclipse.preferences.PropertiesStore.EncodersGroup;
 public class EncoderTool extends ApplicationWindow {
 
     private static final String ENCODER_PROPERTIES = "encoder.properties";
-    private static final String VERSION            = "0.2.2";
+    private static final String VERSION            = "0.3.0";
 
     private Text                targetText;
     private Text                sourceText;
@@ -89,11 +88,7 @@ public class EncoderTool extends ApplicationWindow {
 
     private Image getImage() {
         try {
-            InputStream img = getClass().getClassLoader().getResourceAsStream(
-                "icons/encoders.jpg");
-            if (img == null) {
-                img = new FileInputStream("icons/encoders.jpg");
-            }
+            InputStream img = Utils.getFile("icons/encoders.jpg");
             ImageLoader imageLoader = new ImageLoader();
             ImageData[] load = imageLoader.load(img);
             return new Image(shell.getDisplay(), load[0]);

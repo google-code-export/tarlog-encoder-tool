@@ -14,28 +14,14 @@ public class VerifySignature extends KeyStoreAwareEncoder {
     @InputField(name = "Algorithm", readonly = true)
     private SignatureAlgorithms algorithm = SignatureAlgorithms.SHA1withDSA;
 
-    @InputField(name = "Certificate Alias")
+    @InputField(name = "Certificate Alias", required = true)
+    @InputTextField(validateNotEmpty = true)
     private String              alias;
 
-    @InputField(name = "Signature")
-    @InputTextField(multiline = true)
+    @InputField(name = "Signature", required = true)
+    @InputTextField(multiline = true, validateNotEmpty = true)
     private String              signature;
 
-    @Override
-    public String isValid() {
-        String valid = super.isValid();
-        if (valid != null) {
-            return valid;
-        }
-        if (alias == null || alias.equals("")) {
-            return "Certificate alias cannot be empty";
-        }
-        if (signature == null || signature.equals("")) {
-            return "Signature cannot be empty";
-        }
-        return null;
-    }
-    
     @Override
     public Object encode(byte[] source) {
         try {

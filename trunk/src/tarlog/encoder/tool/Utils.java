@@ -1,5 +1,9 @@
 package tarlog.encoder.tool;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
 import org.eclipse.core.runtime.IStatus;
@@ -14,6 +18,15 @@ import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 
 public class Utils {
+    
+    public static InputStream getFile(String name) throws FileNotFoundException {
+        InputStream img = Utils.class.getClassLoader().getResourceAsStream(
+            name);
+        if (img == null) {
+            img = new FileInputStream(name);
+        }
+        return img;
+    }
 
     public static void showErrorMessage(Shell shell, String title, String text) {
         MessageBox messageBox = new MessageBox(shell, SWT.ICON_ERROR | SWT.OK);

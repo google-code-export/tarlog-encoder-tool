@@ -29,6 +29,7 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
 import tarlog.encoder.tool.Utils;
+import tarlog.encoder.tool.api.fields.InputTextField;
 import tarlog.encoder.tool.eclipse.Activator;
 import tarlog.encoder.tool.eclipse.preferences.PropertiesStore.EncoderDef;
 import tarlog.encoder.tool.eclipse.preferences.PropertiesStore.EncodersGroup;
@@ -48,8 +49,9 @@ import tarlog.encoder.tool.ui.ddialog.DynamicInputDialog;
 public class EncoderToolPreferencePage extends PreferencePage implements
     IWorkbenchPreferencePage {
 
-    public static final Pattern WORD_PATTERN = Pattern.compile("\\w.*\\w");
+    public static final Pattern WORD_PATTERN = Pattern.compile(InputTextField.WORD_PATTERN);
 
+    
     private PropertiesStore     store;
     private TreeViewer          treeViewer;
 

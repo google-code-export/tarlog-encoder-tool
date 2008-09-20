@@ -45,4 +45,9 @@ public @interface InputField {
      * indicates if the field is enabled
      */
     boolean enabled() default true;
+
+    /**
+     * Indicates if the field is required. Required field cannot be null.
+     */
+    boolean required() default false;
 }

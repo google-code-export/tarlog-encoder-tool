@@ -16,11 +16,11 @@ public abstract class KeyStoreAwareEncoder extends AbstractEncoder implements
 
     protected KeyStore keystore;
 
-    @InputField(name = "Key Store File", order = -300)
+    @InputField(name = "Key Store File", required = true, order = -300)
     private File       file;
 
     @InputField(name = "Key Store Type", order = -200)
-    @InputTextField(values = { "JKS", "PKCS12" })
+    @InputTextField(values = { "JKS", "PKCS12" }, validateNotEmpty = true)
     private String     type = "JKS";
 
     @InputField(name = "Key Store Password", order = -100)
@@ -28,9 +28,17 @@ public abstract class KeyStoreAwareEncoder extends AbstractEncoder implements
     private String     password;
 
     public String isValid() {
-        if (file == null || !file.isFile()) {
-            return "File cannot be empty";
+        try {
+            keystore = KeyStore.getInstance(type);
+        } catch (KeyStoreException e) {
+            return e.getMessage();
         }
+        try {
+            keystore.load(new FileInputStream(file), password.toCharArray());
+        } catch (Exception e) {
+            return e.getMessage();
+        }
+
         return null;
     }
 
