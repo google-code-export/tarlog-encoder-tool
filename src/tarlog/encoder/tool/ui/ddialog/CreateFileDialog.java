@@ -124,7 +124,7 @@ public class CreateFileDialog extends CreateField {
                 }
             }
         });
-        if (inputDialog.validator != null) {
+        if (inputDialog.toValidateInput()) {
             text.addModifyListener(new ModifyListener() {
 
                 public void modifyText(ModifyEvent e) {

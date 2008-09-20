@@ -1,6 +1,8 @@
 package tarlog.encoder.tool.ui.ddialog;
 
 import java.lang.reflect.Field;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -11,6 +13,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Text;
 
 import tarlog.encoder.tool.api.fields.InputTextField;
+import tarlog.encoder.tool.api.fields.Validator;
 import tarlog.encoder.tool.ui.ddialog.DynamicInputDialog.FieldControl;
 import tarlog.encoder.tool.ui.ddialog.DynamicInputDialog.FieldWrapper;
 
@@ -21,11 +24,48 @@ public class CreateText extends CreateField {
     }
 
     public Text createField(Font font, Composite parent,
-        final FieldWrapper fieldWrapper, String fieldName) {
+        final FieldWrapper fieldWrapper, final String fieldName) {
         createLabel(font, parent, fieldName);
-        InputTextField textField = fieldWrapper.field.getAnnotation(InputTextField.class);
-        boolean isMultiline = textField != null ? textField.multiline() : false;
-        boolean isPassword = textField != null ? textField.password() : false;
+        final InputTextField textField = fieldWrapper.field.getAnnotation(InputTextField.class);
+        boolean isMultiline = false;
+        boolean isPassword = false;
+        if (textField != null) {
+            isMultiline = textField.multiline();
+            isPassword = textField.password();
+
+            if (textField.validateNotEmpty()) {
+                inputDialog.validators.add(inputDialog.validators.isEmpty() ? 0
+                    : inputDialog.validators.size() - 1, new Validator() {
+
+                    public String isValid() {
+                        Object value = fieldWrapper.getValue(object,
+                            fieldWrapper.field);
+                        if (((String) value).equals("")) {
+                            return fieldName + " cannot be empty.";
+                        }
+                        return null;
+                    }
+                });
+            }
+
+            if (!textField.validationPattern().equals("")) {
+                inputDialog.validators.add(inputDialog.validators.isEmpty() ? 0
+                    : inputDialog.validators.size() - 1, new Validator() {
+
+                    final Pattern pattern = Pattern.compile(textField.validationPattern());
+
+                    public String isValid() {
+                        Object value = fieldWrapper.getValue(object,
+                            fieldWrapper.field);
+                        Matcher matcher = pattern.matcher((String) value);
+                        if (!matcher.matches()) {
+                            return textField.validationMessage();
+                        }
+                        return null;
+                    }
+                });
+            }
+        }
         final Text text = new Text(parent, (isMultiline ? SWT.MULTI
             : SWT.SINGLE)
             | SWT.BORDER
@@ -45,7 +85,7 @@ public class CreateText extends CreateField {
             text.setText(value);
         }
 
-        if (inputDialog.validator != null) {
+        if (inputDialog.toValidateInput()) {
             text.addModifyListener(new ModifyListener() {
 
                 public void modifyText(ModifyEvent e) {

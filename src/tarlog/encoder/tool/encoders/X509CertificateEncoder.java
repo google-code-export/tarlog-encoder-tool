@@ -15,32 +15,20 @@ import tarlog.encoder.tool.Utils;
 import tarlog.encoder.tool.api.AbstractEncoder;
 import tarlog.encoder.tool.api.fields.InputField;
 import tarlog.encoder.tool.api.fields.InputTextField;
-import tarlog.encoder.tool.api.fields.Validator;
 
-public class X509CertificateEncoder extends AbstractEncoder implements
-    Validator {
+public class X509CertificateEncoder extends AbstractEncoder {
 
     private X509Certificate     cert;
 
-    @InputField(name = "Certificate File", order = -300)
+    @InputField(name = "Certificate File", required = true, order = -300)
     private File                file;
 
     @InputField(name = "Algorithm", readonly = true)
     private SignatureAlgorithms algorithm = SignatureAlgorithms.SHA1withDSA;
 
-    @InputField(name = "Signature")
-    @InputTextField(multiline = true)
+    @InputField(name = "Signature", required = true)
+    @InputTextField(multiline = true, validateNotEmpty = true)
     private String              signature;
-
-    public String isValid() {
-        if (file == null || file.equals("")) {
-            return "Certificate File cannot be empty";
-        }
-        if (signature == null || signature.equals("")) {
-            return "Signature cannot be empty";
-        }
-        return null;
-    }
 
     @Override
     protected int beforeEncode() {

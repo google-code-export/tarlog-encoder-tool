@@ -13,27 +13,13 @@ public class SignatureEncoder extends KeyStoreAwareEncoder {
     @InputField(name = "Algorithm", readonly = true)
     private SignatureAlgorithms algorithm = SignatureAlgorithms.SHA1withDSA;
 
-    @InputField(name = "Private Key Alias")
+    @InputField(name = "Private Key Alias", required = true)
+    @InputTextField(validateNotEmpty = true)
     private String              alias;
 
-    @InputField(name = "Private Key Password")
-    @InputTextField(password = true)
+    @InputField(name = "Private Key Password", required = true)
+    @InputTextField(password = true, validateNotEmpty = true)
     private String              password;
-
-    @Override
-    public String isValid() {
-        String valid = super.isValid();
-        if (valid != null) {
-            return valid;
-        }
-        if (alias == null || alias.equals("")) {
-            return "Private Key cannot be empty";
-        }
-        if (password == null || password.equals("")) {
-            return "Private Key Password cannot be empty";
-        }
-        return null;
-    }
 
     @Override
     public Object encode(byte[] source) {

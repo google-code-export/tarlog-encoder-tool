@@ -33,7 +33,7 @@ public class CreateCombo extends CreateField {
         if (value != null) {
             combo.setText(((Enum<?>) value).name());
         }
-        if (inputDialog.validator != null) {
+        if (inputDialog.toValidateInput()) {
             combo.addModifyListener(new ModifyListener() {
 
                 public void modifyText(ModifyEvent e) {
@@ -74,7 +74,7 @@ public class CreateCombo extends CreateField {
         if (value != null) {
             combo.setText((String) value);
         }
-        if (inputDialog.validator != null) {
+        if (inputDialog.toValidateInput()) {
             combo.addModifyListener(new ModifyListener() {
 
                 public void modifyText(ModifyEvent e) {

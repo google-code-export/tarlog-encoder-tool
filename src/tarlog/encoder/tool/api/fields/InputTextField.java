@@ -24,6 +24,8 @@ import java.lang.annotation.Target;
 @Target(ElementType.FIELD)
 public @interface InputTextField {
 
+    public static final String WORD_PATTERN = "\\w.*\\w";
+
     /**
      * <p>
      * For text field declares if the field is multiline
@@ -51,5 +53,25 @@ public @interface InputTextField {
      * true.
      */
     String[] values() default {};
+
+    /**
+     * Validates that string is not empty. Pay attention that string can contain
+     * white-spaces. Use validationPattern() for more specific validation.
+     */
+    boolean validateNotEmpty() default false;
+
+    /**
+     * If specified, the text is validated using the pattern. If validation
+     * fails, the validationMessage() is displayed.
+     * 
+     * @see java.util.regex.Pattern
+     * 
+     */
+    String validationPattern() default "";
+
+    /**
+     * validation message to be displayed if validationPattern() fails
+     */
+    String validationMessage() default "";
 
 }

@@ -33,7 +33,7 @@ public class DynamicInputDialog extends Dialog {
     final List<FieldWrapper> fields;
     final String             title;
     final List<FieldControl> fieldControls;
-    final Validator          validator;
+    final List<Validator>    validators = new ArrayList<Validator>();
     private Text             errorMessageText;
     private String           errorMessage;
 
@@ -69,8 +69,9 @@ public class DynamicInputDialog extends Dialog {
         this.fields = fields;
         this.title = title;
         this.fieldControls = new ArrayList<FieldControl>(fields.size());
-        this.validator = object instanceof Validator ? (Validator) object
-            : null;
+        if (object instanceof Validator) {
+            validators.add((Validator) object);
+        }
     }
 
     protected void configureShell(Shell shell) {
@@ -94,7 +95,7 @@ public class DynamicInputDialog extends Dialog {
 
         for (final FieldWrapper fieldWrapper : fields) {
 
-            String fieldName = fieldWrapper.inputField.name().equals("") ? fieldWrapper.field.getName()
+            final String fieldName = fieldWrapper.inputField.name().equals("") ? fieldWrapper.field.getName()
                 : fieldWrapper.inputField.name();
 
             // create input field
@@ -135,10 +136,25 @@ public class DynamicInputDialog extends Dialog {
                     + fieldType.getName());
             }
 
+            if (fieldWrapper.inputField.required()) {
+                validators.add(
+                    validators.isEmpty() ? 0 : validators.size() - 1,
+                    new Validator() {
+
+                        public String isValid() {
+                            Object value = fieldWrapper.getValue(object, fieldWrapper.field);
+                            if (value == null) {
+                                return fieldName + " is required";
+                            }
+                            return null;
+                        }
+                    });
+            }
             control.setEnabled(fieldWrapper.inputField.enabled());
         }
         errorMessageText = new Text(composite, SWT.READ_ONLY | SWT.WRAP);
-        errorMessageText.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 2, 1));
+        errorMessageText.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true,
+            true, 2, 1));
         errorMessageText.setBackground(errorMessageText.getDisplay().getSystemColor(
             SWT.COLOR_WIDGET_BACKGROUND));
         setErrorMessage(errorMessage);
@@ -156,12 +172,17 @@ public class DynamicInputDialog extends Dialog {
 
     protected void validateInput() {
         String errorMessage = null;
-        if (validator != null) {
+        for (Validator validator : validators) {
             errorMessage = validator.isValid();
+            if (errorMessage != null) {
+                break;
+            }
         }
-        // Bug 16256: important not to treat "" (blank error) the same as null
-        // (no error)
         setErrorMessage(errorMessage);
+    }
+
+    protected boolean toValidateInput() {
+        return validators.isEmpty() == false;
     }
 
     public void setErrorMessage(String errorMessage) {

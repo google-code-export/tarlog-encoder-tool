@@ -29,7 +29,7 @@ public class CreateSpinner extends CreateField {
             spinner.setSelection(((Integer) value).intValue());
         }
 
-        if (inputDialog.validator != null) {
+        if (inputDialog.toValidateInput()) {
             spinner.addModifyListener(new ModifyListener() {
 
                 public void modifyText(ModifyEvent e) {
