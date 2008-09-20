@@ -16,6 +16,8 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.MouseAdapter;
+import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.FillLayout;
@@ -51,7 +53,6 @@ public class EncoderToolPreferencePage extends PreferencePage implements
 
     public static final Pattern WORD_PATTERN = Pattern.compile(InputTextField.WORD_PATTERN);
 
-    
     private PropertiesStore     store;
     private TreeViewer          treeViewer;
 
@@ -158,27 +159,32 @@ public class EncoderToolPreferencePage extends PreferencePage implements
         button.setEnabled(false);
         button.addSelectionListener(new SelectionAdapter() {
 
-            public void widgetSelected(SelectionEvent event) {
-                TreeSelection selection = (TreeSelection) treeViewer.getSelection();
-                Object firstElement = selection.getFirstElement();
-                if (firstElement instanceof EncodersGroup) {
-                    EncodersGroup group = (EncodersGroup) firstElement;
-                    String name = editGroupName(group.getGroupName());
-                    if (name != null) {
-                        group.setGroupName(name);
-                        treeViewer.refresh();
-                    }
-                } else if (firstElement instanceof EncoderDef) {
-                    DynamicInputDialog dynamicInputDialog = new DynamicInputDialog(
-                        getShell(), "Edit Encoder", firstElement);
-                    int rc = dynamicInputDialog.open();
-                    if (rc == Dialog.OK) {
-                        treeViewer.refresh();
-                    }
-                }
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                edit();
             }
         });
         return button;
+    }
+
+    private void edit() {
+        TreeSelection selection = (TreeSelection) treeViewer.getSelection();
+        Object firstElement = selection.getFirstElement();
+        if (firstElement instanceof EncodersGroup) {
+            EncodersGroup group = (EncodersGroup) firstElement;
+            String name = editGroupName(group.getGroupName());
+            if (name != null) {
+                group.setGroupName(name);
+                treeViewer.refresh();
+            }
+        } else if (firstElement instanceof EncoderDef) {
+            DynamicInputDialog dynamicInputDialog = new DynamicInputDialog(
+                getShell(), "Edit Encoder", firstElement);
+            int rc = dynamicInputDialog.open();
+            if (rc == Dialog.OK) {
+                treeViewer.refresh();
+            }
+        }
     }
 
     private Button createAddEncoderButton(Composite composite) {
@@ -293,6 +299,13 @@ public class EncoderToolPreferencePage extends PreferencePage implements
         tree.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
         tree.setLayout(new FillLayout());
         tree.setVisible(true);
+        tree.addMouseListener(new MouseAdapter() {
+
+            @Override
+            public void mouseDoubleClick(MouseEvent e) {
+                edit();
+            }
+        });
         treeViewer.setContentProvider(new ContentProvider());
         treeViewer.setAutoExpandLevel(2);
         treeViewer.setLabelProvider(new LabelProvider());

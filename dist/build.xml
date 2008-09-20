@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="Encoder Tool" default="build-stand-alone">
 
-	<property name="encoder.version" value="0.2.1" />
+	<property name="encoder.version" value="0.3.0" />
 	<property name="source" value="${basedir}/../src" />
 	<property name="target" value="${basedir}/../target" />
 	<property name="jar" value="${target}/jar" />
