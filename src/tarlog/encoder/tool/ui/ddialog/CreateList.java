@@ -8,6 +8,7 @@ import java.net.URL;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IInputValidator;
 import org.eclipse.jface.dialogs.InputDialog;
+import org.eclipse.osgi.framework.adaptor.FilePath;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -30,10 +31,12 @@ import tarlog.encoder.tool.ui.AbstractSelectionListener;
 import tarlog.encoder.tool.ui.ddialog.DynamicInputDialog.FieldControl;
 import tarlog.encoder.tool.ui.ddialog.DynamicInputDialog.FieldWrapper;
 
+@SuppressWarnings("restriction")
 public class CreateList extends CreateField {
 
     private static final ListConverter<String> stringConverter = new StringConverter();
     private static final ListConverter<URL>    urlConverter    = new URLConverter();
+    private static final String                absolutePath    = new File(".").getAbsolutePath();
 
     @SuppressWarnings("unchecked")
     private ListConverter                      converter       = null;
@@ -176,6 +179,7 @@ public class CreateList extends CreateField {
             }
         });
         button.addSelectionListener(new SelectionAdapter() {
+
             public void widgetSelected(SelectionEvent event) {
                 inputDialog.setFields();
                 inputDialog.validateInput();
@@ -202,6 +206,7 @@ public class CreateList extends CreateField {
             }
         });
         button.addSelectionListener(new SelectionAdapter() {
+
             public void widgetSelected(SelectionEvent event) {
                 inputDialog.setFields();
                 inputDialog.validateInput();
@@ -223,6 +228,7 @@ public class CreateList extends CreateField {
             }
         });
         button.addSelectionListener(new SelectionAdapter() {
+
             public void widgetSelected(SelectionEvent event) {
                 inputDialog.setFields();
                 inputDialog.validateInput();
@@ -239,7 +245,8 @@ public class CreateList extends CreateField {
 
             public void widgetSelected(SelectionEvent e) {
                 String file = null;
-                FileDialog fileDialog = new FileDialog(shell);
+                FileDialog fileDialog = new FileDialog(shell, SWT.OPEN
+                    | SWT.MULTI);
                 String[] filterExtensions = inputFileField.filterExtensions().length > 0 ? inputFileField.filterExtensions()
                     : null;
                 String[] filterNames = inputFileField.filterNames().length > 0 ? inputFileField.filterNames()
@@ -248,15 +255,32 @@ public class CreateList extends CreateField {
                     : inputFileField.filterPath();
                 fileDialog.setFilterExtensions(filterExtensions);
                 fileDialog.setFilterNames(filterNames);
-                fileDialog.setFilterPath(filterPath);
+                fileDialog.setFilterPath(filterPath == null ? absolutePath
+                    : filterPath);
 
                 file = fileDialog.open();
                 if (file != null) {
-                    list.add(file);
+                    String[] fileNames = fileDialog.getFileNames();
+                    String path = inputFileField.relative() ? new FilePath(
+                        absolutePath).makeRelative(new FilePath(
+                        fileDialog.getFilterPath()))
+                        : fileDialog.getFilterPath();
+                    String sep = File.separator;
+                    if (path.contains("/")) {
+                        if (File.separatorChar == '\\') {
+                            sep = "\\\\";
+                        }
+                        path = path.replaceAll("/", sep);
+                    }
+                    for (String fileName : fileNames) {
+                        fileName = path + File.separator + fileName;
+                        list.add(fileName);
+                    }
                 }
             }
         });
         button.addSelectionListener(new SelectionAdapter() {
+
             public void widgetSelected(SelectionEvent event) {
                 inputDialog.setFields();
                 inputDialog.validateInput();
@@ -276,7 +300,8 @@ public class CreateList extends CreateField {
                 DirectoryDialog directoryDialog = new DirectoryDialog(shell);
                 String filterPath = inputDirectoryField.filterPath().equals("") ? null
                     : inputDirectoryField.filterPath();
-                directoryDialog.setFilterPath(filterPath);
+                directoryDialog.setFilterPath(filterPath == null ? absolutePath
+                    : filterPath);
                 file = directoryDialog.open();
                 if (file != null) {
                     list.add(file);
@@ -284,6 +309,7 @@ public class CreateList extends CreateField {
             }
         });
         button.addSelectionListener(new SelectionAdapter() {
+
             public void widgetSelected(SelectionEvent event) {
                 inputDialog.setFields();
                 inputDialog.validateInput();
@@ -322,6 +348,7 @@ public class CreateList extends CreateField {
             }
         });
         button.addSelectionListener(new SelectionAdapter() {
+
             public void widgetSelected(SelectionEvent event) {
                 inputDialog.setFields();
                 inputDialog.validateInput();

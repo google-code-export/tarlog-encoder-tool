@@ -17,7 +17,7 @@ import java.lang.annotation.Target;
 public @interface InputFileField {
 
     String buttonText() default "...";
-    
+
     /**
      * Set the file extensions which the file dialog will use to filter the
      * files it shows to the argument, which may be null.
@@ -44,7 +44,6 @@ public @interface InputFileField {
      */
     String[] filterNames() default {};
 
-    
     /**
      * <p>
      * Sets the directory path that the dialog will use to the argument, which
@@ -56,4 +55,12 @@ public @interface InputFileField {
      * '/' or '\' can be used as a path separator.
      */
     String filterPath() default "";
+
+    /**
+     * <p>Indicates either to return a full path or a relative path
+     * <p>The path is relative to the filter path
+     * 
+     * @return
+     */
+    boolean relative() default false;
 }

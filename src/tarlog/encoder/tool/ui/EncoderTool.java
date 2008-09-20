@@ -52,7 +52,7 @@ import tarlog.encoder.tool.eclipse.preferences.PropertiesStore.EncodersGroup;
 public class EncoderTool extends ApplicationWindow {
 
     private static final String ENCODER_PROPERTIES = "encoder.properties";
-    private static final String VERSION            = "0.2.0";
+    private static final String VERSION            = "0.2.2";
 
     private Text                targetText;
     private Text                sourceText;
@@ -133,7 +133,7 @@ public class EncoderTool extends ApplicationWindow {
             try {
                 EncoderToolPreferencePage page = new EncoderToolPreferencePage(
                     ENCODER_PROPERTIES);
-                page.setTitle("Encoder Tool");
+                page.setTitle("Diagnostic Tool");
                 PreferenceManager mgr = new PreferenceManager();
                 IPreferenceNode node = new PreferenceNode("1", page);
                 mgr.addToRoot(node);
@@ -153,7 +153,7 @@ public class EncoderTool extends ApplicationWindow {
     @Override
     protected Control createContents(Composite parent) {
         shell = getShell();
-        shell.setText("Encoder Tool " + VERSION);
+        shell.setText("Diagnostic Tool " + VERSION);
         shell.setSize(1000, 700);
         Image image = getImage();
         if (image != null) {

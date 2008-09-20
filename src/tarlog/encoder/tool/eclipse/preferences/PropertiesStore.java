@@ -1,5 +1,6 @@
 package tarlog.encoder.tool.eclipse.preferences;
 
+import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -192,14 +193,14 @@ public class PropertiesStore {
         }
 
         @InputField(name = "Class name")
-        String className;
+        String   className;
 
         @InputField(name = "Classpath")
         @InputFileField(buttonText = "Add jar", filterExtensions = { "*.jar",
-            "*.*" })
+            "*.*" }, relative = true)
         @InputDirectoryField(buttonText = "Add class folder")
         @InputListField(inputType = { InputType.UP, InputType.DOWN })
-        URL[]  classPath;
+        String[] classPath;
 
         EncoderDef() {
 
@@ -217,13 +218,12 @@ public class PropertiesStore {
             int classPathLength = isDefault ? preferenceStore.getDefaultInt(prefix
                 + "classPath")
                 : preferenceStore.getInt(prefix + "classPath");
-            classPath = new URL[classPathLength];
+            classPath = new String[classPathLength];
             for (int k = 0; k < classPathLength; ++k) {
-                classPath[k] = new URL(
-                    isDefault ? preferenceStore.getDefaultString(prefix
-                        + "classPath." + String.valueOf(k))
-                        : preferenceStore.getString(prefix + "classPath."
-                            + String.valueOf(k)));
+                classPath[k] = isDefault ? preferenceStore.getDefaultString(prefix
+                    + "classPath." + String.valueOf(k))
+                    : preferenceStore.getString(prefix + "classPath."
+                        + String.valueOf(k));
             }
         }
 
@@ -267,13 +267,23 @@ public class PropertiesStore {
                 }
             } catch (ClassNotFoundException e) {
                 return "Class not found";
+            } catch (MalformedURLException e) {
+                return e.getMessage();
             }
             return null;
         }
 
-        public Class<?> getEncoderClass() throws ClassNotFoundException {
-            ClassLoader classLoader = classPath == null ? getClass().getClassLoader()
-                : new URLClassLoader(classPath, getClass().getClassLoader());
+        public Class<?> getEncoderClass() throws ClassNotFoundException,
+            MalformedURLException {
+            ClassLoader classLoader = getClass().getClassLoader();
+            if (classPath != null) {
+                URL[] urls = new URL[classPath.length];
+                for (int i = 0; i < classPath.length; ++i) {
+                    urls[i] = new File(classPath[i]).toURL();
+                }
+                classLoader = new URLClassLoader(urls,
+                    getClass().getClassLoader());
+            }
             return classLoader.loadClass(className);
         }
     }

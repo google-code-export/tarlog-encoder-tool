@@ -1,7 +1,5 @@
 package tarlog.encoder.tool.eclipse.preferences;
 
-import java.net.URL;
-
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 
@@ -53,7 +51,7 @@ class ContentProvider implements ITreeContentProvider {
             return false;
         }
 
-        if (element instanceof URL) {
+        if (element instanceof String) {
             return false;
         }
 
