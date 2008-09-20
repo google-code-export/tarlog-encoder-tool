@@ -1,12 +1,11 @@
 package tarlog.encoder.tool.eclipse.preferences;
 
-import java.net.URL;
 
 class EncoderClasspathWrapper {
 
-    URL[] classpath;
+    String[] classpath;
 
-    public EncoderClasspathWrapper(URL[] classpath) {
+    public EncoderClasspathWrapper(String[] classpath) {
         super();
         this.classpath = classpath;
     }
