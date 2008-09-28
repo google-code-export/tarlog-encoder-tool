@@ -24,7 +24,6 @@ import tarlog.encoder.tool.ui.AbstractSelectionListener;
 import tarlog.encoder.tool.ui.ddialog.DynamicInputDialog.FieldControl;
 import tarlog.encoder.tool.ui.ddialog.DynamicInputDialog.FieldWrapper;
 
-@SuppressWarnings("restriction")
 public class CreateFileDialog extends CreateField {
 
     private static final String absolutePath = new File(".").getAbsolutePath();
