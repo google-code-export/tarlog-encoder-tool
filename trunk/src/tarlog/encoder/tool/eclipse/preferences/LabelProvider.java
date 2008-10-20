@@ -2,44 +2,77 @@ package tarlog.encoder.tool.eclipse.preferences;
 
 import java.net.URL;
 
+import org.eclipse.jface.viewers.ILabelProviderListener;
+import org.eclipse.jface.viewers.ITableLabelProvider;
+import org.eclipse.swt.graphics.Image;
+
 import tarlog.encoder.tool.eclipse.preferences.PropertiesStore.EncoderDef;
 import tarlog.encoder.tool.eclipse.preferences.PropertiesStore.EncodersGroup;
-import tarlog.encoder.tool.ui.AbstractLabelProvider;
 
-class LabelProvider extends AbstractLabelProvider {
+class LabelProvider implements ITableLabelProvider {
 
-    @Override
-    public String getText(Object element) {
+    public Image getColumnImage(Object arg0, int arg1) {
+        return null;
+    }
+
+    public String getColumnText(Object element, int index) {
         if (element == null) {
             return null;
         }
-        if (element instanceof String) {
-            return (String) element;
-        }
-        if (element instanceof URL) {
-            return element.toString();
+
+        if (index == 0) {
+            if (element instanceof String) {
+                return (String) element;
+            }
+
+            if (element instanceof URL) {
+                return element.toString();
+            }
+            if (element instanceof EncoderClassWrapper) {
+                EncoderClassWrapper classWrapper = (EncoderClassWrapper) element;
+                return "Class: " + classWrapper.className;
+            }
+
+            if (element instanceof EncoderClasspathWrapper) {
+                return "Classpath:";
+            }
         }
         if (element instanceof EncodersGroup) {
             EncodersGroup encodersGroup = (EncodersGroup) element;
-            return "Group: " + encodersGroup.getGroupName();
+            switch (index) {
+                case 0:
+                    return "Group: " + encodersGroup.getGroupName();
+                case 1:
+                    return String.valueOf(encodersGroup.isEnabled());
+            }
         }
         if (element instanceof EncoderDef) {
             EncoderDef encoderDef = (EncoderDef) element;
-            return "Encoder: " + encoderDef.name;
+            switch (index) {
+                case 0:
+                    return "Encoder: " + encoderDef.name;
+                case 1:
+                    return String.valueOf(encoderDef.isEnabled());
+            }
         }
 
-        if (element instanceof EncoderClassWrapper) {
-            EncoderClassWrapper classWrapper = (EncoderClassWrapper) element;
-            return "Class: " + classWrapper.className;
-        }
-
-        if (element instanceof EncoderClasspathWrapper) {
-            return "Classpath:";
-        }
-
-        System.out.println("LabelProvider.getText() "
-            + element.getClass().getName());
         return null;
+    }
+
+    public void addListener(ILabelProviderListener arg0) {
+
+    }
+
+    public void dispose() {
+
+    }
+
+    public boolean isLabelProperty(Object arg0, String arg1) {
+        return false;
+    }
+
+    public void removeListener(ILabelProviderListener arg0) {
+
     }
 
 }

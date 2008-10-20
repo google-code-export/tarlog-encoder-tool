@@ -16,6 +16,8 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.MenuAdapter;
+import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -26,7 +28,10 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
+import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
@@ -35,6 +40,7 @@ import tarlog.encoder.tool.api.fields.InputTextField;
 import tarlog.encoder.tool.eclipse.Activator;
 import tarlog.encoder.tool.eclipse.preferences.PropertiesStore.EncoderDef;
 import tarlog.encoder.tool.eclipse.preferences.PropertiesStore.EncodersGroup;
+import tarlog.encoder.tool.ui.AbstractSelectionListener;
 import tarlog.encoder.tool.ui.ddialog.DynamicInputDialog;
 
 /**
@@ -294,10 +300,19 @@ public class EncoderToolPreferencePage extends PreferencePage implements
 
     private void createTree(Composite parent) {
         treeViewer = new TreeViewer(parent, SWT.SINGLE | SWT.H_SCROLL
-            | SWT.V_SCROLL | SWT.BORDER);
+            | SWT.V_SCROLL | SWT.BORDER | SWT.FULL_SELECTION);
         Tree tree = treeViewer.getTree();
+        tree.setHeaderVisible(true);
+        TreeColumn mainColumn = new TreeColumn(tree, SWT.NONE);
+        mainColumn.setWidth(200);
+        mainColumn.setText("Name");
+        TreeColumn enabledColumn = new TreeColumn(tree, SWT.NONE);
+        enabledColumn.setWidth(200);
+        enabledColumn.setText("Enabled");
+        tree.setMenu(createTreeMenu(tree));
         tree.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
         tree.setLayout(new FillLayout());
+
         tree.setVisible(true);
         tree.addMouseListener(new MouseAdapter() {
 
@@ -306,6 +321,7 @@ public class EncoderToolPreferencePage extends PreferencePage implements
                 edit();
             }
         });
+
         treeViewer.setContentProvider(new ContentProvider());
         treeViewer.setAutoExpandLevel(2);
         treeViewer.setLabelProvider(new LabelProvider());
@@ -342,6 +358,54 @@ public class EncoderToolPreferencePage extends PreferencePage implements
                 }
             }
         });
+    }
+
+    private Menu createTreeMenu(Tree tree) {
+        Menu menu = new Menu(tree);
+
+        final MenuItem enabledMenuItem = new MenuItem(menu, SWT.CHECK);
+        enabledMenuItem.setText("Enabled");
+        enabledMenuItem.addSelectionListener(new AbstractSelectionListener() {
+
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                boolean enabledMenuSelection = ((MenuItem) e.widget).getSelection();
+                TreeSelection selection = (TreeSelection) treeViewer.getSelection();
+                Object firstElement = selection.getFirstElement();
+                if (firstElement instanceof EncodersGroup) {
+                    EncodersGroup group = (EncodersGroup) firstElement;
+                    group.setEnabled(enabledMenuSelection);
+                } else if (firstElement instanceof EncoderDef) {
+                    EncoderDef def = (EncoderDef) firstElement;
+                    def.setEnabled(enabledMenuSelection);
+                }
+                treeViewer.refresh();
+            }
+        });
+
+        menu.addMenuListener(new MenuAdapter() {
+
+            @Override
+            public void menuShown(MenuEvent e) {
+                TreeSelection selection = (TreeSelection) treeViewer.getSelection();
+                Object firstElement = selection.getFirstElement();
+
+                if (firstElement instanceof EncodersGroup) {
+                    EncodersGroup group = (EncodersGroup) firstElement;
+                    enabledMenuItem.setEnabled(true);
+                    enabledMenuItem.setSelection(group.isEnabled());
+                } else if (firstElement instanceof EncoderDef) {
+                    EncoderDef def = (EncoderDef) firstElement;
+                    enabledMenuItem.setEnabled(true);
+                    enabledMenuItem.setSelection(def.isEnabled());
+                } else {
+                    enabledMenuItem.setEnabled(false);
+                }
+                treeViewer.refresh();
+                treeViewer.setSelection(treeViewer.getSelection());
+            }
+        });
+        return menu;
     }
 
     private void initialize() {
