@@ -226,7 +226,10 @@ public class EncoderTool extends ApplicationWindow {
     private void load() {
         final List<Button> radioButtons = new ArrayList<Button>();
 
-        for (EncodersGroup encodersGroup : propertiesStore.getStore()) {
+        LOOP_GROUP: for (EncodersGroup encodersGroup : propertiesStore.getStore()) {
+            if (!encodersGroup.isEnabled()) {
+                continue LOOP_GROUP;
+            }
             Composite grouping;
 
             Group group = new Group(leftComposite, SWT.NONE);
@@ -235,7 +238,10 @@ public class EncoderTool extends ApplicationWindow {
             grouping.setLayout(new GridLayout());
             GridData layoutData = new GridData(SWT.FILL, SWT.FILL, true, true);
             grouping.setLayoutData(layoutData);
-            for (EncoderDef encoderDef : encodersGroup.getList()) {
+            LOOP_ENCODER: for (EncoderDef encoderDef : encodersGroup.getList()) {
+                if (!encoderDef.isEnabled()) {
+                    continue LOOP_ENCODER;
+                }
                 try {
                     @SuppressWarnings("unchecked")
                     Class<AbstractEncoder> clazz = (Class<AbstractEncoder>) encoderDef.getEncoderClass();

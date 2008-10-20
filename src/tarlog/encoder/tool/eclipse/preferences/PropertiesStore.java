@@ -102,7 +102,8 @@ public class PropertiesStore {
     public static class EncodersGroup {
 
         private String           groupName;
-        private List<EncoderDef> list = new ArrayList<EncoderDef>();
+        private boolean          enabled = true;
+        private List<EncoderDef> list    = new ArrayList<EncoderDef>();
 
         private EncodersGroup() {
 
@@ -114,6 +115,14 @@ public class PropertiesStore {
                 + ".group";
             groupName = isDefault ? preferenceStore.getDefaultString(groupStr)
                 : preferenceStore.getString(groupStr);
+            String enabledStr = getClass().getName() + "." + String.valueOf(i)
+                + ".enabled";
+            if (preferenceStore.contains(enabledStr)) {
+                enabled = isDefault ? preferenceStore.getDefaultBoolean(enabledStr)
+                    : preferenceStore.getBoolean(enabledStr);
+            } else {
+                enabled = true;
+            }
             String encodersStr = getClass().getName() + "." + String.valueOf(i)
                 + ".encoders";
             int encodersAmount = isDefault ? preferenceStore.getDefaultInt(encodersStr)
@@ -153,6 +162,8 @@ public class PropertiesStore {
             preferenceStore.setValue(getClass().getName() + "."
                 + String.valueOf(i) + ".group", groupName);
             preferenceStore.setValue(getClass().getName() + "."
+                + String.valueOf(i) + ".enabled", enabled);
+            preferenceStore.setValue(getClass().getName() + "."
                 + String.valueOf(i) + ".encoders", list.size());
             for (int j = 0; j < list.size(); ++j) {
                 list.get(j).store(i, j, preferenceStore);
@@ -178,6 +189,14 @@ public class PropertiesStore {
         public List<EncoderDef> getList() {
             return list;
         }
+
+        public void setEnabled(boolean enabled) {
+            this.enabled = enabled;
+        }
+
+        public boolean isEnabled() {
+            return enabled;
+        }
     }
 
     /**
@@ -187,7 +206,9 @@ public class PropertiesStore {
 
         @InputField(name = "Name", required = true)
         @InputTextField(validateNotEmpty = true, validationPattern = InputTextField.WORD_PATTERN, validationMessage = "Encoder name must be a word")
-        String name;
+        String          name;
+
+        private boolean enabled = true;
 
         public String getName() {
             return name;
@@ -214,6 +235,13 @@ public class PropertiesStore {
                 + "." + String.valueOf(j) + ".";
             name = isDefault ? preferenceStore.getDefaultString(prefix + "name")
                 : preferenceStore.getString(prefix + "name");
+            if (preferenceStore.contains(prefix + "enabled")) {
+                enabled = isDefault ? preferenceStore.getDefaultBoolean(prefix
+                    + "enabled") : preferenceStore.getBoolean(prefix
+                    + "enabled");
+            } else {
+                enabled = true;
+            }
             className = isDefault ? preferenceStore.getDefaultString(prefix
                 + "className")
                 : preferenceStore.getString(prefix + "className");
@@ -234,6 +262,7 @@ public class PropertiesStore {
                 + "." + String.valueOf(j) + ".";
             preferenceStore.setValue(prefix + "name", name);
             preferenceStore.setValue(prefix + "className", className);
+            preferenceStore.setValue(prefix + "enabled", enabled);
             if (classPath != null) {
                 preferenceStore.setValue(prefix + "classPath", classPath.length);
                 for (int k = 0; k < classPath.length; ++k) {
@@ -271,6 +300,14 @@ public class PropertiesStore {
                     getClass().getClassLoader());
             }
             return classLoader.loadClass(className);
+        }
+
+        public void setEnabled(boolean enabled) {
+            this.enabled = enabled;
+        }
+
+        public boolean isEnabled() {
+            return enabled;
         }
     }
 
