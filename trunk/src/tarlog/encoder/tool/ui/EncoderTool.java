@@ -41,6 +41,9 @@ import tarlog.encoder.tool.eclipse.preferences.EncoderToolPreferencePage;
 import tarlog.encoder.tool.eclipse.preferences.PropertiesStore;
 import tarlog.encoder.tool.eclipse.preferences.PropertiesStore.EncoderDef;
 import tarlog.encoder.tool.eclipse.preferences.PropertiesStore.EncodersGroup;
+import tarlog.encoder.tool.ui.inner.HistoryManager;
+import tarlog.encoder.tool.ui.inner.InputTextEditor;
+import tarlog.encoder.tool.ui.inner.SwapButton;
 
 /**
  *
@@ -166,26 +169,13 @@ public class EncoderTool extends ApplicationWindow {
         composite.setLayout(new GridLayout(2, false));
         sourceText = createTextEditor(composite, SWT.MULTI | SWT.BORDER);
         Composite rightComposite = new Composite(composite, SWT.NONE);
-        rightComposite.setLayout(new GridLayout());
-        Button exchange = new Button(rightComposite, SWT.PUSH);
-        exchange.setText("<>");
-        exchange.setToolTipText("Swap input");
-        exchange.addSelectionListener(new AbstractSelectionListener() {
-
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                Button sourceBytesButton = (Button) sourceText.getData();
-                Button targetBytesButton = (Button) targetText.getData();
-
-                String oldText = sourceText.getText();
-                boolean oldBytesButtonStatus = sourceBytesButton.getSelection();
-
-                sourceText.setText(targetText.getText());
-                sourceBytesButton.setSelection(targetBytesButton.getSelection());
-                targetText.setText(oldText);
-                targetBytesButton.setSelection(oldBytesButtonStatus);
-            }
-        });
+        GridLayout gridLayout = new GridLayout();
+        gridLayout.marginHeight = 0;
+        gridLayout.marginWidth = 0;
+        rightComposite.setLayout(gridLayout);
+        GridData gridData = new GridData(SWT.CENTER, SWT.FILL, false, true);
+        rightComposite.setLayoutData(gridData);
+        new SwapButton(rightComposite, this);
         historyManager = new HistoryManager(rightComposite, this);
     }
 

@@ -1,4 +1,4 @@
-package tarlog.encoder.tool.ui;
+package tarlog.encoder.tool.ui.inner;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -10,6 +10,7 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
+
 
 
 public class InputTextEditor extends Composite {

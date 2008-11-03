@@ -1,4 +1,4 @@
-package tarlog.encoder.tool.ui;
+package tarlog.encoder.tool.ui.inner;
 
 import org.apache.commons.codec.DecoderException;
 import org.eclipse.swt.events.SelectionEvent;
@@ -6,6 +6,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Text;
 
 import tarlog.encoder.tool.Utils;
+import tarlog.encoder.tool.ui.AbstractSelectionListener;
 
 public class ShowBytesListener extends AbstractSelectionListener {
 
