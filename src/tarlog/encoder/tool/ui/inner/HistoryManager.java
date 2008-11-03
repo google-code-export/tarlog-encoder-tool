@@ -1,14 +1,18 @@
-package tarlog.encoder.tool.ui;
+package tarlog.encoder.tool.ui.inner;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
+
+import tarlog.encoder.tool.ui.AbstractSelectionListener;
+import tarlog.encoder.tool.ui.EncoderTool;
 
 public class HistoryManager {
 
@@ -18,9 +22,13 @@ public class HistoryManager {
     public HistoryManager(final Composite rightComposite,
         final EncoderTool encoderTool) {
         Label label = new Label(rightComposite, SWT.NONE);
+        GridData gridData = new GridData(SWT.LEFT, SWT.BOTTOM, false, false);
+        gridData.verticalIndent = 15;
+        label.setLayoutData(gridData);
         label.setText("History:");
         historyList = new org.eclipse.swt.widgets.List(rightComposite,
             SWT.MULTI | SWT.BORDER | SWT.V_SCROLL);
+        historyList.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
         historyList.addSelectionListener(new AbstractSelectionListener() {
 
             @Override
@@ -28,8 +36,16 @@ public class HistoryManager {
                 int selectionIndex = historyList.getSelectionIndex();
                 if (selectionIndex != -1) {
                     Step step = history.get(selectionIndex);
-                    encoderTool.getSourceText().setText(step.sourceText);
-                    encoderTool.getTargetText().setText(step.targetText);
+                    Text sourceText = encoderTool.getSourceText();
+                    Text targetText = encoderTool.getTargetText();
+
+                    Button sourceBytesButton = (Button) sourceText.getData();
+                    Button targetBytesButton = (Button) targetText.getData();
+
+                    sourceText.setText(step.sourceText);
+                    sourceBytesButton.setSelection(step.sourceBytesButtonSelection);
+                    targetText.setText(step.targetText);
+                    targetBytesButton.setSelection(step.targetBytesButtonSelection);
                 }
             }
         });
