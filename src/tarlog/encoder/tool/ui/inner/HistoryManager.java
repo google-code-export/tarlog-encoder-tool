@@ -22,8 +22,9 @@ import tarlog.encoder.tool.ui.EncoderTool;
 
 public class HistoryManager {
 
-    private List<Step>                         history = new ArrayList<Step>();
+    private List<Step>                         history          = new ArrayList<Step>();
     private final org.eclipse.swt.widgets.List historyList;
+    private final int                          MAX_HISTORY_SIZE = 50;
 
     public HistoryManager(final Composite rightComposite,
         final EncoderTool encoderTool) {
@@ -33,7 +34,7 @@ public class HistoryManager {
         label.setLayoutData(gridData);
         label.setText("History:");
         historyList = new org.eclipse.swt.widgets.List(rightComposite,
-            SWT.SINGLE | SWT.BORDER | SWT.V_SCROLL);
+            SWT.SINGLE | SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
         historyList.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
         // create menu
@@ -46,13 +47,8 @@ public class HistoryManager {
             @Override
             public void widgetSelected(SelectionEvent e) {
                 int selectionIndex = historyList.getSelectionIndex();
-                if (selectionIndex != -1) {
-                    history.remove(selectionIndex);
-                    historyList.removeAll();
-                    for (int i = 0; i < history.size(); ++i) {
-                        addToHistoryList(i, history.get(i).name);
-                    }
-                }
+                remove(selectionIndex);
+                historyList.setTopIndex(historyList.getItemCount() > 0 ? historyList.getItemCount() - 1 : 0);
             }
         });
 
@@ -108,6 +104,9 @@ public class HistoryManager {
     }
 
     public void addStep(String name, Text sourceText, Text targetText) {
+        if (history.size() >= MAX_HISTORY_SIZE) {
+            remove(0);
+        }
         Button sourceBytesButton = (Button) sourceText.getData();
         Button targetBytesButton = (Button) targetText.getData();
         boolean sourceBytesButtonSelection = sourceBytesButton.getSelection();
@@ -116,10 +115,21 @@ public class HistoryManager {
         history.add(new Step(name, sourceText.getText(), targetText.getText(),
             sourceBytesButtonSelection, targetBytesButtonSelection));
         addToHistoryList(history.size() - 1, name);
+        historyList.setTopIndex(historyList.getItemCount() > 0 ? historyList.getItemCount() - 1 : 0);
     }
-    
+
     private void addToHistoryList(int index, String name) {
         historyList.add(String.format("%d. %s", index + 1, name), index);
+    }
+
+    private void remove(int selectionIndex) {
+        if (selectionIndex != -1) {
+            history.remove(selectionIndex);
+            historyList.removeAll();
+            for (int i = 0; i < history.size(); ++i) {
+                addToHistoryList(i, history.get(i).name);
+            }
+        }
     }
 
     private class Step {
