@@ -29,10 +29,7 @@ import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Group;
-import org.eclipse.swt.widgets.Link;
-import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
@@ -59,6 +56,7 @@ public class EncoderTool extends ApplicationWindow {
     private Shell               shell;
     private boolean             standalone         = false;
     private PropertiesStore     propertiesStore;
+    private HistoryManager      historyManager;
 
     public EncoderTool() {
         super(null);
@@ -167,7 +165,9 @@ public class EncoderTool extends ApplicationWindow {
         Composite composite = new Composite(parent, SWT.BORDER);
         composite.setLayout(new GridLayout(2, false));
         sourceText = createTextEditor(composite, SWT.MULTI | SWT.BORDER);
-        Button exchange = new Button(composite, SWT.PUSH);
+        Composite rightComposite = new Composite(composite, SWT.NONE);
+        rightComposite.setLayout(new GridLayout());
+        Button exchange = new Button(rightComposite, SWT.PUSH);
         exchange.setText("<>");
         exchange.setToolTipText("Swap input");
         exchange.addSelectionListener(new AbstractSelectionListener() {
@@ -186,6 +186,7 @@ public class EncoderTool extends ApplicationWindow {
                 targetBytesButton.setSelection(oldBytesButtonStatus);
             }
         });
+        historyManager = new HistoryManager(rightComposite, this);
     }
 
     private void createBottomPart(Composite parent) {
@@ -250,6 +251,7 @@ public class EncoderTool extends ApplicationWindow {
                     encoder.setTarget(targetText);
                     encoder.setName(encoderDef.getName());
                     encoder.setShell(shell);
+                    encoder.setHistoryManager(historyManager);
                     final Composite composite = new Composite(grouping,
                         SWT.NONE);
                     composite.setLayoutData(new GridData(SWT.FILL, SWT.FILL,
@@ -299,28 +301,8 @@ public class EncoderTool extends ApplicationWindow {
     }
 
     private Text createTextEditor(Composite parent, int style) {
-        Composite composite = new Composite(parent, SWT.NONE);
-        composite.setLayout(new GridLayout());
-        composite.setLayoutData(new GridData(GridData.FILL_BOTH));
-        final Text text = new Text(composite, style | SWT.WRAP | SWT.V_SCROLL);
-        text.setLayoutData(new GridData(GridData.FILL_BOTH));
-        Composite bottomComposite = new Composite(composite, SWT.NONE);
-        bottomComposite.setLayout(new RowLayout(SWT.HORIZONTAL));
-        final Button showBytesButton = new Button(bottomComposite, SWT.CHECK);
-        showBytesButton.setData(text);
-        text.setData(showBytesButton);
-        showBytesButton.setText("Show bytes");
-        showBytesButton.addSelectionListener(new ShowBytesListener());
-        Link link = new Link(bottomComposite, SWT.NONE);
-        link.setText("<a>Clean</a>");
-        link.addListener(SWT.Selection, new Listener() {
-
-            public void handleEvent(Event event) {
-                text.setText("");
-            }
-        });
-
-        return text;
+        InputTextEditor textEditor = new InputTextEditor(parent, SWT.NONE);
+        return textEditor.getText();
     }
 
     /**
@@ -331,5 +313,13 @@ public class EncoderTool extends ApplicationWindow {
         EncoderTool encoderTool = new EncoderTool();
         encoderTool.standalone = true;
         encoderTool.init();
+    }
+
+    public Text getTargetText() {
+        return targetText;
+    }
+
+    public Text getSourceText() {
+        return sourceText;
     }
 }
