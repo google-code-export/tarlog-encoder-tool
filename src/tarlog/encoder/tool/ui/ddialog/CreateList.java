@@ -31,6 +31,7 @@ import tarlog.encoder.tool.ui.AbstractSelectionListener;
 import tarlog.encoder.tool.ui.ddialog.DynamicInputDialog.FieldControl;
 import tarlog.encoder.tool.ui.ddialog.DynamicInputDialog.FieldWrapper;
 
+@SuppressWarnings("restriction")
 public class CreateList extends CreateField {
 
     private static final ListConverter<String> stringConverter = new StringConverter();
