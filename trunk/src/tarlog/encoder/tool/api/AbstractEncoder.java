@@ -11,6 +11,7 @@ import org.eclipse.swt.widgets.Text;
 
 import tarlog.encoder.tool.Utils;
 import tarlog.encoder.tool.ui.AbstractSelectionListener;
+import tarlog.encoder.tool.ui.HistoryManager;
 import tarlog.encoder.tool.ui.ddialog.DynamicInputDialog;
 import tarlog.encoder.tool.ui.ddialog.DynamicInputDialog.FieldWrapper;
 
@@ -23,10 +24,11 @@ import tarlog.encoder.tool.ui.ddialog.DynamicInputDialog.FieldWrapper;
  */
 public abstract class AbstractEncoder extends AbstractSelectionListener {
 
-    private String  name;
-    private Text    targetText;
-    private Text    sourceText;
-    protected Shell shell;
+    private String         name;
+    private Text           targetText;
+    private Text           sourceText;
+    private HistoryManager historyManager;
+    protected Shell        shell;
 
     public AbstractEncoder() {
         try {
@@ -74,6 +76,7 @@ public abstract class AbstractEncoder extends AbstractSelectionListener {
                 ((Button) targetText.getData()).setSelection(false);
                 targetText.setText(String.valueOf(out));
             }
+            historyManager.addStep(getName(), sourceText, targetText);
         } catch (Exception e1) {
             Utils.showException(shell, e1);
         }
@@ -174,8 +177,11 @@ public abstract class AbstractEncoder extends AbstractSelectionListener {
 
     /**
      * shows information message to user
-     * @param title - title
-     * @param text - message text
+     * 
+     * @param title
+     *            - title
+     * @param text
+     *            - message text
      */
     protected void showInformationMessage(String title, String text) {
         Utils.showInformationMessage(shell, title, text);
@@ -183,7 +189,9 @@ public abstract class AbstractEncoder extends AbstractSelectionListener {
 
     /**
      * shows exception dialog
-     * @param t - exception
+     * 
+     * @param t
+     *            - exception
      */
     protected void showException(Throwable t) {
         Utils.showException(shell, t);
@@ -191,10 +199,21 @@ public abstract class AbstractEncoder extends AbstractSelectionListener {
 
     /**
      * shows error message to user
-     * @param title - title
-     * @param text - message text
+     * 
+     * @param title
+     *            - title
+     * @param text
+     *            - message text
      */
     protected void showErrorMessage(String title, String text) {
         Utils.showErrorMessage(shell, title, text);
+    }
+
+    public void setHistoryManager(HistoryManager historyManager) {
+        this.historyManager = historyManager;
+    }
+
+    public HistoryManager getHistoryManager() {
+        return historyManager;
     }
 }
