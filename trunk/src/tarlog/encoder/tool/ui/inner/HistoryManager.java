@@ -4,11 +4,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.MenuAdapter;
+import org.eclipse.swt.events.MenuEvent;
+import org.eclipse.swt.events.MouseAdapter;
+import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Text;
 
 import tarlog.encoder.tool.ui.AbstractSelectionListener;
@@ -27,12 +33,62 @@ public class HistoryManager {
         label.setLayoutData(gridData);
         label.setText("History:");
         historyList = new org.eclipse.swt.widgets.List(rightComposite,
-            SWT.MULTI | SWT.BORDER | SWT.V_SCROLL);
+            SWT.SINGLE | SWT.BORDER | SWT.V_SCROLL);
         historyList.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-        historyList.addSelectionListener(new AbstractSelectionListener() {
+
+        // create menu
+        Menu menu = new Menu(historyList);
+        historyList.setMenu(menu);
+        final MenuItem removeMenuItem = new MenuItem(menu, SWT.NONE);
+        removeMenuItem.setText("Remove");
+        removeMenuItem.addSelectionListener(new AbstractSelectionListener() {
 
             @Override
             public void widgetSelected(SelectionEvent e) {
+                int selectionIndex = historyList.getSelectionIndex();
+                if (selectionIndex != -1) {
+                    history.remove(selectionIndex);
+                    historyList.removeAll();
+                    for (int i = 0; i < history.size(); ++i) {
+                        addToHistoryList(i, history.get(i).name);
+                    }
+                }
+            }
+        });
+
+        final MenuItem clearMenuItem = new MenuItem(menu, SWT.NONE);
+        clearMenuItem.setText("Clear");
+        clearMenuItem.addSelectionListener(new AbstractSelectionListener() {
+
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                history.clear();
+                historyList.removeAll();
+            }
+        });
+
+        menu.addMenuListener(new MenuAdapter() {
+
+            @Override
+            public void menuShown(MenuEvent e) {
+                int selectionIndex = historyList.getSelectionIndex();
+                if (selectionIndex != -1) {
+                    removeMenuItem.setEnabled(true);
+                } else {
+                    removeMenuItem.setEnabled(false);
+                }
+                if (historyList.getItemCount() > 0) {
+                    clearMenuItem.setEnabled(true);
+                } else {
+                    clearMenuItem.setEnabled(false);
+                }
+            }
+        });
+
+        historyList.addMouseListener(new MouseAdapter() {
+
+            @Override
+            public void mouseDoubleClick(MouseEvent e) {
                 int selectionIndex = historyList.getSelectionIndex();
                 if (selectionIndex != -1) {
                     Step step = history.get(selectionIndex);
@@ -59,7 +115,11 @@ public class HistoryManager {
 
         history.add(new Step(name, sourceText.getText(), targetText.getText(),
             sourceBytesButtonSelection, targetBytesButtonSelection));
-        historyList.add(name);
+        addToHistoryList(history.size() - 1, name);
+    }
+    
+    private void addToHistoryList(int index, String name) {
+        historyList.add(String.format("%d. %s", index + 1, name), index);
     }
 
     private class Step {
