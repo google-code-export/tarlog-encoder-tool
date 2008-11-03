@@ -51,7 +51,7 @@ import tarlog.encoder.tool.ui.inner.SwapButton;
 public class EncoderTool extends ApplicationWindow {
 
     private static final String ENCODER_PROPERTIES = "encoder.properties";
-    private static final String VERSION            = "0.3.0";
+    private static final String VERSION            = "0.4.0";
 
     private Text                targetText;
     private Text                sourceText;
