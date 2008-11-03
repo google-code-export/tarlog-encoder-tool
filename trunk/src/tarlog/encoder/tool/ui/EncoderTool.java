@@ -165,18 +165,18 @@ public class EncoderTool extends ApplicationWindow {
     }
 
     private void createTopPart(Composite parent) {
-        Composite composite = new Composite(parent, SWT.BORDER);
-        composite.setLayout(new GridLayout(2, false));
-        sourceText = createTextEditor(composite, SWT.MULTI | SWT.BORDER);
-        Composite rightComposite = new Composite(composite, SWT.NONE);
+        SashForm sashForm = new SashForm(parent, SWT.HORIZONTAL);
+        Composite leftComposite = new Composite(sashForm, SWT.BORDER);
+        leftComposite.setLayout(new GridLayout(1, false));
+        sourceText = createTextEditor(leftComposite, SWT.MULTI | SWT.BORDER);
+        Composite rightComposite = new Composite(sashForm, SWT.BORDER);
         GridLayout gridLayout = new GridLayout();
-        gridLayout.marginHeight = 0;
-        gridLayout.marginWidth = 0;
         rightComposite.setLayout(gridLayout);
         GridData gridData = new GridData(SWT.CENTER, SWT.FILL, false, true);
         rightComposite.setLayoutData(gridData);
         new SwapButton(rightComposite, this);
         historyManager = new HistoryManager(rightComposite, this);
+        sashForm.setWeights(new int[] { 5, 1 });
     }
 
     private void createBottomPart(Composite parent) {
