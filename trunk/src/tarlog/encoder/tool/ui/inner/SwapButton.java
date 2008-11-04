@@ -9,14 +9,17 @@ import org.eclipse.swt.widgets.Text;
 
 import tarlog.encoder.tool.ui.AbstractSelectionListener;
 import tarlog.encoder.tool.ui.EncoderTool;
+import tarlog.encoder.tool.ui.GridComposite;
 
-public class SwapButton {
+public class SwapButton extends GridComposite{
 
-    public SwapButton(final Composite rightComposite,
+    public SwapButton(final Composite parent,
         final EncoderTool encoderTool) {
-        Button exchange = new Button(rightComposite, SWT.PUSH);
+        super(parent);
+        removeMargins();
+        setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, true, false));
+        Button exchange = new Button(this, SWT.PUSH);
         GridData gridData = new GridData(SWT.CENTER, SWT.CENTER, false, false);
-        gridData.verticalIndent = 50;
         exchange.setLayoutData(gridData);
         exchange.setText("<>");
         exchange.setToolTipText("Swap input");
