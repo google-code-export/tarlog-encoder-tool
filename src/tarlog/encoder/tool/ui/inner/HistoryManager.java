@@ -30,7 +30,6 @@ public class HistoryManager {
         final EncoderTool encoderTool) {
         Label label = new Label(rightComposite, SWT.NONE);
         GridData gridData = new GridData(SWT.LEFT, SWT.BOTTOM, false, false);
-        gridData.verticalIndent = 15;
         label.setLayoutData(gridData);
         label.setText("History:");
         historyList = new org.eclipse.swt.widgets.List(rightComposite,

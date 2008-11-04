@@ -2,8 +2,6 @@ package tarlog.encoder.tool.ui.inner;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
@@ -11,20 +9,26 @@ import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
 
+import tarlog.encoder.tool.ui.GridComposite;
 
+public class InputTextEditor extends GridComposite {
 
-public class InputTextEditor extends Composite {
+    private final Text          text;
+    private final GridComposite bottomComposite;
 
-    private final Text text;
+    public GridComposite getBottomComposite() {
+        return bottomComposite;
+    }
 
     public InputTextEditor(Composite parent, int style) {
         super(parent, style);
-        setLayout(new GridLayout());
+//        removeMargins();
         setLayoutData(new GridData(GridData.FILL_BOTH));
         text = new Text(this, style | SWT.WRAP | SWT.V_SCROLL | SWT.BORDER);
         getText().setLayoutData(new GridData(GridData.FILL_BOTH));
-        Composite bottomComposite = new Composite(this, SWT.NONE);
-        bottomComposite.setLayout(new RowLayout(SWT.HORIZONTAL));
+        bottomComposite = new GridComposite(this, SWT.NONE, 2);
+        bottomComposite.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true,
+            false));
         final Button showBytesButton = new Button(bottomComposite, SWT.CHECK);
         showBytesButton.setData(getText());
         getText().setData(showBytesButton);
@@ -40,7 +44,7 @@ public class InputTextEditor extends Composite {
         });
     }
 
-    public Text getText() {
+    public final Text getText() {
         return text;
     }
 
