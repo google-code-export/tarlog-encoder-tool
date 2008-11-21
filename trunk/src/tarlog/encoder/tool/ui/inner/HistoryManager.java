@@ -18,7 +18,7 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Text;
 
 import tarlog.encoder.tool.ui.AbstractSelectionListener;
-import tarlog.encoder.tool.ui.EncoderTool;
+import tarlog.encoder.tool.ui.EncoderUI;
 
 public class HistoryManager {
 
@@ -27,7 +27,7 @@ public class HistoryManager {
     private final int                          MAX_HISTORY_SIZE = 50;
 
     public HistoryManager(final Composite rightComposite,
-        final EncoderTool encoderTool) {
+        final EncoderUI encoderTool) {
         Label label = new Label(rightComposite, SWT.NONE);
         GridData gridData = new GridData(SWT.LEFT, SWT.BOTTOM, false, false);
         label.setLayoutData(gridData);

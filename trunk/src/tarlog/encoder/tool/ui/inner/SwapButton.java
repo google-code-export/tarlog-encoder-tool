@@ -8,13 +8,13 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Text;
 
 import tarlog.encoder.tool.ui.AbstractSelectionListener;
-import tarlog.encoder.tool.ui.EncoderTool;
+import tarlog.encoder.tool.ui.EncoderUI;
 import tarlog.encoder.tool.ui.GridComposite;
 
 public class SwapButton extends GridComposite{
 
     public SwapButton(final Composite parent,
-        final EncoderTool encoderTool) {
+        final EncoderUI encoderTool) {
         super(parent);
         removeMargins();
         setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, true, false));
