@@ -49,4 +49,30 @@
             class="tarlog.encoder.tool.eclipse.preferences.PreferenceInitializer">
       </initializer>
    </extension>
+   <extension
+         point="org.eclipse.ui.views">
+      <category
+            id="tarlog.encoder.tool"
+            name="Encoder Tools">
+      </category>
+      <view
+            category="tarlog.encoder.tool"
+            class="tarlog.encoder.tool.views.EncoderView"
+            icon="icons/encoders.jpg"
+            id="tarlog.encoder.tool.views.EncoderView"
+            name="Encoder">
+      </view>
+   </extension>
+   <extension
+         point="org.eclipse.ui.perspectiveExtensions">
+      <perspectiveExtension
+            targetID="org.eclipse.jdt.ui.JavaPerspective">
+         <view
+               id="tarlog.encoder.tool.views.EncoderView"
+               ratio="0.5"
+               relationship="right"
+               relative="org.eclipse.ui.views.TaskList">
+         </view>
+      </perspectiveExtension>
+   </extension>
    </plugin>
