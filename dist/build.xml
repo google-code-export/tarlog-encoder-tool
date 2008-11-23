@@ -12,8 +12,9 @@
 	<property name="encoder.jar.name" value="encoder-${encoder.version}.jar" />
 	<property name="encoder.zip.name" value="encoder-${encoder.version}.zip" />
 	<property name="icons.dir" value="${basedir}/../icons" />
-
+	
 	<fileset dir="${eclipse.plugins}" id="third.parties">
+		<include name="org.apache.commons.lang_2.3.0.v200803061910.jar" />
 		<include name="org.apache.commons.codec_1.3.0.v20080530-1600.jar" />
 		<include name="org.eclipse.ui_3.4.1.M20080910-0800.jar" />
 		<include name="org.eclipse.ui.workbench_3.4.1.M20080827-0800a.jar" />
