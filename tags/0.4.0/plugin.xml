@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.commands">
+      <category
+            id="tarlog.encoder.category.run"
+            name="Run Encoder">
+      </category>
+      <command
+            categoryId="tarlog.encoder.category.run"
+            id="tarlog.encoder.commands.run"
+            name="Sample Command">
+      </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.handlers">
+      <handler
+            class="tarlog.encoder.tool.eclipse.handlers.Handler"
+            commandId="tarlog.encoder.commands.run">
+      </handler>
+   </extension>
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            locationURI="toolbar:org.eclipse.ui.main.toolbar?after=additions">
+         <toolbar
+               id="tarlog.encoder.toolbar">
+            <command
+                  commandId="tarlog.encoder.commands.run"
+                  icon="icons/encoders.jpg"
+                  id="tarlog.encoder.toolbar.run"
+                  tooltip="Run Encoder">
+            </command>
+         </toolbar>
+      </menuContribution>
+   </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            class="tarlog.encoder.tool.eclipse.preferences.EncoderToolPreferencePage"
+            id="tarlog.encoder.tool.eclipse.preferences.EncoderToolPreferencePage"
+            name="Encoder Tool">
+      </page>
+   </extension>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="tarlog.encoder.tool.eclipse.preferences.PreferenceInitializer">
+      </initializer>
+   </extension>
+   <extension
+         point="org.eclipse.ui.views">
+      <category
+            id="tarlog.encoder.tool"
+            name="Encoder Tools">
+      </category>
+      <view
+            category="tarlog.encoder.tool"
+            class="tarlog.encoder.tool.views.EncoderView"
+            icon="icons/encoders.jpg"
+            id="tarlog.encoder.tool.views.EncoderView"
+            name="Encoder">
+      </view>
+   </extension>
+   <extension
+         point="org.eclipse.ui.perspectiveExtensions">
+      <perspectiveExtension
+            targetID="org.eclipse.jdt.ui.JavaPerspective">
+         <view
+               id="tarlog.encoder.tool.views.EncoderView"
+               ratio="0.5"
+               relationship="right"
+               relative="org.eclipse.ui.views.TaskList">
+         </view>
+      </perspectiveExtension>
+   </extension>
+   </plugin>
