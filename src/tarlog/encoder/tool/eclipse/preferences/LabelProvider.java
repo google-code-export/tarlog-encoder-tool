@@ -28,9 +28,10 @@ class LabelProvider implements ITableLabelProvider {
             if (element instanceof URL) {
                 return element.toString();
             }
-            if (element instanceof EncoderClassWrapper) {
-                EncoderClassWrapper classWrapper = (EncoderClassWrapper) element;
-                return "Class: " + classWrapper.className;
+            if (element instanceof StringWrapper) {
+                StringWrapper stringWrapper = (StringWrapper) element;
+                return String.format("%s: %s", stringWrapper.title,
+                    stringWrapper.string);
             }
 
             if (element instanceof EncoderClasspathWrapper) {

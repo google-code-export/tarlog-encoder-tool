@@ -98,6 +98,22 @@ public class DynamicInputDialog extends Dialog {
             final String fieldName = fieldWrapper.inputField.name().equals("") ? fieldWrapper.field.getName()
                 : fieldWrapper.inputField.name();
 
+            if (fieldWrapper.inputField.required()) {
+                validators.add(
+                    validators.isEmpty() ? 0 : validators.size() - 1,
+                    new Validator() {
+
+                        public String isValid() {
+                            Object value = fieldWrapper.getValue(object,
+                                fieldWrapper.field);
+                            if (value == null) {
+                                return fieldName + " is required";
+                            }
+                            return null;
+                        }
+                    });
+            }
+
             // create input field
             final Class<?> fieldType = fieldWrapper.field.getType();
             Control control;
@@ -136,20 +152,6 @@ public class DynamicInputDialog extends Dialog {
                     + fieldType.getName());
             }
 
-            if (fieldWrapper.inputField.required()) {
-                validators.add(
-                    validators.isEmpty() ? 0 : validators.size() - 1,
-                    new Validator() {
-
-                        public String isValid() {
-                            Object value = fieldWrapper.getValue(object, fieldWrapper.field);
-                            if (value == null) {
-                                return fieldName + " is required";
-                            }
-                            return null;
-                        }
-                    });
-            }
             control.setEnabled(fieldWrapper.inputField.enabled());
         }
         errorMessageText = new Text(composite, SWT.READ_ONLY | SWT.WRAP);

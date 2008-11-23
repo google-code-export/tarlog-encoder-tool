@@ -40,7 +40,7 @@ public class CreateText extends CreateField {
                     public String isValid() {
                         Object value = fieldWrapper.getValue(object,
                             fieldWrapper.field);
-                        if (((String) value).equals("")) {
+                        if (value == null || ((String) value).equals("")) {
                             return fieldName + " cannot be empty.";
                         }
                         return null;

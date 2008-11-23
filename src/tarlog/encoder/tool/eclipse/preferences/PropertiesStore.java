@@ -210,20 +210,19 @@ public class PropertiesStore {
 
         private boolean enabled = true;
 
-        public String getName() {
-            return name;
-        }
-
         @InputField(name = "Class name", required = true)
         @InputTextField(validateNotEmpty = true)
-        String   className;
+        String          className;
+
+        @InputField(name = "Encoding Method")
+        String          encodingMethod;
 
         @InputField(name = "Classpath")
         @InputFileField(buttonText = "Add jar", filterExtensions = { "*.jar",
             "*.*" }, relative = true)
         @InputDirectoryField(buttonText = "Add class folder")
         @InputListField(inputType = { InputType.UP, InputType.DOWN })
-        String[] classPath;
+        String[]        classPath;
 
         EncoderDef() {
 
@@ -242,6 +241,15 @@ public class PropertiesStore {
             } else {
                 enabled = true;
             }
+
+            if (preferenceStore.contains(prefix + "encodingMethod")) {
+                encodingMethod = isDefault ? preferenceStore.getDefaultString(prefix
+                    + "encodingMethod")
+                    : preferenceStore.getString(prefix + "encodingMethod");
+            } else {
+                encodingMethod = null;
+            }
+
             className = isDefault ? preferenceStore.getDefaultString(prefix
                 + "className")
                 : preferenceStore.getString(prefix + "className");
@@ -263,6 +271,7 @@ public class PropertiesStore {
             preferenceStore.setValue(prefix + "name", name);
             preferenceStore.setValue(prefix + "className", className);
             preferenceStore.setValue(prefix + "enabled", enabled);
+            preferenceStore.setValue(prefix + "encodingMethod", encodingMethod);
             if (classPath != null) {
                 preferenceStore.setValue(prefix + "classPath", classPath.length);
                 for (int k = 0; k < classPath.length; ++k) {
@@ -308,6 +317,14 @@ public class PropertiesStore {
 
         public boolean isEnabled() {
             return enabled;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public String getEncodingMethod() {
+            return encodingMethod;
         }
     }
 

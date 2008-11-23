@@ -150,6 +150,7 @@ public class EncoderUI extends SashForm {
                     encoder.setSource(sourceText);
                     encoder.setTarget(targetText);
                     encoder.setName(encoderDef.getName());
+                    encoder.setEncodingMethod(encoderDef.getEncodingMethod());
                     encoder.setShell(shell);
                     encoder.setHistoryManager(historyManager);
                     final Composite composite = new Composite(grouping,
