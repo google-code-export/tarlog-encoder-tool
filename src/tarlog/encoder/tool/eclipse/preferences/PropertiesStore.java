@@ -271,7 +271,10 @@ public class PropertiesStore {
             preferenceStore.setValue(prefix + "name", name);
             preferenceStore.setValue(prefix + "className", className);
             preferenceStore.setValue(prefix + "enabled", enabled);
-            preferenceStore.setValue(prefix + "encodingMethod", encodingMethod);
+            if (encodingMethod != null) {
+                preferenceStore.setValue(prefix + "encodingMethod",
+                    encodingMethod);
+            }
             if (classPath != null) {
                 preferenceStore.setValue(prefix + "classPath", classPath.length);
                 for (int k = 0; k < classPath.length; ++k) {

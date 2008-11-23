@@ -1,5 +1,8 @@
 package tarlog.encoder.tool.eclipse.preferences;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 
@@ -15,10 +18,17 @@ class ContentProvider implements ITreeContentProvider {
         }
         if (parentElement instanceof EncoderDef) {
             EncoderDef encoderDef = (EncoderDef) parentElement;
-            return new Object[] {
-                new StringWrapper("Class", encoderDef.className),
-                new StringWrapper("Encoding Method", encoderDef.encodingMethod),
-                new EncoderClasspathWrapper(encoderDef.classPath) };
+            List<Object> list = new ArrayList<Object>(3);
+            list.add(new StringWrapper("Class", encoderDef.className));
+            if (encoderDef.encodingMethod != null) {
+                list.add(new StringWrapper(
+                    "Encoding Method", encoderDef.encodingMethod));
+            }
+            if (encoderDef.classPath != null && encoderDef.classPath.length > 0) {
+                list.add(new EncoderClasspathWrapper(encoderDef.classPath));
+            }
+            
+            return list.toArray();
         }
         if (parentElement instanceof EncoderClasspathWrapper) {
             EncoderClasspathWrapper classpathWrapper = (EncoderClasspathWrapper) parentElement;
