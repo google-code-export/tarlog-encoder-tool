@@ -28,6 +28,7 @@ public abstract class AbstractEncoder extends AbstractSelectionListener {
     private Text           targetText;
     private Text           sourceText;
     private HistoryManager historyManager;
+    private String         encodingMethod = null;
     protected Shell        shell;
 
     public AbstractEncoder() {
@@ -76,10 +77,14 @@ public abstract class AbstractEncoder extends AbstractSelectionListener {
                 ((Button) targetText.getData()).setSelection(false);
                 targetText.setText(String.valueOf(out));
             }
-            historyManager.addStep(getName(), sourceText, targetText);
+            historyManager.addStep(historyInfo(), sourceText, targetText);
         } catch (Exception e1) {
             Utils.showException(shell, e1);
         }
+    }
+
+    protected String historyInfo() {
+        return getName();
     }
 
     /**
@@ -215,5 +220,13 @@ public abstract class AbstractEncoder extends AbstractSelectionListener {
 
     public HistoryManager getHistoryManager() {
         return historyManager;
+    }
+
+    public void setEncodingMethod(String encodingMethod) {
+        this.encodingMethod = encodingMethod;
+    }
+
+    public String getEncodingMethod() {
+        return encodingMethod;
     }
 }

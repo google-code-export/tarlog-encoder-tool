@@ -12,6 +12,7 @@ import org.eclipse.osgi.framework.adaptor.FilePath;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -96,6 +97,20 @@ public class CreateList extends CreateField {
         Object[] value = (Object[]) fieldWrapper.initialValue;
         if (value != null) {
             list.setItems(converter.toList(value));
+        }
+
+        if (inputDialog.toValidateInput()) {
+            list.addSelectionListener(new SelectionListener() {
+
+                public void widgetDefaultSelected(SelectionEvent arg0) {
+                    inputDialog.setFields();
+                    inputDialog.validateInput();
+
+                }
+
+                public void widgetSelected(SelectionEvent e) {
+                }
+            });
         }
 
         //        if (inputDialog.validator != null) {

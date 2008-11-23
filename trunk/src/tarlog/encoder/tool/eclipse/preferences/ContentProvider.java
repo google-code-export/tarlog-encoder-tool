@@ -6,7 +6,6 @@ import org.eclipse.jface.viewers.Viewer;
 import tarlog.encoder.tool.eclipse.preferences.PropertiesStore.EncoderDef;
 import tarlog.encoder.tool.eclipse.preferences.PropertiesStore.EncodersGroup;
 
-
 class ContentProvider implements ITreeContentProvider {
 
     public Object[] getChildren(Object parentElement) {
@@ -17,7 +16,8 @@ class ContentProvider implements ITreeContentProvider {
         if (parentElement instanceof EncoderDef) {
             EncoderDef encoderDef = (EncoderDef) parentElement;
             return new Object[] {
-                new EncoderClassWrapper(encoderDef.className),
+                new StringWrapper("Class", encoderDef.className),
+                new StringWrapper("Encoding Method", encoderDef.encodingMethod),
                 new EncoderClasspathWrapper(encoderDef.classPath) };
         }
         if (parentElement instanceof EncoderClasspathWrapper) {
@@ -47,7 +47,7 @@ class ContentProvider implements ITreeContentProvider {
             return true;
         }
 
-        if (element instanceof EncoderClassWrapper) {
+        if (element instanceof StringWrapper) {
             return false;
         }
 
@@ -89,4 +89,3 @@ class ContentProvider implements ITreeContentProvider {
     }
 
 }
-
