@@ -9,11 +9,11 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
-import tarlog.encoder.tool.Utils;
-import tarlog.encoder.tool.ui.AbstractSelectionListener;
-import tarlog.encoder.tool.ui.ddialog.DynamicInputDialog;
-import tarlog.encoder.tool.ui.ddialog.DynamicInputDialog.FieldWrapper;
 import tarlog.encoder.tool.ui.inner.HistoryManager;
+import tarlog.ui.swt.ddialog.impl.DynamicInputDialog;
+import tarlog.ui.swt.ddialog.impl.DynamicInputDialog.FieldWrapper;
+import tarlog.ui.swt.ddialog.utils.AbstractSelectionListener;
+import tarlog.ui.swt.ddialog.utils.Utils;
 
 /**
  * Basic class for all encoders. The implementing class should extend from this

@@ -11,13 +11,13 @@ import java.util.List;
 import org.eclipse.jface.preference.IPreferenceStore;
 
 import tarlog.encoder.tool.api.AbstractEncoder;
-import tarlog.encoder.tool.api.fields.InputDirectoryField;
-import tarlog.encoder.tool.api.fields.InputField;
-import tarlog.encoder.tool.api.fields.InputFileField;
-import tarlog.encoder.tool.api.fields.InputListField;
-import tarlog.encoder.tool.api.fields.InputTextField;
-import tarlog.encoder.tool.api.fields.Validator;
-import tarlog.encoder.tool.api.fields.InputListField.InputType;
+import tarlog.ui.swt.ddialog.api.fields.InputDirectoryField;
+import tarlog.ui.swt.ddialog.api.fields.InputField;
+import tarlog.ui.swt.ddialog.api.fields.InputFileField;
+import tarlog.ui.swt.ddialog.api.fields.InputListField;
+import tarlog.ui.swt.ddialog.api.fields.InputTextField;
+import tarlog.ui.swt.ddialog.api.fields.Validator;
+import tarlog.ui.swt.ddialog.api.fields.InputListField.InputType;
 
 public class PropertiesStore {
 

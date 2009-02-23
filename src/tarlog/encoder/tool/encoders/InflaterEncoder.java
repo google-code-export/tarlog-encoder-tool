@@ -3,7 +3,7 @@ package tarlog.encoder.tool.encoders;
 import java.util.zip.Inflater;
 
 import tarlog.encoder.tool.api.AbstractEncoder;
-import tarlog.encoder.tool.api.fields.InputField;
+import tarlog.ui.swt.ddialog.api.fields.InputField;
 
 public class InflaterEncoder extends AbstractEncoder {
 

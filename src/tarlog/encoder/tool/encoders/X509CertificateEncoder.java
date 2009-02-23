@@ -11,10 +11,10 @@ import java.security.cert.X509Certificate;
 import org.eclipse.jface.dialogs.Dialog;
 
 import tarlog.encoder.tool.SignatureAlgorithms;
-import tarlog.encoder.tool.Utils;
 import tarlog.encoder.tool.api.AbstractEncoder;
-import tarlog.encoder.tool.api.fields.InputField;
-import tarlog.encoder.tool.api.fields.InputTextField;
+import tarlog.ui.swt.ddialog.api.fields.InputField;
+import tarlog.ui.swt.ddialog.api.fields.InputTextField;
+import tarlog.ui.swt.ddialog.utils.Utils;
 
 public class X509CertificateEncoder extends AbstractEncoder {
 

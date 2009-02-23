@@ -35,13 +35,13 @@ import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
-import tarlog.encoder.tool.Utils;
-import tarlog.encoder.tool.api.fields.InputTextField;
 import tarlog.encoder.tool.eclipse.Activator;
 import tarlog.encoder.tool.eclipse.preferences.PropertiesStore.EncoderDef;
 import tarlog.encoder.tool.eclipse.preferences.PropertiesStore.EncodersGroup;
-import tarlog.encoder.tool.ui.AbstractSelectionListener;
-import tarlog.encoder.tool.ui.ddialog.DynamicInputDialog;
+import tarlog.ui.swt.ddialog.api.fields.InputTextField;
+import tarlog.ui.swt.ddialog.impl.DynamicInputDialog;
+import tarlog.ui.swt.ddialog.utils.AbstractSelectionListener;
+import tarlog.ui.swt.ddialog.utils.Utils;
 
 /**
  * This class represents a preference page that is contributed to the
