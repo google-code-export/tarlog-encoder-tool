@@ -6,7 +6,7 @@ import java.util.zip.Deflater;
 import java.util.zip.DeflaterOutputStream;
 
 import tarlog.encoder.tool.api.AbstractEncoder;
-import tarlog.encoder.tool.api.fields.InputField;
+import tarlog.ui.swt.ddialog.api.fields.InputField;
 
 public class DeflateEncoder extends AbstractEncoder {
 

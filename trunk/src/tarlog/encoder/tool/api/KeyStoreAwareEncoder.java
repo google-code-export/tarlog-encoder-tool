@@ -7,9 +7,9 @@ import java.security.KeyStoreException;
 
 import org.eclipse.jface.dialogs.Dialog;
 
-import tarlog.encoder.tool.api.fields.InputField;
-import tarlog.encoder.tool.api.fields.InputTextField;
-import tarlog.encoder.tool.api.fields.Validator;
+import tarlog.ui.swt.ddialog.api.fields.InputField;
+import tarlog.ui.swt.ddialog.api.fields.InputTextField;
+import tarlog.ui.swt.ddialog.api.fields.Validator;
 
 public abstract class KeyStoreAwareEncoder extends AbstractEncoder implements
     Validator {

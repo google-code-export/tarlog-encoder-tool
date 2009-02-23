@@ -19,8 +19,8 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
 
-import tarlog.encoder.tool.Utils;
 import tarlog.encoder.tool.eclipse.preferences.EncoderToolPreferencePage;
+import tarlog.ui.swt.ddialog.utils.Utils;
 
 /**
  *
@@ -29,7 +29,8 @@ public class EncoderTool extends ApplicationWindow {
 
     static final String         ENCODER_PROPERTIES = "encoder.properties";
     private static final String VERSION            = "0.4.0";
-
+    private static final String TITLE              = "Diagnostic Tool";
+    
     private Shell               shell;
     private boolean             standalone         = false;
     private EncoderUI           encoderUI;
@@ -88,7 +89,7 @@ public class EncoderTool extends ApplicationWindow {
             try {
                 EncoderToolPreferencePage page = new EncoderToolPreferencePage(
                     ENCODER_PROPERTIES);
-                page.setTitle("Diagnostic Tool");
+                page.setTitle(TITLE);
                 PreferenceManager mgr = new PreferenceManager();
                 IPreferenceNode node = new PreferenceNode("1", page);
                 mgr.addToRoot(node);
@@ -118,6 +119,23 @@ public class EncoderTool extends ApplicationWindow {
         return shell;
     }
 
+//    private void getVersion() {
+//        String className = ManifestReader.class.getSimpleName();
+//
+//        String classFileName = className + ".class";
+//
+//
+//        String pathToThisClass = ManifestReader.class.getResource(classFileName).toString();
+//
+//        int mark = pathToThisClass.indexOf("!");
+//
+//        String pathToManifest = pathToThisClass.substring(0, mark + 1);
+//
+//        pathToManifest += "/META-INF/MANIFEST.MF";
+//
+//        Manifest manifest = new Manifest(new URL(pathToManifest).openStream());
+//    }
+    
     /**
      * @param args
      * @throws Exception

@@ -4,10 +4,10 @@ import java.security.Signature;
 import java.security.cert.Certificate;
 
 import tarlog.encoder.tool.SignatureAlgorithms;
-import tarlog.encoder.tool.Utils;
 import tarlog.encoder.tool.api.KeyStoreAwareEncoder;
-import tarlog.encoder.tool.api.fields.InputField;
-import tarlog.encoder.tool.api.fields.InputTextField;
+import tarlog.ui.swt.ddialog.api.fields.InputField;
+import tarlog.ui.swt.ddialog.api.fields.InputTextField;
+import tarlog.ui.swt.ddialog.utils.Utils;
 
 public class VerifySignature extends KeyStoreAwareEncoder {
 

@@ -21,7 +21,6 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
-import tarlog.encoder.tool.Utils;
 import tarlog.encoder.tool.api.AbstractEncoder;
 import tarlog.encoder.tool.api.Initiable;
 import tarlog.encoder.tool.eclipse.Activator;
@@ -31,6 +30,8 @@ import tarlog.encoder.tool.eclipse.preferences.PropertiesStore.EncodersGroup;
 import tarlog.encoder.tool.ui.inner.HistoryManager;
 import tarlog.encoder.tool.ui.inner.InputTextEditor;
 import tarlog.encoder.tool.ui.inner.SwapButton;
+import tarlog.ui.swt.ddialog.utils.AbstractSelectionListener;
+import tarlog.ui.swt.ddialog.utils.Utils;
 
 public class EncoderUI extends SashForm {
 

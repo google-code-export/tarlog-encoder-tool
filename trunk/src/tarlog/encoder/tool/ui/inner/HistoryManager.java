@@ -17,8 +17,8 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Text;
 
-import tarlog.encoder.tool.ui.AbstractSelectionListener;
 import tarlog.encoder.tool.ui.EncoderUI;
+import tarlog.ui.swt.ddialog.utils.AbstractSelectionListener;
 
 public class HistoryManager {
 

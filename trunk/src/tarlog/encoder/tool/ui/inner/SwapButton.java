@@ -7,9 +7,9 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Text;
 
-import tarlog.encoder.tool.ui.AbstractSelectionListener;
 import tarlog.encoder.tool.ui.EncoderUI;
 import tarlog.encoder.tool.ui.GridComposite;
+import tarlog.ui.swt.ddialog.utils.AbstractSelectionListener;
 
 public class SwapButton extends GridComposite{
 

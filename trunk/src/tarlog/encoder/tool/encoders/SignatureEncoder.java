@@ -5,8 +5,8 @@ import java.security.Signature;
 
 import tarlog.encoder.tool.SignatureAlgorithms;
 import tarlog.encoder.tool.api.KeyStoreAwareEncoder;
-import tarlog.encoder.tool.api.fields.InputField;
-import tarlog.encoder.tool.api.fields.InputTextField;
+import tarlog.ui.swt.ddialog.api.fields.InputField;
+import tarlog.ui.swt.ddialog.api.fields.InputTextField;
 
 public class SignatureEncoder extends KeyStoreAwareEncoder {
 
