@@ -1,6 +1,9 @@
 package tarlog.encoder.tool.ui.inner;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseWheelListener;
+import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
@@ -20,15 +23,25 @@ public class InputTextEditor extends GridComposite {
         return bottomComposite;
     }
 
-    public InputTextEditor(Composite parent, int style) {
+    public InputTextEditor(final Composite parent, int style) {
         super(parent, style);
-//        removeMargins();
+        //        removeMargins();
         setLayoutData(new GridData(GridData.FILL_BOTH));
         text = new Text(this, style | SWT.WRAP | SWT.V_SCROLL | SWT.BORDER);
+
+        text.addMouseWheelListener(new MouseWheelListener() {
+
+            public void mouseScrolled(MouseEvent event) {
+                System.out.println(event.count);
+                FontData fontData = text.getFont().getFontData()[0];
+                fontData.setHeight(fontData.getHeight() + event.count);
+                parent.layout();
+            }
+        });
+
         getText().setLayoutData(new GridData(GridData.FILL_BOTH));
         bottomComposite = new GridComposite(this, SWT.NONE, 2);
-        bottomComposite.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true,
-            false));
+        bottomComposite.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
         final Button showBytesButton = new Button(bottomComposite, SWT.CHECK);
         showBytesButton.setData(getText());
         getText().setData(showBytesButton);
@@ -42,6 +55,7 @@ public class InputTextEditor extends GridComposite {
                 getText().setText("");
             }
         });
+        
     }
 
     public final Text getText() {
