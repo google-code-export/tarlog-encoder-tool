@@ -203,7 +203,7 @@ public class EncoderUI extends SashForm {
     }
 
     private Text createTextEditor(Composite parent, int style) {
-        InputTextEditor textEditor = new InputTextEditor(parent, SWT.NONE);
+        InputTextEditor textEditor = new InputTextEditor(parent, SWT.READ_ONLY);
         return textEditor.getText();
     }
 
