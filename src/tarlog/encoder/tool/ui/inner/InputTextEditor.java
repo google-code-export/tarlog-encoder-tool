@@ -5,15 +5,14 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.charset.Charset;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
-import org.eclipse.swt.events.MouseEvent;
-import org.eclipse.swt.events.MouseWheelListener;
-import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.FileDialog;
@@ -39,16 +38,6 @@ public class InputTextEditor extends GridComposite {
         setLayoutData(new GridData(GridData.FILL_BOTH));
         text = new Text(this, style | SWT.WRAP | SWT.V_SCROLL | SWT.BORDER);
 
-        text.addMouseWheelListener(new MouseWheelListener() {
-
-            public void mouseScrolled(MouseEvent event) {
-                System.out.println(event.count);
-                FontData fontData = text.getFont().getFontData()[0];
-                fontData.setHeight(fontData.getHeight() + event.count);
-                parent.layout();
-            }
-        });
-
         text.addKeyListener(new KeyAdapter() {
 
             public void keyPressed(KeyEvent e) {
@@ -64,13 +53,27 @@ public class InputTextEditor extends GridComposite {
         });
 
         text.setLayoutData(new GridData(GridData.FILL_BOTH));
-        bottomComposite = new GridComposite(this, SWT.NONE, readonly ? 2 : 3);
+
+        bottomComposite = new GridComposite(this, SWT.NONE, readonly ? 3 : 4);
         bottomComposite.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+
+        // Show bytes
         final Button showBytesButton = new Button(bottomComposite, SWT.CHECK);
         showBytesButton.setData(getText());
-        getText().setData(showBytesButton);
+        text.setData(showBytesButton);
         showBytesButton.setText("Show bytes");
         showBytesButton.addSelectionListener(new ShowBytesListener());
+
+        // Charset
+        Combo combo = new Combo(bottomComposite, SWT.DROP_DOWN);
+        combo.add("UTF-8");
+        combo.add("UTF-16");
+        combo.add("US-ASCII");
+        combo.add("ISO-8859-1");
+        combo.select(0);
+        text.setData(Charset.class.getName(), combo);
+
+        // Clean Link
         Link cleanLink = new Link(bottomComposite, SWT.NONE);
         cleanLink.setText("<a>Clean</a>");
         cleanLink.addListener(SWT.Selection, new Listener() {
@@ -80,6 +83,7 @@ public class InputTextEditor extends GridComposite {
             }
         });
 
+        // Import Link
         if (!readonly) {
             Link importLink = new Link(bottomComposite, SWT.NONE);
             importLink.setText("<a>Import</a>");
