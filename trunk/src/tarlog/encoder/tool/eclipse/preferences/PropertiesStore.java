@@ -306,7 +306,7 @@ public class PropertiesStore {
             if (classPath != null) {
                 URL[] urls = new URL[classPath.length];
                 for (int i = 0; i < classPath.length; ++i) {
-                    urls[i] = new File(classPath[i]).toURL();
+                    urls[i] = new File(classPath[i]).toURI().toURL();
                 }
                 classLoader = new URLClassLoader(urls,
                     getClass().getClassLoader());
