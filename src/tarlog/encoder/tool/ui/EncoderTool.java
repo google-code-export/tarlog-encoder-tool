@@ -17,9 +17,11 @@ import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.ImageLoader;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
 import tarlog.encoder.tool.eclipse.preferences.EncoderToolPreferencePage;
+import tarlog.encoder.tool.ui.inner.ExitAction;
 import tarlog.ui.swt.ddialog.utils.Utils;
 
 /**
@@ -28,9 +30,9 @@ import tarlog.ui.swt.ddialog.utils.Utils;
 public class EncoderTool extends ApplicationWindow {
 
     static final String         ENCODER_PROPERTIES = "encoder.properties";
-    private static final String VERSION            = "0.4.0";
+    private static final String VERSION            = "0.5.0";
     private static final String TITLE              = "Diagnostic Tool";
-    
+
     private Shell               shell;
     private boolean             standalone         = false;
     private EncoderUI           encoderUI;
@@ -65,6 +67,7 @@ public class EncoderTool extends ApplicationWindow {
         // create menu only when stand alone
         MenuManager fileMenuManager = new MenuManager("&File");
         fileMenuManager.add(new OpenPreferencesAction());
+        fileMenuManager.add(new ExitAction(this));
         menuManager.add(fileMenuManager);
 
         //        SaveAction saveAction = new SaveAction();
@@ -87,8 +90,7 @@ public class EncoderTool extends ApplicationWindow {
         @Override
         public void run() {
             try {
-                EncoderToolPreferencePage page = new EncoderToolPreferencePage(
-                    ENCODER_PROPERTIES);
+                EncoderToolPreferencePage page = new EncoderToolPreferencePage(ENCODER_PROPERTIES);
                 page.setTitle(TITLE);
                 PreferenceManager mgr = new PreferenceManager();
                 IPreferenceNode node = new PreferenceNode("1", page);
@@ -119,23 +121,23 @@ public class EncoderTool extends ApplicationWindow {
         return shell;
     }
 
-//    private void getVersion() {
-//        String className = ManifestReader.class.getSimpleName();
-//
-//        String classFileName = className + ".class";
-//
-//
-//        String pathToThisClass = ManifestReader.class.getResource(classFileName).toString();
-//
-//        int mark = pathToThisClass.indexOf("!");
-//
-//        String pathToManifest = pathToThisClass.substring(0, mark + 1);
-//
-//        pathToManifest += "/META-INF/MANIFEST.MF";
-//
-//        Manifest manifest = new Manifest(new URL(pathToManifest).openStream());
-//    }
-    
+    //    private void getVersion() {
+    //        String className = ManifestReader.class.getSimpleName();
+    //
+    //        String classFileName = className + ".class";
+    //
+    //
+    //        String pathToThisClass = ManifestReader.class.getResource(classFileName).toString();
+    //
+    //        int mark = pathToThisClass.indexOf("!");
+    //
+    //        String pathToManifest = pathToThisClass.substring(0, mark + 1);
+    //
+    //        pathToManifest += "/META-INF/MANIFEST.MF";
+    //
+    //        Manifest manifest = new Manifest(new URL(pathToManifest).openStream());
+    //    }
+
     /**
      * @param args
      * @throws Exception
@@ -144,6 +146,7 @@ public class EncoderTool extends ApplicationWindow {
         EncoderTool encoderTool = new EncoderTool();
         encoderTool.standalone = true;
         encoderTool.init();
+        Display.getCurrent().dispose();
     }
 
 }
