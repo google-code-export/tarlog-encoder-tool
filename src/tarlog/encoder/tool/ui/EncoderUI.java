@@ -58,8 +58,7 @@ public class EncoderUI extends SashForm {
     private void createTopPart(Composite parent) {
         SashForm sashForm = new SashForm(parent, SWT.HORIZONTAL);
         Composite leftComposite = new GridComposite(sashForm);
-        InputTextEditor textEditor = new InputTextEditor(leftComposite,
-            SWT.MULTI | SWT.BORDER);
+        InputTextEditor textEditor = new InputTextEditor(leftComposite, SWT.MULTI | SWT.BORDER);
         sourceText = textEditor.getText();
         Composite textEditorBottomComposite = textEditor.getBottomComposite();
         ((GridLayout) textEditorBottomComposite.getLayout()).numColumns++;
@@ -80,11 +79,9 @@ public class EncoderUI extends SashForm {
 
     private void createLeftPart(Composite parent) {
         ScrolledComposite scrolledComposite = null;
-        scrolledComposite = new ScrolledComposite(parent, SWT.BORDER
-            | SWT.V_SCROLL | SWT.H_SCROLL);
+        scrolledComposite = new ScrolledComposite(parent, SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
         scrolledComposite.setLayout(new GridLayout());
-        scrolledComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true,
-            true));
+        scrolledComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
         parent = scrolledComposite;
 
         leftComposite = new Composite(parent, SWT.NONE);
@@ -99,8 +96,7 @@ public class EncoderUI extends SashForm {
         try {
             IPreferenceStore preferenceStore;
             if (standalone) {
-                PreferenceStore store = new PreferenceStore(
-                    EncoderTool.ENCODER_PROPERTIES);
+                PreferenceStore store = new PreferenceStore(EncoderTool.ENCODER_PROPERTIES);
                 store.load();
                 preferenceStore = store;
             } else {
@@ -154,10 +150,8 @@ public class EncoderUI extends SashForm {
                     encoder.setEncodingMethod(encoderDef.getEncodingMethod());
                     encoder.setShell(shell);
                     encoder.setHistoryManager(historyManager);
-                    final Composite composite = new Composite(grouping,
-                        SWT.NONE);
-                    composite.setLayoutData(new GridData(SWT.FILL, SWT.FILL,
-                        true, true));
+                    final Composite composite = new Composite(grouping, SWT.NONE);
+                    composite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
                     RowLayout layout = new RowLayout();
                     layout.type = SWT.HORIZONTAL;
                     composite.setLayout(layout);
@@ -181,8 +175,8 @@ public class EncoderUI extends SashForm {
 
                             public void widgetSelected(SelectionEvent e) {
                                 ((Initiable) encoder).init();
-                                leftComposite.setSize(leftComposite.computeSize(
-                                    SWT.DEFAULT, SWT.DEFAULT));
+                                leftComposite.setSize(leftComposite.computeSize(SWT.DEFAULT,
+                                    SWT.DEFAULT));
                             }
                         });
                     }
@@ -191,20 +185,13 @@ public class EncoderUI extends SashForm {
                 }
             }
         }
-        leftComposite.setSize(leftComposite.computeSize(SWT.DEFAULT,
-            SWT.DEFAULT));
+        leftComposite.setSize(leftComposite.computeSize(SWT.DEFAULT, SWT.DEFAULT));
     }
 
     private void createRightPart(Composite parent) {
-        Composite rightComposite = new Composite(parent, SWT.BORDER);
-        rightComposite.setLayout(new GridLayout());
-        targetText = createTextEditor(rightComposite, SWT.MULTI | SWT.READ_ONLY
+        InputTextEditor textEditor = new InputTextEditor(parent, SWT.MULTI | SWT.READ_ONLY
             | SWT.BORDER);
-    }
-
-    private Text createTextEditor(Composite parent, int style) {
-        InputTextEditor textEditor = new InputTextEditor(parent, style);
-        return textEditor.getText();
+        targetText = textEditor.getText();
     }
 
     public Text getTargetText() {
