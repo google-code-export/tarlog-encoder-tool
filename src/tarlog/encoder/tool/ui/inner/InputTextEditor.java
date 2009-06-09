@@ -2,10 +2,12 @@ package tarlog.encoder.tool.ui.inner;
 
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
+import java.nio.charset.UnsupportedCharsetException;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyAdapter;
@@ -54,17 +56,37 @@ public class InputTextEditor extends GridComposite {
 
         text.setLayoutData(new GridData(GridData.FILL_BOTH));
 
-        bottomComposite = new GridComposite(this, SWT.NONE, readonly ? 3 : 4);
+        bottomComposite = new GridComposite(this, SWT.NONE, readonly ? 4 : 5);
+        bottomComposite.removeMargins();
         bottomComposite.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 
         // Show bytes
+        createShowBytesButton();
+
+        // Charset
+        createCharsetCombo();
+
+        // Clean Link
+        createCleanLink();
+
+        // Import Link
+        if (!readonly) {
+            createImportLink();
+        }
+
+        // Export Link
+        createExportLink();
+    }
+
+    private void createShowBytesButton() {
         final Button showBytesButton = new Button(bottomComposite, SWT.CHECK);
-        showBytesButton.setData(getText());
+        showBytesButton.setData(text);
         text.setData(showBytesButton);
         showBytesButton.setText("Show bytes");
         showBytesButton.addSelectionListener(new ShowBytesListener());
+    }
 
-        // Charset
+    private void createCharsetCombo() {
         Combo combo = new Combo(bottomComposite, SWT.DROP_DOWN);
         combo.add("UTF-8");
         combo.add("UTF-16");
@@ -72,8 +94,9 @@ public class InputTextEditor extends GridComposite {
         combo.add("ISO-8859-1");
         combo.select(0);
         text.setData(Charset.class.getName(), combo);
+    }
 
-        // Clean Link
+    private void createCleanLink() {
         Link cleanLink = new Link(bottomComposite, SWT.NONE);
         cleanLink.setText("<a>Clean</a>");
         cleanLink.addListener(SWT.Selection, new Listener() {
@@ -82,40 +105,82 @@ public class InputTextEditor extends GridComposite {
                 text.setText("");
             }
         });
+    }
 
-        // Import Link
-        if (!readonly) {
-            Link importLink = new Link(bottomComposite, SWT.NONE);
-            importLink.setText("<a>Import</a>");
-            importLink.addListener(SWT.Selection, new Listener() {
+    private void createImportLink() {
+        Link importLink = new Link(bottomComposite, SWT.NONE);
+        importLink.setText("<a>Import</a>");
+        importLink.addListener(SWT.Selection, new Listener() {
 
-                public void handleEvent(Event event) {
-                    FileInputStream is = null;
-                    try {
-                        FileDialog fileDialog = new FileDialog(getShell(), SWT.OPEN);
-                        String name = fileDialog.open();
-                        if (name != null) {
-                            is = new FileInputStream(name);
-                            ByteArrayOutputStream os = new ByteArrayOutputStream();
-                            copyStream(is, os);
-                            String bytes = Utils.bytesToHex(os.toByteArray());
-                            ((Button) text.getData()).setSelection(true);
-                            text.setText(bytes);
-                        }
-                    } catch (IOException e) {
-                        Utils.showException(getShell(), e);
-                    } finally {
-                        if (is != null) {
-                            try {
-                                is.close();
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
+            public void handleEvent(Event event) {
+                FileInputStream is = null;
+                try {
+                    FileDialog fileDialog = new FileDialog(getShell(), SWT.OPEN);
+                    String name = fileDialog.open();
+                    if (name != null) {
+                        is = new FileInputStream(name);
+                        ByteArrayOutputStream os = new ByteArrayOutputStream();
+                        copyStream(is, os);
+                        String bytes = Utils.bytesToHex(os.toByteArray());
+                        ((Button) text.getData()).setSelection(true);
+                        text.setText(bytes);
+                    }
+                } catch (IOException e) {
+                    Utils.showException(getShell(), e);
+                } finally {
+                    if (is != null) {
+                        try {
+                            is.close();
+                        } catch (IOException e) {
+                            e.printStackTrace();
                         }
                     }
                 }
-            });
-        }
+            }
+        });
+    }
+
+    private void createExportLink() {
+        Link importLink = new Link(bottomComposite, SWT.NONE);
+        importLink.setText("<a>Export</a>");
+        importLink.addListener(SWT.Selection, new Listener() {
+
+            public void handleEvent(Event event) {
+                FileOutputStream os = null;
+                String charsetText = null;
+                try {
+                    FileDialog fileDialog = new FileDialog(getShell(), SWT.SAVE);
+                    String name = fileDialog.open();
+                    byte[] bytes = null;
+                    if (name != null) {
+                        boolean selection = ((Button) text.getData()).getSelection();
+                        if (selection) {
+                            bytes = Utils.bytesFromHex(text.getText());
+                        } else {
+                            Combo charsetCombo = (Combo) text.getData(Charset.class.getName());
+                            charsetText = charsetCombo.getText();
+                            Charset charset = Charset.forName(charsetText);
+                            bytes = text.getText().getBytes(charset);
+                        }
+                        os = new FileOutputStream(name);
+                        os.write(bytes);
+                    }
+                } catch (UnsupportedCharsetException e1) {
+                    Utils.showErrorMessage(getShell(), "Unsupported charset",
+                        "Unsupported charset: " + charsetText);
+                } catch (Exception e) {
+                    Utils.showException(getShell(), e);
+                } finally {
+                    if (os != null) {
+                        try {
+                            os.close();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            }
+        });
     }
 
     private static void copyStream(InputStream src, OutputStream dst) throws IOException {
