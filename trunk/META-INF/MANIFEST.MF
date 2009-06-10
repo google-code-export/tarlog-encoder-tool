@@ -4,6 +4,10 @@ Bundle-Name: Encoder Tool
 Bundle-SymbolicName: tarlog.encoder.tool;singleton:=true
 Bundle-Version: 0.5.0
 Export-Package: tarlog.encoder.tool,
+ tarlog.encoder.tool.api,
+ tarlog.encoder.tool.eclipse,
+ tarlog.encoder.tool.eclipse.handlers,
+ tarlog.encoder.tool.eclipse.preferences,
  tarlog.encoder.tool.encoders;uses:="tarlog.encoder.tool.api",
  tarlog.encoder.tool.ui;
   uses:="org.eclipse.jface.window,
@@ -11,7 +15,15 @@ Export-Package: tarlog.encoder.tool,
    org.eclipse.swt.custom,
    org.eclipse.jface.viewers,
    org.eclipse.swt.widgets,
-   org.eclipse.swt.layout"
+   org.eclipse.swt.layout",
+ tarlog.encoder.tool.ui.inner,
+ tarlog.encoder.tool.views,
+ tarlog.ui.swt.ddialog.api.fields,
+ tarlog.ui.swt.ddialog.csv,
+ tarlog.ui.swt.ddialog.csv.mapper,
+ tarlog.ui.swt.ddialog.csv.model,
+ tarlog.ui.swt.ddialog.impl,
+ tarlog.ui.swt.ddialog.utils
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.apache.commons.codec;bundle-version="1.3.0",
