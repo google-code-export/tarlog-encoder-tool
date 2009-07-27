@@ -1,5 +1,0 @@
-This package contains classes at API level. 
-This means that changes of the classes in this package and of its sub-packages must be done 
-with the respect to the backward compatibility.
-
-Other packages are free of this limitation. 
