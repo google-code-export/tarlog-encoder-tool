@@ -1,9 +1,27 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry exported="true" kind="lib" path="dist/ddialog-1.0-SNAPSHOT.jar"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/jre6"/>
-	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
-	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="src" path="META-INF"/>
-	<classpathentry kind="output" path="bin"/>
+  <classpathentry kind="src" path="src/main/java" including="**/*.java"/>
+  <classpathentry kind="output" path="target/classes"/>
+  <classpathentry kind="var" path="M2_REPO/org/eclipse/core/commands/3.4/commands-3.4.jar" sourcepath="M2_REPO/org/eclipse/core/commands/3.4/commands-3.4-sources.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/eclipse/equinox/common/3.4/common-3.4.jar" sourcepath="M2_REPO/org/eclipse/equinox/common/3.4/common-3.4-sources.jar"/>
+  <classpathentry kind="var" path="M2_REPO/commons-codec/commons-codec/1.3/commons-codec-1.3.jar" sourcepath="M2_REPO/commons-codec/commons-codec/1.3/commons-codec-1.3-sources.jar">
+    <attributes>
+      <attribute value="jar:file:/C:/Documents%20and%20Settings/elman/.m2/repository/commons-codec/commons-codec/1.3/commons-codec-1.3-javadoc.jar!/" name="javadoc_location"/>
+    </attributes>
+  </classpathentry>
+  <classpathentry kind="var" path="M2_REPO/commons-lang/commons-lang/2.4/commons-lang-2.4.jar" sourcepath="M2_REPO/commons-lang/commons-lang/2.4/commons-lang-2.4-sources.jar">
+    <attributes>
+      <attribute value="jar:file:/C:/Documents%20and%20Settings/elman/.m2/repository/commons-lang/commons-lang/2.4/commons-lang-2.4-javadoc.jar!/" name="javadoc_location"/>
+    </attributes>
+  </classpathentry>
+  <classpathentry kind="var" path="M2_REPO/tarlog/ui/swt/ddialog/1.0-SNAPSHOT/ddialog-1.0-SNAPSHOT.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/eclipse/jface/3.4.1/jface-3.4.1.jar" sourcepath="M2_REPO/org/eclipse/jface/3.4.1/jface-3.4.1-sources.jar"/>
+  <classpathentry kind="var" path="M2_REPO/junit/junit/3.8.1/junit-3.8.1.jar" sourcepath="M2_REPO/junit/junit/3.8.1/junit-3.8.1-sources.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/eclipse/osgi/3.4.2/osgi-3.4.2.jar" sourcepath="M2_REPO/org/eclipse/osgi/3.4.2/osgi-3.4.2-sources.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/eclipse/equinox/preferences/3.2.300/preferences-3.2.300.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/eclipse/equinox/registry/3.4/registry-3.4.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/eclipse/core/runtime/3.5/runtime-3.5.jar"/>
+  <classpathentry kind="var" path="M2_REPO/tarlog/shavtsak/shavtsak-core/1.0-SNAPSHOT/shavtsak-core-1.0-SNAPSHOT.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/eclipse/swt/3.5/swt-3.5.jar" sourcepath="M2_REPO/org/eclipse/swt/3.5/swt-3.5-sources.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/eclipse/ui/workbench/3.4.1/workbench-3.4.1.jar" sourcepath="M2_REPO/org/eclipse/ui/workbench/3.4.1/workbench-3.4.1-sources.jar"/>
+  <classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 </classpath>
