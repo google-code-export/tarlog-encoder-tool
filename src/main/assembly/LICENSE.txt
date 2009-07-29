@@ -1,4 +1,4 @@
-   Copyright 2008 Michael Elman (aka tarlog - http://tarlogonjava.blogspot.com) 
+   Copyright 2009 Michael Elman (http://tarlogonjava.blogspot.com) 
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.

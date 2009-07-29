@@ -5,7 +5,7 @@ To run Encoder as stand alone application, run
 	javaw -jar @JAR_FILE_NAME@
 	
 from the command line.
-Of cause you need JRE installed and be in your path.
+Of course you need JRE installed and be in your path.
 
 
 To run Encoder as Eclipse plugin, download plugin version from the Official site.
