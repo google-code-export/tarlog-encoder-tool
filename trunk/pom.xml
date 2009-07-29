@@ -4,10 +4,34 @@
 	<groupId>tarlog.tools.encoder</groupId>
 	<artifactId>encoder</artifactId>
 	<packaging>jar</packaging>
-	<version>0.5.1-SNAPSHOT</version>
+	<version>0.5.1</version>
 	<name>${artifactId}-${version}</name>
 	<url>http://tarlogonjava.blogspot.com/</url>
 	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<configuration>
+					<archive>
+						<manifest>
+							<addClasspath>true</addClasspath>
+							<mainClass>tarlog.encoder.tool.ui.EncoderTool</mainClass>
+							<classpathPrefix>lib</classpathPrefix>
+						</manifest>
+					</archive>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<configuration>
+					<descriptors>
+						<descriptor>src/main/assembly/src.xml</descriptor>
+					</descriptors>
+				</configuration>
+			</plugin>
+		</plugins>
 		<pluginManagement>
 			<plugins>
 				<plugin>
