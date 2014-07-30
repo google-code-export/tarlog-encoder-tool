@@ -46,7 +46,7 @@ import tarlog.ui.swt.ddialog.utils.Utils;
 public class EncoderTool extends ApplicationWindow {
 
     static final String         ENCODER_PROPERTIES = "encoder.properties";
-    private static final String VERSION            = "0.5.1";
+    private static final String VERSION            = "0.6.0";
     private static final String TITLE              = "Diagnostic Tool";
 
     private Shell               shell;
