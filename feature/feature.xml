@@ -2,7 +2,8 @@
 <feature
       id="encoderfeature"
       label="Encoder"
-      version="0.6.0">
+      version="0.6.0"
+      plugin="tarlog.encoder.tool">
 
    <description url="http://tarlog-encoder-tool.googlecode.com/">
       Encoder Tool
