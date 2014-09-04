@@ -3,6 +3,7 @@
       id="encoderfeature"
       label="Encoder"
       version="0.6.1"
+      provider-name="Michael Elman"
       plugin="tarlog.encoder.tool">
 
    <description url="http://tarlog-encoder-tool.googlecode.com/">
