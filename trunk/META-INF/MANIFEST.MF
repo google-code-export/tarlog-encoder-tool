@@ -8,23 +8,40 @@ Bundle-ClassPath: dist/ddialog-1.0-SNAPSHOT.jar,
 Bundle-Activator: tarlog.encoder.tool.eclipse.Activator
 Bundle-Vendor: http://tarlogonjava.blogspot.com
 Export-Package: tarlog.encoder.tool,
- tarlog.encoder.tool.api,
- tarlog.encoder.tool.eclipse,
- tarlog.encoder.tool.eclipse.handlers,
- tarlog.encoder.tool.eclipse.preferences,
+ tarlog.encoder.tool.api;
+  uses:="org.eclipse.swt.events,
+   tarlog.ui.swt.ddialog.api.fields,
+   tarlog.encoder.tool.ui.inner,
+   org.eclipse.swt.widgets,
+   tarlog.ui.swt.ddialog.utils",
+ tarlog.encoder.tool.eclipse;uses:="org.osgi.framework,org.eclipse.ui.plugin",
+ tarlog.encoder.tool.eclipse.handlers;uses:="org.eclipse.core.commands",
+ tarlog.encoder.tool.eclipse.preferences;
+  uses:="org.eclipse.ui,
+   tarlog.ui.swt.ddialog.api.fields,
+   org.eclipse.swt.graphics,
+   org.eclipse.jface.preference,
+   org.eclipse.swt.widgets,
+   org.eclipse.core.runtime.preferences,
+   org.eclipse.jface.viewers",
  tarlog.encoder.tool.encoders;uses:="tarlog.encoder.tool.api",
  tarlog.encoder.tool.ui;
   uses:="org.eclipse.jface.window,
    org.eclipse.jface.action,
-   org.eclipse.swt.custom,
-   org.eclipse.jface.viewers,
+   org.eclipse.swt.layout,
    org.eclipse.swt.widgets,
-   org.eclipse.swt.layout",
- tarlog.encoder.tool.ui.inner,
- tarlog.encoder.tool.views
+   org.eclipse.swt.custom,
+   org.eclipse.jface.viewers",
+ tarlog.encoder.tool.ui.inner;
+  uses:="tarlog.encoder.tool.ui,
+   org.eclipse.jface.window,
+   org.eclipse.swt.events,
+   org.eclipse.jface.action,
+   org.eclipse.swt.widgets,
+   tarlog.ui.swt.ddialog.utils",
+ tarlog.encoder.tool.views;uses:="org.eclipse.swt.widgets,org.eclipse.ui.part"
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.apache.commons.codec;bundle-version="1.6.0",
  org.apache.commons.lang;bundle-version="2.3.0"
 Bundle-ActivationPolicy: lazy
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
